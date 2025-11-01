@@ -114,10 +114,10 @@ def cmd_bench(args: argparse.Namespace) -> None:
     env["PYTHONPATH"] = ":".join(runtime_paths + ([python_path] if python_path else []))
 
     cmd = [sys.executable, str(bench_script)]
-    cmd.extend(["--batches", str(args.batches)])
-    cmd.extend(["--rank", str(args.rank)])
-    cmd.extend(["--dimension", str(args.dimension)])
-    cmd.extend(["--repeat", str(args.repeat)])
+    cmd.extend(["--batches", str(getattr(args, "batches", 32))])
+    cmd.extend(["--rank", str(getattr(args, "rank", 4))])
+    cmd.extend(["--dimension", str(getattr(args, "dimension", 2048))])
+    cmd.extend(["--repeat", str(getattr(args, "repeat", 5))])
 
     print("Running", " ".join(cmd))
     subprocess.run(cmd, check=True, env=env)
@@ -149,22 +149,21 @@ def cmd_all(args: argparse.Namespace) -> None:
     """Run all infrastructure operations in sequence."""
     print("=== Running Full Infrastructure Stack ===")
     operations = ["lint", "sim", "cov", "bench", "docs"]
+    command_handlers = {
+        "lint": cmd_lint,
+        "sim": cmd_sim,
+        "cov": cmd_cov,
+        "bench": cmd_bench,
+        "docs": cmd_docs,
+    }
     for op in operations:
         print(f"\n--- Starting {op.upper()} ---")
         try:
-            if op == "lint":
-                cmd_lint(args)
-            elif op == "sim":
-                cmd_sim(args)
-            elif op == "cov":
-                cmd_cov(args)
-            elif op == "bench":
-                cmd_bench(args)
-            elif op == "docs":
-                cmd_docs(args)
+            handler = command_handlers[op]
+            handler(args)
         except Exception as e:
             print(f"Error during {op}: {e}", file=sys.stderr)
-            if not args.continue_on_error:
+            if not getattr(args, "continue_on_error", False):
                 raise
     print("\n=== Full Infrastructure Stack Completed ===")
 
