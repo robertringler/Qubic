@@ -15,7 +15,7 @@
       "title": "Kernel Throughput",
       "targets": [
         {
-          "expr": "sum(rate(autonomous_systems_requests_total{endpoint='/autonomous_systems/kernel'}[5m]))"
+          "expr": "sum(rate(autonomous_systems_requests_total{endpoint='/kernel'}[5m]))"
         }
       ]
     }
