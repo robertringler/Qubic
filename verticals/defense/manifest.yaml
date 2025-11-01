@@ -1,0 +1,66 @@
+name: defense
+description: Defense and national security simulation vertical
+version: 1.0.0
+python_version: ">=3.11"
+
+kernels:
+  - name: radar_signal_processing
+    description: Multi-target tracking and synthetic aperture radar processing
+    precision: [fp32, fp64]
+    backend: [cuda, hip]
+    
+  - name: ew_simulation
+    description: Electronic warfare and jamming scenario simulation
+    precision: [fp32]
+    backend: [cuda, cpu]
+    
+  - name: ballistics_modeling
+    description: Projectile trajectory and guidance system simulation
+    precision: [fp64]
+    backend: [cpu, cuda]
+    
+  - name: threat_assessment
+    description: Real-time threat detection and classification
+    precision: [fp32]
+    backend: [cuda, edge]
+    
+  - name: cryptographic_analysis
+    description: Post-quantum cryptography resistance testing
+    precision: [fp64]
+    backend: [quantum, cpu]
+
+datasets:
+  - name: sensor_fusion_data
+    format: hdf5
+    size_gb: 400
+    source: "Multi-sensor tracking scenarios"
+    
+  - name: radar_returns
+    format: binary
+    size_gb: 250
+    source: "Simulated and field radar data"
+
+benchmarks:
+  - name: tracking_performance_bench
+    metric: [track_updates_per_sec, false_alarm_rate, energy_w]
+    target_speedup: 2.5x
+    
+  - name: crypto_resistance_bench
+    metric: [attacks_tested_per_sec, quantum_resistance_score]
+    target_speedup: 3.0x
+
+dependencies:
+  python:
+    - numpy>=1.24
+    - torch>=2.3
+    - jax>=0.4.28
+    - scipy>=1.11
+    - cryptography>=41.0
+  system:
+    - cuda>=12.0
+    - triton>=3.0
+
+reports:
+  format: [html, pdf, json]
+  include_visualizations: true
+  output_dir: outputs/reports/defense

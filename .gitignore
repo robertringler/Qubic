@@ -5,3 +5,12 @@ obj_dir/
 __pycache__/
 *.pyc
 *.so
+*.wasm
+*.ll
+*.elf
+outputs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/

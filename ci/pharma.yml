@@ -1,0 +1,53 @@
+name: Pharma Vertical CI
+
+on:
+  push:
+    paths:
+      - 'verticals/pharma/**'
+      - 'core/**'
+      - 'quantum_bridge/**'
+  pull_request:
+    paths:
+      - 'verticals/pharma/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest numpy torch>=2.3 jax>=0.4.28
+    
+    - name: Run pharma tests
+      run: |
+        PYTHONPATH=. pytest verticals/pharma/tests/ -v
+    
+    - name: Run benchmarks
+      run: |
+        PYTHONPATH=. python verticals/pharma/benchmarks/protein_folding_bench.py --quick
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Lint
+      run: |
+        pip install ruff mypy
+        ruff check verticals/pharma/
+        mypy verticals/pharma/ --ignore-missing-imports

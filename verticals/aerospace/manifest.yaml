@@ -1,0 +1,61 @@
+name: aerospace
+description: Aerospace and aerodynamic simulation vertical
+version: 1.0.0
+python_version: ">=3.11"
+
+kernels:
+  - name: cfd_solver
+    description: Computational fluid dynamics with adaptive mesh refinement
+    precision: [fp32, fp64]
+    backend: [cuda, hip]
+    
+  - name: structural_analysis
+    description: Finite element analysis for composite materials
+    precision: [fp64]
+    backend: [cuda, hip, cpu]
+    
+  - name: trajectory_optimization
+    description: Rocket trajectory and orbital mechanics optimization
+    precision: [fp64]
+    backend: [cpu, cuda]
+    
+  - name: thermal_protection
+    description: Re-entry heat shield thermal analysis
+    precision: [fp32, fp64]
+    backend: [cuda, hip]
+
+datasets:
+  - name: airfoil_geometries
+    format: step
+    size_gb: 20
+    source: "NASA airfoil database"
+    
+  - name: flight_telemetry
+    format: parquet
+    size_gb: 100
+    source: "Historical mission data"
+
+benchmarks:
+  - name: cfd_convergence_bench
+    metric: [iterations_per_sec, residual_error, energy_efficiency]
+    target_speedup: 2.5x
+    
+  - name: structural_optimization_bench
+    metric: [solve_time_sec, stress_accuracy]
+    target_speedup: 2.0x
+
+dependencies:
+  python:
+    - numpy>=1.24
+    - torch>=2.3
+    - jax>=0.4.28
+    - scipy>=1.11
+    - pyvista>=0.42
+  system:
+    - cuda>=12.0
+    - triton>=3.0
+
+reports:
+  format: [html, pdf, json]
+  include_visualizations: true
+  output_dir: outputs/reports/aerospace

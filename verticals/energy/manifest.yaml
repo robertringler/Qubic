@@ -1,0 +1,67 @@
+name: energy
+description: Energy systems, fusion, and smart-grid control vertical
+version: 1.0.0
+python_version: ">=3.11"
+
+kernels:
+  - name: plasma_field_solver
+    description: MHD plasma simulation for tokamak fusion reactors
+    precision: [fp64]
+    backend: [cuda, hip]
+    
+  - name: grid_balancing
+    description: Real-time smart-grid load balancing with RL control
+    precision: [fp32]
+    backend: [cpu, cuda]
+    
+  - name: renewable_forecasting
+    description: Solar and wind power generation forecasting
+    precision: [fp32]
+    backend: [cpu, cuda]
+    
+  - name: battery_optimization
+    description: Energy storage system optimization and degradation modeling
+    precision: [fp32, fp64]
+    backend: [cpu, cuda]
+    
+  - name: thermal_management
+    description: Power plant thermal dynamics and control
+    precision: [fp64]
+    backend: [cuda, hip]
+
+datasets:
+  - name: plasma_diagnostics
+    format: hdf5
+    size_gb: 300
+    source: "ITER experimental data"
+    
+  - name: grid_telemetry
+    format: parquet
+    size_gb: 150
+    source: "Smart meter data streams"
+
+benchmarks:
+  - name: plasma_convergence_bench
+    metric: [time_to_solution_sec, energy_confinement_accuracy]
+    target_speedup: 2.0x
+    
+  - name: grid_response_bench
+    metric: [control_latency_ms, load_balancing_quality, energy_w]
+    target_speedup: 2.5x
+
+dependencies:
+  python:
+    - numpy>=1.24
+    - torch>=2.3
+    - jax>=0.4.28
+    - scipy>=1.11
+    - gymnasium>=0.29
+  system:
+    - cuda>=12.0
+    - triton>=3.0
+    - nvml
+
+reports:
+  format: [html, pdf, json]
+  include_visualizations: true
+  output_dir: outputs/reports/energy

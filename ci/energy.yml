@@ -1,0 +1,49 @@
+name: Energy Vertical CI
+
+on:
+  push:
+    paths:
+      - 'verticals/energy/**'
+      - 'core/**'
+      - 'operators/**'
+  pull_request:
+    paths:
+      - 'verticals/energy/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest numpy torch>=2.3 scipy>=1.11
+    
+    - name: Run energy tests
+      run: |
+        PYTHONPATH=. pytest verticals/energy/tests/ -v
+    
+    - name: Run plasma simulation benchmarks
+      run: |
+        PYTHONPATH=. python verticals/energy/benchmarks/plasma_convergence_bench.py --quick
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Lint
+      run: |
+        pip install ruff mypy
+        ruff check verticals/energy/
+        mypy verticals/energy/ --ignore-missing-imports

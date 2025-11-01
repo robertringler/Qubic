@@ -1,0 +1,56 @@
+name: pharma
+description: Pharmaceutical and drug discovery simulation vertical
+version: 1.0.0
+python_version: ">=3.11"
+
+kernels:
+  - name: molecular_dynamics
+    description: GPU-accelerated molecular dynamics for protein folding
+    precision: [fp16, fp32, fp64]
+    backend: [cuda, hip, metal]
+    
+  - name: docking_simulation
+    description: Ligand-protein docking optimization with quantum corrections
+    precision: [fp32, fp64]
+    backend: [cuda, hip]
+    
+  - name: pharmacokinetics
+    description: ADME/Tox prediction via neural ODEs
+    precision: [fp32]
+    backend: [cpu, cuda]
+
+datasets:
+  - name: protein_structures
+    format: pdb
+    size_gb: 50
+    source: "PDB database subset"
+    
+  - name: compound_library
+    format: sdf
+    size_gb: 10
+    source: "ChEMBL curated compounds"
+
+benchmarks:
+  - name: protein_folding_bench
+    metric: [latency_ms, energy_j, accuracy]
+    target_speedup: 2.0x
+    
+  - name: virtual_screening_bench
+    metric: [throughput_compounds_per_sec, precision_recall]
+    target_speedup: 3.0x
+
+dependencies:
+  python:
+    - numpy>=1.24
+    - torch>=2.3
+    - jax>=0.4.28
+    - biopython>=1.81
+    - rdkit>=2023.3
+  system:
+    - cuda>=12.0
+    - triton>=3.0
+
+reports:
+  format: [html, pdf, json]
+  include_visualizations: true
+  output_dir: outputs/reports/pharma

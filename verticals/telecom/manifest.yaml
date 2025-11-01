@@ -1,0 +1,61 @@
+name: telecom
+description: Telecommunications and 6G network simulation vertical
+version: 1.0.0
+python_version: ">=3.11"
+
+kernels:
+  - name: mimo_channel_propagation
+    description: Massive MIMO channel modeling with beamforming
+    precision: [fp32, fp64]
+    backend: [cuda, hip]
+    
+  - name: mmwave_propagation
+    description: mmWave field propagation and path loss calculation
+    precision: [fp32]
+    backend: [cuda, cpu]
+    
+  - name: network_optimizer
+    description: Dynamic spectrum allocation and load balancing
+    precision: [fp32]
+    backend: [cpu, cuda]
+    
+  - name: latency_profiler
+    description: Causal profiling for latency variance analysis
+    precision: [fp32]
+    backend: [cpu]
+
+datasets:
+  - name: channel_measurements
+    format: hdf5
+    size_gb: 200
+    source: "Field measurement campaigns"
+    
+  - name: network_topologies
+    format: json
+    size_gb: 2
+    source: "Urban deployment scenarios"
+
+benchmarks:
+  - name: mimo_throughput_bench
+    metric: [gbps_throughput, latency_p99, spectral_efficiency]
+    target_speedup: 2.0x
+    
+  - name: coverage_planning_bench
+    metric: [planning_time_sec, coverage_accuracy]
+    target_speedup: 2.5x
+
+dependencies:
+  python:
+    - numpy>=1.24
+    - torch>=2.3
+    - jax>=0.4.28
+    - scipy>=1.11
+    - networkx>=3.0
+  system:
+    - cuda>=12.0
+    - triton>=3.0
+
+reports:
+  format: [html, pdf, json]
+  include_visualizations: true
+  output_dir: outputs/reports/telecom

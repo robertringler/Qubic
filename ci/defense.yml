@@ -1,0 +1,49 @@
+name: Defense Vertical CI
+
+on:
+  push:
+    paths:
+      - 'verticals/defense/**'
+      - 'core/**'
+      - 'edge_runtime/**'
+  pull_request:
+    paths:
+      - 'verticals/defense/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest numpy torch>=2.3 scipy>=1.11 cryptography>=41.0
+    
+    - name: Run defense tests
+      run: |
+        PYTHONPATH=. pytest verticals/defense/tests/ -v
+    
+    - name: Run tracking benchmarks
+      run: |
+        PYTHONPATH=. python verticals/defense/benchmarks/tracking_performance_bench.py --quick
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Lint
+      run: |
+        pip install ruff mypy
+        ruff check verticals/defense/
+        mypy verticals/defense/ --ignore-missing-imports
