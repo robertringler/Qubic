@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: quantum-benchmarks-ingress
+  namespace: quantum-benchmarks
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts: ["quantum_benchmarks.quasim.example.com"]
+      secretName: quantum-benchmarks-tls
+  rules:
+    - host: quantum_benchmarks.quasim.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: quantum-benchmarks-backend
+                port:
+                  number: 80
+

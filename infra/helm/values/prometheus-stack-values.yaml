@@ -1,0 +1,14 @@
+grafana:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts: [grafana.example.com]
+  sidecar:
+    dashboards:
+      enabled: true
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    scrapeInterval: 15s
+alertmanager:
+  enabled: true

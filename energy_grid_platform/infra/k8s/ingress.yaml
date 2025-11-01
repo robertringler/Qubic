@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: energy-grid-ingress
+  namespace: energy-grid
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts: ["energy_grid.quasim.example.com"]
+      secretName: energy-grid-tls
+  rules:
+    - host: energy_grid.quasim.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: energy-grid-backend
+                port:
+                  number: 80
+

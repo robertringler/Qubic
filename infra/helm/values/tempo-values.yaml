@@ -1,0 +1,10 @@
+tempo:
+  storage:
+    trace:
+      backend: s3
+      s3:
+        bucket: quasim-tempo
+        endpoint: s3.amazonaws.com
+        insecure: false
+  server:
+    http_listen_port: 3100

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: energy-grid
+  labels:
+    app: quasim
+    vertical: energy_grid
+

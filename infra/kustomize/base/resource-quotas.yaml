@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: ResourceQuota
+  metadata: { name: rq-mlops, namespace: mlops }
+  spec:
+    hard:
+      requests.cpu: "200"
+      requests.memory: 512Gi
+      limits.cpu: "400"
+      limits.memory: 1Ti
+- apiVersion: v1
+  kind: ResourceQuota
+  metadata: { name: rq-inference, namespace: inference }
+  spec:
+    hard:
+      requests.nvidia.com/gpu: "20"
+      limits.nvidia.com/gpu: "40"
+      requests.cpu: "100"
+      requests.memory: 256Gi

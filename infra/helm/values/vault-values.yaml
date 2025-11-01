@@ -1,0 +1,16 @@
+server:
+  dataStorage:
+    enabled: true
+    size: 50Gi
+  auditStorage:
+    enabled: true
+    size: 20Gi
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts: [vault.example.com]

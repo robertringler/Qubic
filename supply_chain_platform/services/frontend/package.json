@@ -1,0 +1,12 @@
+{
+  "name": "quasim-vertical-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'Static assets ready'"
+  },
+  "dependencies": {
+    "axios": "1.5.1"
+  }
+}

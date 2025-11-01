@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: finance-trading
+  labels:
+    app: quasim
+    vertical: finance_trading
+

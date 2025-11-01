@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: material-science-ingress
+  namespace: material-science
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts: ["material_science.quasim.example.com"]
+      secretName: material-science-tls
+  rules:
+    - host: material_science.quasim.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: material-science-backend
+                port:
+                  number: 80
+

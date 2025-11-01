@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: optimization-services-ingress
+  namespace: optimization-services
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts: ["optimization_services.quasim.example.com"]
+      secretName: optimization-services-tls
+  rules:
+    - host: optimization_services.quasim.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: optimization-services-backend
+                port:
+                  number: 80
+

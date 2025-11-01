@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: material-science-backend
+  namespace: material-science
+spec:
+  selector:
+    app: material-science-backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
+

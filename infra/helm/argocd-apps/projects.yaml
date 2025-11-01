@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: QuASIM platform services
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  sourceRepos:
+    - '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  description: Observability stack
+  destinations:
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
+  sourceRepos:
+    - '*'

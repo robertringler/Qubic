@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cryptography-ingress
+  namespace: cryptography
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts: ["cryptography.quasim.example.com"]
+      secretName: cryptography-tls
+  rules:
+    - host: cryptography.quasim.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cryptography-backend
+                port:
+                  number: 80
+

@@ -1,0 +1,25 @@
+image:
+  repository: <ECR_REPOSITORY_URL>
+  tag: latest
+service:
+  port: 80
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: optimization_services.quasim.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - optimization_services.quasim.example.com
+      secretName: optimization-services-tls
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2
+    memory: 4Gi
+

@@ -1,0 +1,14 @@
+global:
+  domain: argocd.example.com
+configs:
+  cm:
+    timeout.reconciliation: 30s
+  params:
+    server.insecure: true
+server:
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts: [argocd.example.com]

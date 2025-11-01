@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: healthcare-analytics-ingress
+  namespace: healthcare-analytics
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts: ["healthcare_analytics.quasim.example.com"]
+      secretName: healthcare-analytics-tls
+  rules:
+    - host: healthcare_analytics.quasim.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: healthcare-analytics-backend
+                port:
+                  number: 80
+

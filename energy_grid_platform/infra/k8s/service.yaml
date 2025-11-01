@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: energy-grid-backend
+  namespace: energy-grid
+spec:
+  selector:
+    app: energy-grid-backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
+

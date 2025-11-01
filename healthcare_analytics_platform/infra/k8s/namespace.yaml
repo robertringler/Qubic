@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: healthcare-analytics
+  labels:
+    app: quasim
+    vertical: healthcare_analytics
+

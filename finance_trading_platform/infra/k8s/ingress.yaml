@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finance-trading-ingress
+  namespace: finance-trading
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts: ["finance_trading.quasim.example.com"]
+      secretName: finance-trading-tls
+  rules:
+    - host: finance_trading.quasim.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: finance-trading-backend
+                port:
+                  number: 80
+

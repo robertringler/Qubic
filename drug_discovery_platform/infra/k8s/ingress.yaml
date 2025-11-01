@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drug-discovery-ingress
+  namespace: drug-discovery
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts: ["drug_discovery.quasim.example.com"]
+      secretName: drug-discovery-tls
+  rules:
+    - host: drug_discovery.quasim.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: drug-discovery-backend
+                port:
+                  number: 80
+

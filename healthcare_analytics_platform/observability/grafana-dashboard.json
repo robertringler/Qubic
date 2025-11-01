@@ -1,0 +1,23 @@
+{
+  "title": "Healthcare Analytics Kernel Observability",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Kernel p95 Latency",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(healthcare_analytics_request_latency_seconds_bucket[5m])) by (le))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Kernel Throughput",
+      "targets": [
+        {
+          "expr": "sum(rate(healthcare_analytics_requests_total{endpoint='/healthcare_analytics/kernel'}[5m]))"
+        }
+      ]
+    }
+  ]
+}

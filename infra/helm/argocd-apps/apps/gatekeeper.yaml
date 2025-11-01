@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gatekeeper
+  namespace: argocd
+spec:
+  project: platform
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: security
+  source:
+    chart: gatekeeper
+    repoURL: https://open-policy-agent.github.io/gatekeeper/charts
+    targetRevision: 3.14.0
+    helm:
+      valueFiles:
+        - ../../values/gatekeeper-values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

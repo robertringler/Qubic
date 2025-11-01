@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: supply-chain
+  labels:
+    app: quasim
+    vertical: supply_chain
+
