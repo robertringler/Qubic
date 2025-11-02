@@ -1,4 +1,5 @@
 """QuASIM quantum simulation utilities built on top of libquasim."""
+
 from __future__ import annotations
 
 from quasim import Config, runtime

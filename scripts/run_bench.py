@@ -1,4 +1,5 @@
 """CLI wrapper to execute the QuASIM micro-benchmark."""
+
 from __future__ import annotations
 
 import argparse

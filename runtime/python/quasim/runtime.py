@@ -1,11 +1,12 @@
 """High-level runtime facade bridging to libquasim."""
+
 from __future__ import annotations
 
 import contextlib
 import ctypes
 import pathlib
 from dataclasses import dataclass
-from typing import Iterable, List
+from typing import Iterable
 
 LIB_PATH = pathlib.Path(__file__).resolve().parents[2] / "build" / "libquasim" / "libquasim.a"
 
@@ -21,7 +22,7 @@ class _RuntimeHandle:
 
     def __init__(self, config: Config):
         self._config = config
-        self._latencies: List[float] = []
+        self._latencies: list[float] = []
 
     def simulate(self, tensors: Iterable[Iterable[complex]]) -> list[complex]:
         aggregates: list[complex] = []

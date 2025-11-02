@@ -1,4 +1,5 @@
 """Telemetry profiler collecting runtime metrics from libquasim."""
+
 from __future__ import annotations
 
 import argparse

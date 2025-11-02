@@ -1,8 +1,9 @@
 """Launch behavioral simulations for the GB10 top-level RTL."""
+
 from __future__ import annotations
 
-import subprocess
 import pathlib
+import subprocess
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 

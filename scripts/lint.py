@@ -1,4 +1,5 @@
 """Run static analysis passes for firmware and runtime sources."""
+
 from __future__ import annotations
 
 import pathlib

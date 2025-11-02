@@ -1,4 +1,5 @@
 """Render Markdown documentation and validate links."""
+
 from __future__ import annotations
 
 import pathlib

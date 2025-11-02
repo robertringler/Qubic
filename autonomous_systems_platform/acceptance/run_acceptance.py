@@ -4,9 +4,11 @@ from urllib import request
 
 BASE_URL = os.getenv("ACCEPTANCE_BASE_URL", "http://localhost:8000")
 
+
 def fetch(path: str):
     with request.urlopen(f"{BASE_URL}{path}") as resp:
         return resp.read().decode(), resp.status
+
 
 def main():
     _, status = fetch("/health")
@@ -22,6 +24,7 @@ def main():
     _, status = fetch("/metrics")
     assert status == 200
     print("Acceptance checks passed.")
+
 
 if __name__ == "__main__":
     main()

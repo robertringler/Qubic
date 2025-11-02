@@ -1,4 +1,5 @@
 """Software regression tests for the Python runtime bindings."""
+
 from __future__ import annotations
 
 from quasim import Config, runtime

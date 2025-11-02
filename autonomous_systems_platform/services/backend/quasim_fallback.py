@@ -1,5 +1,7 @@
 """Fallback implementation when JAX is not available."""
+
 import random
+
 
 def autonomous_systems_kernel(seed: int = 0, scale: float = 1.0):
     random.seed(seed)

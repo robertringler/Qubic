@@ -1,15 +1,16 @@
 """Micro-benchmark driver for the libquasim Python runtime facade."""
+
 from __future__ import annotations
 
 import argparse
 import statistics
 import time
-from typing import Iterable, List
+from typing import Iterable
 
 from quasim.runtime import Config, runtime
 
 
-def _generate_tensor(rank: int, dimension: int) -> List[complex]:
+def _generate_tensor(rank: int, dimension: int) -> list[complex]:
     """Generate a deterministic tensor payload for benchmarking."""
     if dimension <= 1:
         scale = 0.0
@@ -27,7 +28,7 @@ def _generate_workload(batches: int, rank: int, dimension: int) -> Iterable[Iter
 
 def run_benchmark(batches: int, rank: int, dimension: int, repeat: int) -> dict[str, float]:
     """Execute the simulated tensor workload and record latency statistics."""
-    timings: List[float] = []
+    timings: list[float] = []
     config = Config(simulation_precision="fp8", max_workspace_mb=32)
 
     for _ in range(repeat):
@@ -61,8 +62,12 @@ def _format_results(results: dict[str, float], batches: int, rank: int, dimensio
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Benchmark the QuASIM runtime simulator")
-    parser.add_argument("--batches", type=int, default=32, help="Number of tensor batches to process")
-    parser.add_argument("--rank", type=int, default=4, help="Rank parameter controlling tensor scaling")
+    parser.add_argument(
+        "--batches", type=int, default=32, help="Number of tensor batches to process"
+    )
+    parser.add_argument(
+        "--rank", type=int, default=4, help="Rank parameter controlling tensor scaling"
+    )
     parser.add_argument("--dimension", type=int, default=2048, help="Tensor dimension per batch")
     parser.add_argument("--repeat", type=int, default=5, help="Number of repeated runs")
     args = parser.parse_args()
