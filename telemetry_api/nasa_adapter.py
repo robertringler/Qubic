@@ -177,9 +177,10 @@ class NASATelemetryAdapter:
         Returns:
             Tuple of (successful_count, failed_count, error_messages)
         """
-        import os
+        from pathlib import Path
 
-        if not os.path.exists(file_path):
+        file = Path(file_path)
+        if not file.exists():
             return 0, 0, [f"File not found: {file_path}"]
 
         successful = 0
@@ -187,7 +188,7 @@ class NASATelemetryAdapter:
         errors = []
 
         try:
-            with open(file_path) as f:
+            with open(file) as f:
                 lines = f.readlines()
 
             # Skip header if present

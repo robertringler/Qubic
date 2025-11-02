@@ -308,19 +308,24 @@ class TestRuntimeBehavior:
 
         circuit = [[1 + 0j, 1 + 0j]]
 
+        # Test that runtime works within context
         with runtime(cfg) as rt:
             assert rt._initialized, "Runtime not initialized in context"
             result = rt.simulate(circuit)
             assert len(result) > 0
+            # Store reference to check later
+            runtime_instance = rt
 
-        # After context, should be cleaned up (in full implementation)
-        assert not rt._initialized, "Runtime not cleaned up after context"
+        # After context, should be cleaned up
+        assert not runtime_instance._initialized, "Runtime not cleaned up after context"
 
     def test_runtime_without_context_fails(self):
         """Verify runtime requires context manager."""
+        from quasim import Runtime
+
         cfg = Config(simulation_precision="fp32", max_workspace_mb=64)
-        rt = runtime(cfg).__enter__()
-        rt._initialized = False
+        rt = Runtime(cfg)
+        # Don't initialize it
 
         circuit = [[1 + 0j, 1 + 0j]]
 

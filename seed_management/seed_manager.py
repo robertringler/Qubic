@@ -79,6 +79,22 @@ class SeedRepository:
         """
         return self._seed_sequence.copy()
 
+    def get_all_records(self) -> list[SeedRecord]:
+        """Get all stored seed records.
+
+        Returns:
+            List of all seed records
+        """
+        return list(self._seeds.values())
+
+    def count(self) -> int:
+        """Get count of stored seeds.
+
+        Returns:
+            Number of seeds in repository
+        """
+        return len(self._seeds)
+
     def clear(self) -> None:
         """Clear all stored seeds."""
         self._seeds.clear()
@@ -114,7 +130,7 @@ class SeedManager:
             Seed record with metadata
         """
         if replay_id is None:
-            replay_id = f"replay_{len(self.repository._seeds):06d}"
+            replay_id = f"replay_{self.repository.count():06d}"
 
         seed_value = self._rng.randint(0, 2**31 - 1)
         timestamp = time.time()
@@ -180,7 +196,7 @@ class SeedManager:
                 "replay_id": record.replay_id,
                 "hash_digest": record.hash_digest,
             }
-            for record in self.repository._seeds.values()
+            for record in self.repository.get_all_records()
         ]
 
         return {
