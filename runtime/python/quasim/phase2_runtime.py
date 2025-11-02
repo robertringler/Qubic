@@ -126,7 +126,7 @@ class Phase2Runtime:
         
         # Verify correctness
         verification_result = self.verifier.verify_determinism(
-            lambda x: self._simple_simulate(x),
+            self._simple_simulate,
             (tensor_list,),
             iterations=3,
         )
