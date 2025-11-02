@@ -1,0 +1,56 @@
+# QuASIM Worker Dockerfile for AMD GPUs
+# HIP/ROCm 6.x backend support
+
+FROM rocm/dev-ubuntu-22.04:6.0 AS rocm-worker
+
+# Install Python and dependencies
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3-pip \
+    git \
+    cmake \
+    rocm-dev \
+    rocm-libs \
+    hipblas \
+    rocfft \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Python 3.11 as default
+RUN ln -sf /usr/bin/python3.11 /usr/bin/python3 && \
+    ln -sf /usr/bin/python3.11 /usr/bin/python
+
+WORKDIR /app
+
+# Copy and install dependencies
+COPY requirements-worker.txt .
+RUN pip3 install --no-cache-dir --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements-worker.txt
+
+# Install JAX with ROCm support
+RUN pip3 install --no-cache-dir --upgrade jax jaxlib
+
+# Install Ray
+RUN pip3 install --no-cache-dir "ray[default]>=2.9.0"
+
+# Install QuASIM modules
+COPY quasim/ ./quasim/
+RUN pip3 install --no-cache-dir -e .
+
+# Copy worker scripts
+COPY scripts/worker_*.py ./scripts/
+
+# Create non-root user
+RUN useradd -m -u 1000 quasim && \
+    chown -R quasim:quasim /app
+
+USER quasim
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1 \
+    QUASIM_BACKEND=hip \
+    HIP_VISIBLE_DEVICES=0 \
+    ROCR_VISIBLE_DEVICES=0
+
+# Run as Ray worker
+CMD ["python3", "scripts/worker_main.py"]

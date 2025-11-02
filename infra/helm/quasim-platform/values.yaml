@@ -1,0 +1,287 @@
+# Default values for quasim-platform
+# This is a YAML-formatted file declaring configuration for multi-region QuASIM deployment
+
+# Global settings
+global:
+  clusterName: quasim-primary
+  region: us-west-2
+  environment: production
+  domain: quasim.sybernix.io
+
+# QuASIM API Service
+api:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: quasim/api-server
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: LoadBalancer
+    port: 8080
+    targetPort: 8080
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+  
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# Quantum Computing Workers
+qc:
+  enabled: true
+  replicaCount: 4
+  image:
+    repository: quasim/qc-worker
+    tag: "0.1.0"
+  
+  # GPU configuration
+  gpu:
+    enabled: true
+    type: nvidia  # or 'amd' for ROCm
+    count: 1
+    memory: "16Gi"
+  
+  # Node affinity for GPU nodes
+  nodeSelector:
+    accelerator: nvidia
+  
+  tolerations:
+    - key: "accelerator"
+      operator: "Equal"
+      value: "nvidia"
+      effect: "NoSchedule"
+  
+  resources:
+    requests:
+      cpu: "4000m"
+      memory: "16Gi"
+      nvidia.com/gpu: 1
+    limits:
+      cpu: "8000m"
+      memory: "32Gi"
+      nvidia.com/gpu: 1
+
+# Digital Twin Workers
+dtwin:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: quasim/dtwin-worker
+    tag: "0.1.0"
+  
+  gpu:
+    enabled: true
+    type: nvidia
+    count: 1
+  
+  nodeSelector:
+    accelerator: nvidia
+  
+  tolerations:
+    - key: "accelerator"
+      operator: "Equal"
+      value: "nvidia"
+      effect: "NoSchedule"
+  
+  resources:
+    requests:
+      cpu: "2000m"
+      memory: "8Gi"
+      nvidia.com/gpu: 1
+    limits:
+      cpu: "4000m"
+      memory: "16Gi"
+      nvidia.com/gpu: 1
+
+# Optimization Workers
+opt:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: quasim/opt-worker
+    tag: "0.1.0"
+  
+  gpu:
+    enabled: true
+    type: nvidia
+    count: 1
+  
+  nodeSelector:
+    accelerator: nvidia
+  
+  tolerations:
+    - key: "accelerator"
+      operator: "Equal"
+      value: "nvidia"
+      effect: "NoSchedule"
+  
+  resources:
+    requests:
+      cpu: "2000m"
+      memory: "8Gi"
+      nvidia.com/gpu: 1
+    limits:
+      cpu: "4000m"
+      memory: "16Gi"
+      nvidia.com/gpu: 1
+
+# Ray cluster for distributed execution
+ray:
+  enabled: true
+  head:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: "2000m"
+        memory: "8Gi"
+      limits:
+        cpu: "4000m"
+        memory: "16Gi"
+  
+  worker:
+    replicaCount: 4
+    gpu:
+      enabled: true
+      count: 1
+    nodeSelector:
+      accelerator: nvidia
+    tolerations:
+      - key: "accelerator"
+        operator: "Equal"
+        value: "nvidia"
+        effect: "NoSchedule"
+    resources:
+      requests:
+        cpu: "4000m"
+        memory: "16Gi"
+        nvidia.com/gpu: 1
+      limits:
+        cpu: "8000m"
+        memory: "32Gi"
+        nvidia.com/gpu: 1
+
+# Triton Inference Server for ONNX models
+triton:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: nvcr.io/nvidia/tritonserver
+    tag: "23.10-py3"
+  
+  modelRepository: "s3://quasim-models/repository"
+  
+  gpu:
+    enabled: true
+    count: 1
+  
+  nodeSelector:
+    accelerator: nvidia
+  
+  tolerations:
+    - key: "accelerator"
+      operator: "Equal"
+      value: "nvidia"
+      effect: "NoSchedule"
+  
+  resources:
+    requests:
+      cpu: "2000m"
+      memory: "8Gi"
+      nvidia.com/gpu: 1
+    limits:
+      cpu: "4000m"
+      memory: "16Gi"
+      nvidia.com/gpu: 1
+
+# Monitoring stack
+monitoring:
+  enabled: true
+  
+  prometheus:
+    enabled: true
+    retention: 15d
+    storageSize: 100Gi
+  
+  grafana:
+    enabled: true
+    adminPassword: "changeme"
+    dashboards:
+      enabled: true
+  
+  loki:
+    enabled: true
+    retention: 7d
+    storageSize: 50Gi
+  
+  tempo:
+    enabled: true
+    retention: 7d
+
+# Security configuration
+security:
+  vault:
+    enabled: true
+    address: "https://vault.quasim.sybernix.io"
+    role: "quasim-platform"
+  
+  gatekeeper:
+    enabled: true
+    policies:
+      - required-labels
+      - allowed-repos
+      - resource-limits
+  
+  networkPolicies:
+    enabled: true
+    defaultDeny: true
+
+# RBAC configuration
+rbac:
+  enabled: true
+  multitenancy:
+    enabled: true
+    isolation: namespace
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  
+  hosts:
+    - host: api.quasim.sybernix.io
+      paths:
+        - path: /
+          pathType: Prefix
+  
+  tls:
+    - secretName: quasim-api-tls
+      hosts:
+        - api.quasim.sybernix.io
+
+# Billing and metering
+billing:
+  enabled: true
+  provider: "stripe"
+  metering:
+    enabled: true
+    interval: "1h"
+    metrics:
+      - gpu_hours
+      - api_calls
+      - storage_gb_hours

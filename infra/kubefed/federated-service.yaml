@@ -1,0 +1,70 @@
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedService
+metadata:
+  name: quasim-api
+  namespace: quasim-platform
+spec:
+  template:
+    metadata:
+      labels:
+        app: quasim-api
+    spec:
+      type: LoadBalancer
+      ports:
+      - port: 80
+        targetPort: 8080
+        protocol: TCP
+        name: http
+      - port: 50051
+        targetPort: 50051
+        protocol: TCP
+        name: grpc
+      selector:
+        app: quasim-api
+      sessionAffinity: ClientIP
+      sessionAffinityConfig:
+        clientIP:
+          timeoutSeconds: 3600
+  placement:
+    clusters:
+    - name: us-west-2
+    - name: us-east-1
+    - name: eu-west-1
+    - name: ap-southeast-1
+
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedIngress
+metadata:
+  name: quasim-global
+  namespace: quasim-platform
+spec:
+  template:
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: "nginx"
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    spec:
+      tls:
+      - hosts:
+        - api.quasim.sybernix.io
+        secretName: quasim-api-tls
+      rules:
+      - host: api.quasim.sybernix.io
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: quasim-api
+                port:
+                  number: 80
+  placement:
+    clusters:
+    - name: us-west-2
+    - name: us-east-1
+    - name: eu-west-1
+    - name: ap-southeast-1

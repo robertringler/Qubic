@@ -1,0 +1,123 @@
+{{- if .Values.ray.enabled }}
+---
+# Ray Head Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "quasim-platform.fullname" . }}-ray-head
+  labels:
+    {{- include "quasim-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ray-head
+spec:
+  type: ClusterIP
+  ports:
+  - name: client
+    port: 10001
+    targetPort: 10001
+  - name: dashboard
+    port: 8265
+    targetPort: 8265
+  - name: redis
+    port: 6379
+    targetPort: 6379
+  selector:
+    {{- include "quasim-platform.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: ray-head
+
+---
+# Ray Head Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "quasim-platform.fullname" . }}-ray-head
+  labels:
+    {{- include "quasim-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ray-head
+spec:
+  replicas: {{ .Values.ray.head.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "quasim-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ray-head
+  template:
+    metadata:
+      labels:
+        {{- include "quasim-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: ray-head
+    spec:
+      containers:
+      - name: ray-head
+        image: rayproject/ray:2.9.0-py310-gpu
+        imagePullPolicy: IfNotPresent
+        command: ["ray", "start", "--head", "--port=6379", "--dashboard-host=0.0.0.0", "--block"]
+        ports:
+        - containerPort: 6379
+          name: redis
+        - containerPort: 8265
+          name: dashboard
+        - containerPort: 10001
+          name: client
+        env:
+        - name: RAY_GRAFANA_HOST
+          value: "http://{{ include "quasim-platform.fullname" . }}-grafana"
+        - name: RAY_PROMETHEUS_HOST
+          value: "http://{{ include "quasim-platform.fullname" . }}-prometheus:9090"
+        resources:
+          {{- toYaml .Values.ray.head.resources | nindent 10 }}
+
+---
+# Ray Worker Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "quasim-platform.fullname" . }}-ray-worker
+  labels:
+    {{- include "quasim-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ray-worker
+spec:
+  replicas: {{ .Values.ray.worker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "quasim-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ray-worker
+  template:
+    metadata:
+      labels:
+        {{- include "quasim-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: ray-worker
+    spec:
+      {{- if .Values.ray.worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.ray.worker.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.ray.worker.tolerations }}
+      tolerations:
+        {{- toYaml .Values.ray.worker.tolerations | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: ray-worker
+        image: rayproject/ray:2.9.0-py310-gpu
+        imagePullPolicy: IfNotPresent
+        command: 
+        - ray
+        - start
+        - --address={{ include "quasim-platform.fullname" . }}-ray-head:6379
+        - --block
+        env:
+        - name: RAY_ADDRESS
+          value: "{{ include "quasim-platform.fullname" . }}-ray-head:6379"
+        {{- if .Values.ray.worker.gpu.enabled }}
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"
+        resources:
+          {{- toYaml .Values.ray.worker.resources | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        - name: shm
+          mountPath: /dev/shm
+      volumes:
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 4Gi
+{{- end }}

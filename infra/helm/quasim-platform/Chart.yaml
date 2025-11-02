@@ -1,0 +1,27 @@
+apiVersion: v2
+name: quasim-platform
+description: Production-grade Helm chart for QuASIM multi-region deployment
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - quantum
+  - simulation
+  - distributed
+  - gpu
+maintainers:
+  - name: Sybernix Team
+    email: team@sybernix.io
+dependencies:
+  - name: prometheus
+    version: "~25.8.0"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: monitoring.prometheus.enabled
+  - name: grafana
+    version: "~7.0.0"
+    repository: https://grafana.github.io/helm-charts
+    condition: monitoring.grafana.enabled
+  - name: loki
+    version: "~5.41.0"
+    repository: https://grafana.github.io/helm-charts
+    condition: monitoring.loki.enabled

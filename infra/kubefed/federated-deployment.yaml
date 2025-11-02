@@ -1,0 +1,154 @@
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedDeployment
+metadata:
+  name: quasim-api
+  namespace: quasim-platform
+spec:
+  template:
+    metadata:
+      labels:
+        app: quasim-api
+        version: v1
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          app: quasim-api
+      template:
+        metadata:
+          labels:
+            app: quasim-api
+            version: v1
+        spec:
+          containers:
+          - name: api
+            image: quasim/api-server:0.1.0
+            ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 50051
+              name: grpc
+            env:
+            - name: QUASIM_ENVIRONMENT
+              value: production
+            resources:
+              requests:
+                cpu: "500m"
+                memory: "1Gi"
+              limits:
+                cpu: "2000m"
+                memory: "4Gi"
+  placement:
+    clusters:
+    - name: us-west-2
+    - name: us-east-1
+    - name: eu-west-1
+    - name: ap-southeast-1
+  overrides:
+  # US West 2 - Primary region with more replicas
+  - clusterName: us-west-2
+    clusterOverrides:
+    - path: "/spec/replicas"
+      value: 5
+    - path: "/spec/template/spec/containers/0/env"
+      op: "add"
+      value:
+        name: QUASIM_REGION
+        value: us-west-2
+  # US East 1 - Secondary region
+  - clusterName: us-east-1
+    clusterOverrides:
+    - path: "/spec/replicas"
+      value: 3
+    - path: "/spec/template/spec/containers/0/env"
+      op: "add"
+      value:
+        name: QUASIM_REGION
+        value: us-east-1
+  # EU West 1 - European region
+  - clusterName: eu-west-1
+    clusterOverrides:
+    - path: "/spec/replicas"
+      value: 3
+    - path: "/spec/template/spec/containers/0/env"
+      op: "add"
+      value:
+        name: QUASIM_REGION
+        value: eu-west-1
+  # AP Southeast 1 - Asia Pacific region
+  - clusterName: ap-southeast-1
+    clusterOverrides:
+    - path: "/spec/replicas"
+      value: 2
+    - path: "/spec/template/spec/containers/0/env"
+      op: "add"
+      value:
+        name: QUASIM_REGION
+        value: ap-southeast-1
+
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedDeployment
+metadata:
+  name: quasim-qc-worker
+  namespace: quasim-platform
+spec:
+  template:
+    metadata:
+      labels:
+        app: quasim-qc-worker
+        workload: gpu
+    spec:
+      replicas: 4
+      selector:
+        matchLabels:
+          app: quasim-qc-worker
+      template:
+        metadata:
+          labels:
+            app: quasim-qc-worker
+            workload: gpu
+        spec:
+          nodeSelector:
+            accelerator: nvidia
+          tolerations:
+          - key: "accelerator"
+            operator: "Equal"
+            value: "nvidia"
+            effect: "NoSchedule"
+          containers:
+          - name: qc-worker
+            image: quasim/qc-worker:0.1.0
+            env:
+            - name: QUASIM_BACKEND
+              value: cuda
+            - name: CUDA_VISIBLE_DEVICES
+              value: "0"
+            resources:
+              requests:
+                cpu: "4000m"
+                memory: "16Gi"
+                nvidia.com/gpu: 1
+              limits:
+                cpu: "8000m"
+                memory: "32Gi"
+                nvidia.com/gpu: 1
+  placement:
+    clusters:
+    - name: us-west-2
+    - name: us-east-1
+    - name: eu-west-1
+  overrides:
+  # Distribute GPU workers across regions based on availability
+  - clusterName: us-west-2
+    clusterOverrides:
+    - path: "/spec/replicas"
+      value: 6  # More GPU capacity in primary region
+  - clusterName: us-east-1
+    clusterOverrides:
+    - path: "/spec/replicas"
+      value: 4
+  - clusterName: eu-west-1
+    clusterOverrides:
+    - path: "/spec/replicas"
+      value: 4

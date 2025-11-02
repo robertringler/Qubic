@@ -1,0 +1,57 @@
+{{- if .Values.qc.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "quasim-platform.fullname" . }}-qc-worker
+  labels:
+    {{- include "quasim-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: qc-worker
+spec:
+  replicas: {{ .Values.qc.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "quasim-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: qc-worker
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+      labels:
+        {{- include "quasim-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: qc-worker
+    spec:
+      {{- if .Values.qc.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.qc.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.qc.tolerations }}
+      tolerations:
+        {{- toYaml .Values.qc.tolerations | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: qc-worker
+        image: "{{ .Values.qc.image.repository }}:{{ .Values.qc.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: QUASIM_BACKEND
+          value: {{ .Values.qc.gpu.type | default "cpu" }}
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"
+        - name: GPU_MEMORY_FRACTION
+          value: "0.9"
+        - name: RAY_ADDRESS
+          value: "ray://{{ include "quasim-platform.fullname" . }}-ray-head:10001"
+        {{- if .Values.qc.gpu.enabled }}
+        resources:
+          {{- toYaml .Values.qc.resources | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        - name: shm
+          mountPath: /dev/shm
+      volumes:
+      - name: shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 2Gi
+{{- end }}
