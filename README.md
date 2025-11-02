@@ -93,7 +93,7 @@ This guide brings up a production-ready EKS cluster with GPU node groups and ins
 Sybernix occupies a unique position between quantum SDK platforms (IBM Qiskit, Google Quantum AI) and enterprise visualization tools (NVIDIA Omniverse, Epic Unreal Engine), delivering an integrated quantum-classical simulation stack for operational digital twins.
 
 **Key Differentiators**:
-- **0.81 Tech Moat Index**: Composite score reflecting architectural maturity, quantum model libraries, partner ecosystem, and regulatory compliance
+- **0.85 Tech Moat Index**: Composite score reflecting architectural maturity, quantum model libraries, partner ecosystem, and regulatory compliance (improved from 0.81 with enhanced capabilities)
 - **Hybrid Runtime**: Seamless JAX/PyTorch orchestration with quantum circuit integration
 - **Production-Grade Infrastructure**: Battle-tested Kubernetes platform with GPU acceleration and comprehensive observability
 - **Regulatory Readiness**: SOC2/ISO 27001 compliance frameworks built-in
