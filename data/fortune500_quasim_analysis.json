@@ -147,6 +147,25 @@
     }
   ],
   "sector_summaries": {
+    "Technology": {
+      "sector_name": "Technology",
+      "company_count": 41,
+      "mean_qii": 0.5744,
+      "std_qii": 0.0441,
+      "median_qii": 0.55,
+      "top_companies": [
+        "Company_018",
+        "Company_025",
+        "Company_034",
+        "Company_036",
+        "Company_037"
+      ],
+      "integration_potential": "Medium-High",
+      "key_challenges": [
+        "Integration complexity with legacy systems"
+      ],
+      "recommended_approach": "Partnership model with phased rollout"
+    },
     "Retail": {
       "sector_name": "Retail",
       "company_count": 43,
@@ -167,37 +186,18 @@
       ],
       "recommended_approach": "Education and proof-of-concept demonstrations"
     },
-    "Healthcare": {
-      "sector_name": "Healthcare",
-      "company_count": 31,
-      "mean_qii": 0.3508,
-      "std_qii": 0.0298,
-      "median_qii": 0.35,
+    "Financial Services": {
+      "sector_name": "Financial Services",
+      "company_count": 40,
+      "mean_qii": 0.295,
+      "std_qii": 0.0228,
+      "median_qii": 0.2875,
       "top_companies": [
-        "Company_007",
-        "Company_001",
-        "Company_050",
-        "Company_082",
-        "Company_099"
-      ],
-      "integration_potential": "Medium",
-      "key_challenges": [
-        "Limited technical infrastructure"
-      ],
-      "recommended_approach": "Education and proof-of-concept demonstrations"
-    },
-    "Consumer Goods": {
-      "sector_name": "Consumer Goods",
-      "company_count": 34,
-      "mean_qii": 0.2743,
-      "std_qii": 0.0229,
-      "median_qii": 0.275,
-      "top_companies": [
-        "Company_013",
-        "Company_024",
-        "Company_043",
-        "Company_107",
-        "Company_112"
+        "Company_027",
+        "Company_052",
+        "Company_087",
+        "Company_070",
+        "Company_132"
       ],
       "integration_potential": "Low-Medium",
       "key_challenges": [
@@ -205,6 +205,23 @@
         "Integration complexity with legacy systems"
       ],
       "recommended_approach": "Education and proof-of-concept demonstrations"
+    },
+    "Pharmaceuticals": {
+      "sector_name": "Pharmaceuticals",
+      "company_count": 40,
+      "mean_qii": 0.6647,
+      "std_qii": 0.0432,
+      "median_qii": 0.6625,
+      "top_companies": [
+        "Company_009",
+        "Company_011",
+        "Company_012",
+        "Company_040",
+        "Company_044"
+      ],
+      "integration_potential": "High",
+      "key_challenges": [],
+      "recommended_approach": "Direct enterprise sales with pilot programs"
     },
     "Banking": {
       "sector_name": "Banking",
@@ -226,74 +243,52 @@
       ],
       "recommended_approach": "Education and proof-of-concept demonstrations"
     },
-    "Technology": {
-      "sector_name": "Technology",
-      "company_count": 41,
-      "mean_qii": 0.5744,
-      "std_qii": 0.0441,
-      "median_qii": 0.55,
+    "Aerospace & Defense": {
+      "sector_name": "Aerospace & Defense",
+      "company_count": 31,
+      "mean_qii": 0.7524,
+      "std_qii": 0.0241,
+      "median_qii": 0.75,
       "top_companies": [
-        "Company_018",
-        "Company_025",
-        "Company_034",
-        "Company_036",
-        "Company_037"
-      ],
-      "integration_potential": "Medium-High",
-      "key_challenges": [
-        "Integration complexity with legacy systems"
-      ],
-      "recommended_approach": "Partnership model with phased rollout"
-    },
-    "Pharmaceuticals": {
-      "sector_name": "Pharmaceuticals",
-      "company_count": 40,
-      "mean_qii": 0.6647,
-      "std_qii": 0.0432,
-      "median_qii": 0.6625,
-      "top_companies": [
-        "Company_009",
-        "Company_011",
-        "Company_012",
-        "Company_040",
-        "Company_044"
+        "Company_019",
+        "Company_038",
+        "Company_067",
+        "Company_066",
+        "Company_077"
       ],
       "integration_potential": "High",
       "key_challenges": [],
       "recommended_approach": "Direct enterprise sales with pilot programs"
     },
-    "Insurance": {
-      "sector_name": "Insurance",
-      "company_count": 35,
-      "mean_qii": 0.2543,
-      "std_qii": 0.0257,
-      "median_qii": 0.25,
+    "Chemicals": {
+      "sector_name": "Chemicals",
+      "company_count": 27,
+      "mean_qii": 0.6162,
+      "std_qii": 0.023,
+      "median_qii": 0.625,
       "top_companies": [
-        "Company_010",
-        "Company_042",
-        "Company_059",
-        "Company_089",
-        "Company_213"
+        "Company_022",
+        "Company_039",
+        "Company_045",
+        "Company_088",
+        "Company_109"
       ],
-      "integration_potential": "Low-Medium",
-      "key_challenges": [
-        "Limited technical infrastructure",
-        "Integration complexity with legacy systems"
-      ],
-      "recommended_approach": "Education and proof-of-concept demonstrations"
+      "integration_potential": "Medium-High",
+      "key_challenges": [],
+      "recommended_approach": "Direct enterprise sales with pilot programs"
     },
-    "Manufacturing": {
-      "sector_name": "Manufacturing",
-      "company_count": 28,
-      "mean_qii": 0.6089,
-      "std_qii": 0.0275,
-      "median_qii": 0.6,
+    "Energy": {
+      "sector_name": "Energy",
+      "company_count": 35,
+      "mean_qii": 0.6261,
+      "std_qii": 0.0249,
+      "median_qii": 0.6375,
       "top_companies": [
-        "Company_015",
-        "Company_020",
-        "Company_033",
-        "Company_017",
-        "Company_146"
+        "Company_031",
+        "Company_056",
+        "Company_057",
+        "Company_081",
+        "Company_061"
       ],
       "integration_potential": "Medium-High",
       "key_challenges": [],
@@ -319,18 +314,18 @@
       ],
       "recommended_approach": "Partnership model with phased rollout"
     },
-    "Financial Services": {
-      "sector_name": "Financial Services",
-      "company_count": 40,
-      "mean_qii": 0.295,
-      "std_qii": 0.0228,
-      "median_qii": 0.2875,
+    "Consumer Goods": {
+      "sector_name": "Consumer Goods",
+      "company_count": 34,
+      "mean_qii": 0.2743,
+      "std_qii": 0.0229,
+      "median_qii": 0.275,
       "top_companies": [
-        "Company_027",
-        "Company_052",
-        "Company_087",
-        "Company_070",
-        "Company_132"
+        "Company_013",
+        "Company_024",
+        "Company_043",
+        "Company_107",
+        "Company_112"
       ],
       "integration_potential": "Low-Medium",
       "key_challenges": [
@@ -339,20 +334,20 @@
       ],
       "recommended_approach": "Education and proof-of-concept demonstrations"
     },
-    "Chemicals": {
-      "sector_name": "Chemicals",
-      "company_count": 27,
-      "mean_qii": 0.6162,
-      "std_qii": 0.023,
-      "median_qii": 0.625,
+    "Biotechnology": {
+      "sector_name": "Biotechnology",
+      "company_count": 26,
+      "mean_qii": 0.6514,
+      "std_qii": 0.0429,
+      "median_qii": 0.6312,
       "top_companies": [
-        "Company_022",
-        "Company_039",
-        "Company_045",
-        "Company_088",
-        "Company_109"
+        "Company_016",
+        "Company_029",
+        "Company_005",
+        "Company_074",
+        "Company_091"
       ],
-      "integration_potential": "Medium-High",
+      "integration_potential": "High",
       "key_challenges": [],
       "recommended_approach": "Direct enterprise sales with pilot programs"
     },
@@ -373,56 +368,61 @@
       "key_challenges": [],
       "recommended_approach": "Direct enterprise sales with pilot programs"
     },
-    "Aerospace & Defense": {
-      "sector_name": "Aerospace & Defense",
+    "Healthcare": {
+      "sector_name": "Healthcare",
       "company_count": 31,
-      "mean_qii": 0.7524,
-      "std_qii": 0.0241,
-      "median_qii": 0.75,
+      "mean_qii": 0.3508,
+      "std_qii": 0.0298,
+      "median_qii": 0.35,
       "top_companies": [
-        "Company_019",
-        "Company_038",
-        "Company_067",
-        "Company_066",
-        "Company_077"
+        "Company_007",
+        "Company_001",
+        "Company_050",
+        "Company_082",
+        "Company_099"
       ],
-      "integration_potential": "High",
-      "key_challenges": [],
-      "recommended_approach": "Direct enterprise sales with pilot programs"
-    },
-    "Biotechnology": {
-      "sector_name": "Biotechnology",
-      "company_count": 26,
-      "mean_qii": 0.6514,
-      "std_qii": 0.0429,
-      "median_qii": 0.6312,
-      "top_companies": [
-        "Company_016",
-        "Company_029",
-        "Company_005",
-        "Company_074",
-        "Company_091"
+      "integration_potential": "Medium",
+      "key_challenges": [
+        "Limited technical infrastructure"
       ],
-      "integration_potential": "High",
-      "key_challenges": [],
-      "recommended_approach": "Direct enterprise sales with pilot programs"
+      "recommended_approach": "Education and proof-of-concept demonstrations"
     },
-    "Energy": {
-      "sector_name": "Energy",
-      "company_count": 35,
-      "mean_qii": 0.6261,
-      "std_qii": 0.0249,
-      "median_qii": 0.6375,
+    "Manufacturing": {
+      "sector_name": "Manufacturing",
+      "company_count": 28,
+      "mean_qii": 0.6089,
+      "std_qii": 0.0275,
+      "median_qii": 0.6,
       "top_companies": [
-        "Company_031",
-        "Company_056",
-        "Company_057",
-        "Company_081",
-        "Company_061"
+        "Company_015",
+        "Company_020",
+        "Company_033",
+        "Company_017",
+        "Company_146"
       ],
       "integration_potential": "Medium-High",
       "key_challenges": [],
       "recommended_approach": "Direct enterprise sales with pilot programs"
+    },
+    "Insurance": {
+      "sector_name": "Insurance",
+      "company_count": 35,
+      "mean_qii": 0.2543,
+      "std_qii": 0.0257,
+      "median_qii": 0.25,
+      "top_companies": [
+        "Company_010",
+        "Company_042",
+        "Company_059",
+        "Company_089",
+        "Company_213"
+      ],
+      "integration_potential": "Low-Medium",
+      "key_challenges": [
+        "Limited technical infrastructure",
+        "Integration complexity with legacy systems"
+      ],
+      "recommended_approach": "Education and proof-of-concept demonstrations"
     }
   },
   "correlation_analysis": {
