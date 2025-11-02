@@ -110,7 +110,7 @@ def example_pde_operators_aerospace():
     # Apply to aerospace simulation
     initial_flow = np.random.rand(64, 64, 2)
     predicted_flow = fno.forward(initial_flow)
-    
+    print(f"Predicted flow field shape: {predicted_flow.shape}, mean: {np.mean(predicted_flow):.4f}")
     print(f"✓ Applied neural PDE operator to aerospace flow field\n")
 
 
