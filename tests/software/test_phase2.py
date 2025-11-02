@@ -23,7 +23,7 @@ def test_ir_builder():
     # Add some operations
     node1 = builder.add_tensor_op("add", [], dtype=IRType.FP32, shape=(100,))
     node2 = builder.add_tensor_op("mul", [node1], dtype=IRType.FP32, shape=(100,))
-    node3 = builder.add_tensor_op("relu", [node2], dtype=IRType.FP32, shape=(100,))
+    builder.add_tensor_op("relu", [node2], dtype=IRType.FP32, shape=(100,))
     
     assert len(builder.nodes) == 3
     assert node2 in node1.outputs
