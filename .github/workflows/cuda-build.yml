@@ -1,0 +1,67 @@
+name: QuASIM HPC - CUDA Build (CPU Fallback)
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**', 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  cuda-build-fallback:
+    name: HPC Module Build (CPU Fallback)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pybind11
+      
+      - name: Check CUDA availability
+        run: |
+          if command -v nvcc &> /dev/null; then
+            echo "CUDA_AVAILABLE=true" >> $GITHUB_ENV
+            nvcc --version
+          else
+            echo "CUDA_AVAILABLE=false" >> $GITHUB_ENV
+            echo "CUDA not available - will build CPU-only version"
+          fi
+      
+      - name: Build QuASIM Core (CPU Fallback)
+        run: |
+          cmake -S QuASIM -B build
+          cmake --build build --parallel
+      
+      - name: Run demo
+        run: |
+          ./build/quasim_demo
+      
+      - name: Verify CUDA kernels present
+        run: |
+          echo "Checking CUDA kernel files..."
+          ls -la QuASIM/src/cuda/
+          test -f QuASIM/src/cuda/tensor_solve.cu
+          test -f QuASIM/src/cuda/vjp.cu
+          test -f QuASIM/src/cuda/ftq_kernels.cu
+          echo "✅ All CUDA kernel files present"
+      
+      - name: Verify pybind11 bindings present
+        run: |
+          test -f QuASIM/src/cpp/quasim_bindings.cpp
+          echo "✅ pybind11 bindings file present"
+      
+      - name: Archive HPC artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: quasim-hpc-artifacts
+          path: |
+            QuASIM/src/cuda/*.cu
+            QuASIM/src/cpp/quasim_bindings.cpp
+            QuASIM/Dockerfile.cuda

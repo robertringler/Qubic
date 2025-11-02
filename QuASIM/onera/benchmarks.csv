@@ -1,0 +1,2 @@
+benchmark,build,time_s,flops,energy_kwh,rmse_cp,achieved_tflops,flops_per_kwh
+ONERA_M6,SU2+QuASIM_PhaseXII_BioSwarm,0.48,2.8e14,1.6e-5,0.016,583.33,1.75e19

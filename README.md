@@ -197,3 +197,93 @@ flowchart LR
   users[QuASIM Teams] --> ING
   MON <-- metrics/logs/traces --> k8s
 ```
+
+## QuASIM Master (Phases I–XII Dual-Mode + HPC Edition)
+
+The unified QuASIM Master build integrates the complete Dual-Mode core and HPC Edition, encompassing all phases from initial tensor solve through bio-quantum swarm cognition.
+
+### Features
+
+- **Phases I–XII Integration**: Complete implementation of all QuASIM phases
+- **Dual-Mode Architecture**: CPU/GPU fallback for broad compatibility
+- **HPC Module**: CUDA kernels, pybind11 bindings, and SU2 integration
+- **Benchmark Suite**: ONERA M6 benchmark configurations and results
+- **CI/CD**: Automated build and test workflows for CPU and GPU environments
+- **Docker Support**: Containerized builds with CUDA 12.4 support
+
+### Quick Start
+
+Run the integrated self-test:
+
+```bash
+python3 quasim_master_all.py
+```
+
+Generate the full build scaffold:
+
+```bash
+python3 quasim_master_all.py --emit ./QuASIM
+```
+
+Build and run the demo:
+
+```bash
+cd QuASIM
+cmake -S . -B build
+cmake --build build --parallel
+./build/quasim_demo
+```
+
+### Docker Build (HPC Edition)
+
+For CUDA-enabled builds with pybind11 integration:
+
+```bash
+cd QuASIM
+docker build -f Dockerfile.cuda -t quasim-hpc .
+docker run --gpus all quasim-hpc
+```
+
+### SU2 Integration
+
+The ONERA M6 benchmark configurations are available in `QuASIM/onera/`:
+
+- `benchmarks.csv` - Performance metrics and results
+- `docs/APPENDIX_ONERA_M6.tex` - LaTeX formatted benchmark summary
+
+### Architecture Components
+
+- **TensorSolve**: GPU-optimized tensor network contraction (Phases I-III)
+- **QEM/VJP**: Quantum Error Mitigation with Vector-Jacobian Product (Phases IV-VI)
+- **RL Swarm**: Reinforcement learning swarm convergence (Phase VII)
+- **FTQ Federation**: Fault-tolerant quantum cluster federation (Phases X-XI)
+- **BioSwarm**: Bio-quantum swarm cognition with CRISPR integration (Phase XII)
+
+### Build Requirements
+
+**Minimum (CPU Fallback):**
+- CMake 3.18+
+- C++20 compatible compiler
+- Python 3.8+
+
+**Full HPC Build:**
+- CMake 3.25+
+- CUDA Toolkit 12.4+
+- pybind11
+- C++20 compiler with CUDA 17 support
+
+### CI/CD Workflows
+
+The repository includes automated workflows for:
+
+1. **QuASIM Master Build & Test** (`.github/workflows/quasim-master-build.yml`)
+   - Self-test validation
+   - Core library build (CPU fallback)
+   - Demo execution
+
+2. **CUDA Build** (`.github/workflows/cuda-build.yml`)
+   - HPC module verification
+   - CUDA kernel validation
+   - pybind11 bindings check
+
+All workflows support CPU fallback for environments without GPU support.

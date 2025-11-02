@@ -1,0 +1,46 @@
+name: QuASIM Master Build & Test (CPU Fallback)
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**', 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    name: Build QuASIM Core (CPU)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy
+      
+      - name: Run QuASIM Master self-test
+        run: |
+          python3 quasim_master_all.py
+      
+      - name: Build QuASIM Core (CMake)
+        run: |
+          cmake -S QuASIM -B build
+          cmake --build build --parallel
+      
+      - name: Run QuASIM demo
+        run: |
+          ./build/quasim_demo
+      
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: quasim-build
+          path: |
+            build/quasim_demo
+            build/libquasim_core.a
