@@ -1,4 +1,5 @@
 """Simple assembler/disassembler for the GB10 tensor ISA."""
+
 from __future__ import annotations
 
 import argparse
@@ -30,7 +31,8 @@ def main() -> None:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    words = assemble(open(args.source).read().splitlines())
+    with open(args.source) as f:
+        words = assemble(f.read().splitlines())
     if args.json:
         print(json.dumps(words))
     else:

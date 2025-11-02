@@ -1,4 +1,5 @@
 """Generate lightweight coverage metrics for RTL simulations."""
+
 from __future__ import annotations
 
 import json

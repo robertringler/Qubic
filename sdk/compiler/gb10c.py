@@ -1,4 +1,5 @@
 """Synthetic CUDA-like compiler frontend producing PTX-style IR."""
+
 from __future__ import annotations
 
 import argparse

@@ -1,10 +1,11 @@
 """Example VQE workflow using the QuASIM simulation stack."""
+
 from __future__ import annotations
 
 from quantum.python.quasim_sim import simulate
 
 
-def heisenberg_hamiltonian(n_qubits: int) -> list[np.ndarray]:
+def heisenberg_hamiltonian(n_qubits: int) -> list[list[complex]]:
     gates = []
     for _ in range(n_qubits):
         gates.append([0 + 0j, 1 + 0j, 1 + 0j, 0 + 0j])
