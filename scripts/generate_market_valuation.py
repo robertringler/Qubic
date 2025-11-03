@@ -404,7 +404,8 @@ def main():
     # Determine the output file path
     # The problem statement mentions both "valuation.md" and references existing "market_valuation.md"
     # We'll update the existing market_valuation.md file by appending/updating
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.dirname(script_dir)
     output_file = os.path.join(repo_root, "docs", "market_valuation.md")
     
     print(f"Output file: {output_file}")
@@ -421,9 +422,9 @@ def main():
         # Check if our section already exists
         if marker in existing_content:
             print("Found existing Market Valuation section. Replacing...")
-            # Split at the marker and keep everything before it
-            parts = existing_content.split(marker, 1)
-            existing_content = parts[0].rstrip() + "\n\n"
+            # Find the position of the marker and keep everything before it
+            marker_pos = existing_content.find(marker)
+            existing_content = existing_content[:marker_pos].rstrip() + "\n\n"
         else:
             print("Appending new Market Valuation section to existing content...")
             # Ensure proper spacing before appending

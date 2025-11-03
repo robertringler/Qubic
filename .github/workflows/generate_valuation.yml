@@ -31,7 +31,11 @@ jobs:
       - name: Check for changes
         id: git-check
         run: |
-          git diff --exit-code docs/market_valuation.md || echo "changed=true" >> $GITHUB_OUTPUT
+          if [ ! -f docs/market_valuation.md ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            git diff --exit-code docs/market_valuation.md || echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Commit and push results
         if: steps.git-check.outputs.changed == 'true'
