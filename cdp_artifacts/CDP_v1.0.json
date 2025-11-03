@@ -2,7 +2,7 @@
   "package": {
     "package_id": "CDP_v1.0",
     "revision": "1.0",
-    "date": "2025-11-03T00:03:57.975479",
+    "date": "2025-11-03T00:06:41.645719",
     "standard": "DO-178C Level A / ECSS-Q-ST-80C Rev. 2 / NASA E-HBK-4008",
     "verification_status": "READY_FOR_AUDIT",
     "open_anomalies": 0,
@@ -22,7 +22,7 @@
       "SpaceX",
       "NASA SMA"
     ],
-    "generated_at": "2025-11-03T00:03:57.975499"
+    "generated_at": "2025-11-03T00:06:41.645739"
   },
   "verification_evidence": [
     {
