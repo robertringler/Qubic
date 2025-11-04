@@ -1,0 +1,65 @@
+# Example benchmark configuration file
+# Place this as bench.yaml in your kernel directory
+
+# Problem size parameters passed to the benchmark function
+problem_size:
+  # For CFD kernels
+  grid_size: [128, 128, 128]
+  max_iterations: 100
+  tolerance: 1.0e-6
+  
+  # For ML kernels
+  batch_size: 32
+  sequence_length: 512
+  hidden_dim: 768
+  
+  # For Monte Carlo kernels
+  num_paths: 10000
+  num_steps: 252
+  
+  # Generic size parameter
+  size: 1024
+
+# Precisions to test (will run benchmark for each)
+precisions:
+  - fp32
+  - fp16
+  - fp8   # If supported by kernel
+  - fp4   # If supported by kernel
+
+# Backends to test (will run benchmark for each)
+backends:
+  - cpu
+  - cuda
+  - rocm
+  - jax
+
+# Accuracy tolerances for validation
+tolerances:
+  rmse: 1.0e-3              # Root mean square error
+  relative_error: 1.0e-2    # Relative error vs reference
+  max_error: 1.0e-2         # Maximum absolute error
+
+# Conditions to skip benchmark
+skip_conditions:
+  - backend: cuda
+    reason: "CUDA not available"
+    check: "not torch.cuda.is_available()"
+  
+  - precision: fp8
+    reason: "FP8 not supported"
+    check: "not hasattr(torch, 'float8')"
+
+# Override default iteration counts
+iterations:
+  warmup: 5
+  timed: 50
+
+# Seed for reproducibility
+seed: 42
+
+# Additional metadata
+metadata:
+  author: "QuASIM Team"
+  date: "2024-11-04"
+  description: "Example benchmark configuration"
