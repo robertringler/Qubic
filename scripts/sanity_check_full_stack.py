@@ -184,7 +184,8 @@ def wait_for_service(url: str, service_name: str, timeout: int = MAX_STARTUP_WAI
     start_time = time.time()
     
     while time.time() - start_time < timeout:
-        try:
+        except requests.exceptions.RequestException:
+            # Service not available yet; ignore and retry until timeout
             response = requests.get(url, timeout=5)
             if response.status_code == 200:
                 elapsed = time.time() - start_time
