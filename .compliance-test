@@ -1,0 +1,45 @@
+# Compliance Workflow Test File
+
+This file is created to test the PR Compliance and PR Defense Compliance workflows.
+
+## Test Information
+
+- **Test Date**: 2025-11-04
+- **Test Purpose**: Verify workflows trigger on PR synchronize event
+- **Expected Workflows**: 
+  - PR Compliance
+  - PR Defense Compliance
+
+## Test Procedure
+
+1. Push this file to the PR branch
+2. Verify workflows are triggered in GitHub Actions
+3. Monitor workflow execution with:
+   ```bash
+   gh run watch --exit-status --workflow "PR Compliance"
+   gh run watch --exit-status --workflow "PR Defense Compliance"
+   ```
+
+## Expected Results
+
+- ✅ PR Compliance workflow executes all jobs:
+  - compliance-check (linting, formatting, type checking)
+  - yaml-compliance (YAML/Markdown validation)
+  - workflow-compliance (GitHub Actions validation)
+  - compliance-summary (results summary)
+
+- ✅ PR Defense Compliance workflow executes all jobs:
+  - security-scan (bandit, pip-audit)
+  - secret-scanning (credential detection)
+  - dependency-review (dependency security)
+  - permissions-check (privilege escalation detection)
+  - dockerfile-security (container security)
+  - defense-summary (results summary)
+
+## Test Status
+
+Status: ⏳ PENDING - Workflows triggered, awaiting results
+
+---
+
+**Note**: This is a test file and can be removed after workflow verification is complete.
