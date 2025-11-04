@@ -213,8 +213,10 @@ class PRAutoResolver:
                         keep_theirs = True
                     elif line.startswith('>>>>>>>'):
                         in_conflict = False
-                    elif not in_conflict or keep_theirs:
-                        resolved.append(line)
+                    else:
+                        # Keep lines that are outside conflicts or from the 'theirs' side
+                        if not in_conflict or keep_theirs:
+                            resolved.append(line)
 
                 with open(filepath, 'w', encoding='utf-8') as f:
                     f.write('\n'.join(resolved))
