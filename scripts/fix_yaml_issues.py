@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 def fix_multi_document_yaml(filepath: Path) -> bool:
     """Fix YAML files that contain multiple documents"""
     try:
-        with open(filepath) as f:
+        with open(filepath, encoding='utf-8') as f:
             content = f.read()
 
         # Check if it's a multi-document YAML
@@ -32,7 +32,7 @@ def fix_multi_document_yaml(filepath: Path) -> bool:
 def fix_flow_node_yaml(filepath: Path) -> bool:
     """Fix YAML files with flow node parsing errors"""
     try:
-        with open(filepath) as f:
+        with open(filepath, encoding='utf-8') as f:
             content = f.read()
 
         # Check for common flow node issues
@@ -76,7 +76,7 @@ def main():
             print(f"Checking {file_path}...")
 
             # Try to detect the issue type
-            with open(full_path) as f:
+            with open(full_path, encoding='utf-8') as f:
                 first_line = f.readline()
 
             if first_line.startswith('{{-') or '{{' in first_line:

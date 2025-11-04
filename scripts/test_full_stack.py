@@ -30,7 +30,7 @@ def validate_yaml_files() -> bool:
     for yaml_file in yaml_files:
         try:
             # Check first 1KB for Helm template markers (more efficient)
-            with open(yaml_file) as f:
+            with open(yaml_file, encoding='utf-8') as f:
                 header = f.read(1024)
 
             # Skip Helm templates (contain Jinja2-like syntax)
@@ -39,7 +39,7 @@ def validate_yaml_files() -> bool:
                 continue
 
             # Read full content for parsing
-            with open(yaml_file) as f:
+            with open(yaml_file, encoding='utf-8') as f:
                 content = f.read()
 
             # Always use safe_load_all to handle both single and multi-document YAML
@@ -65,7 +65,7 @@ def validate_json_files() -> bool:
     all_valid = True
     for json_file in json_files:
         try:
-            with open(json_file) as f:
+            with open(json_file, encoding='utf-8') as f:
                 json.load(f)
         except json.JSONDecodeError as e:
             print(f"JSON error in {json_file}: {e}")

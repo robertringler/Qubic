@@ -191,7 +191,7 @@ class PRAutoResolver:
         """
         try:
             # Read the file
-            with open(filepath) as f:
+            with open(filepath, encoding='utf-8') as f:
                 content = f.read()
 
             # Check if it's a simple conflict
@@ -216,7 +216,7 @@ class PRAutoResolver:
                     elif not in_conflict or keep_theirs:
                         resolved.append(line)
 
-                with open(filepath, 'w') as f:
+                with open(filepath, 'w', encoding='utf-8') as f:
                     f.write('\n'.join(resolved))
                 return True
 
@@ -471,7 +471,7 @@ class PRAutoResolver:
                 'issues_fixed': 0,
                 'details': ''
             }
-            with open('pr_resolution_summary.json', 'w') as f:
+            with open('pr_resolution_summary.json', 'w', encoding='utf-8') as f:
                 json.dump(summary, f)
             return
 
@@ -502,7 +502,7 @@ class PRAutoResolver:
         }
 
         # Write summary for GitHub Action
-        with open('pr_resolution_summary.json', 'w') as f:
+        with open('pr_resolution_summary.json', 'w', encoding='utf-8') as f:
             json.dump(summary, f)
 
         print(f"\n{'='*60}")
