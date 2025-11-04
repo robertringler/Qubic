@@ -1,4 +1,4 @@
-# Sybernix — Quantum-Enhanced Simulation Platform
+# QuASIM -Quantum-Enhanced Simulation Platform
 
 **Sybernix** is an advanced quantum-aware simulation and AI infrastructure platform that combines quantum circuit simulation with enterprise-grade immersive visualization. At its core is **QuASIM** (Quantum Accelerated Simulation), a hybrid runtime that layers quantum tensor operations on GPU primitives to enable real-time digital twin modeling, optimization, and scenario planning for regulated industries.
 
