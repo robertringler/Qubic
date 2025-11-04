@@ -6,5 +6,5 @@ RUN pip install --no-cache-dir -r requirements.txt --trusted-host pypi.org --tru
 COPY . .
 ENV JAX_PLATFORM_NAME=cpu
 ENV GUNICORN_WORKERS=4
-EXPOSE 8000
+CMD bash -c 'gunicorn -b 0.0.0.0:8000 -w "${GUNICORN_WORKERS:-$((2 * $(nproc) + 1))}" app:app'
 CMD gunicorn -b 0.0.0.0:8000 -w ${GUNICORN_WORKERS} app:app
