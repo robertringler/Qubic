@@ -107,7 +107,8 @@ class MetricsCollector:
             try:
                 import torch
 
-                self._rocm_available = torch.cuda.is_available()  # ROCm uses torch.cuda
+                # PyTorch with ROCm support uses the torch.cuda API for compatibility
+                self._rocm_available = torch.cuda.is_available()
                 if self._rocm_available:
                     self.torch = torch
                     logger.info("ROCm backend available")

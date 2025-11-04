@@ -121,10 +121,15 @@ class KernelDiscovery:
             config_path = py_file.parent / "bench.yaml"
             config = {}
             if config_path.exists():
-                import yaml
+                try:
+                    import yaml
 
-                with open(config_path) as f:
-                    config = yaml.safe_load(f) or {}
+                    with open(config_path) as f:
+                        config = yaml.safe_load(f) or {}
+                except ImportError:
+                    logger.warning(f"PyYAML not available; skipping config file {config_path}")
+                except Exception as e:
+                    logger.warning(f"Failed to load config {config_path}: {e}")
 
             kernels.append(
                 KernelInfo(
@@ -418,6 +423,8 @@ class BenchmarkRunner:
 
             def wrapper(**kwargs):
                 from integrations.kernels.cfd.pressure_poisson import (
+                    Backend,
+                    Precision,
                     PressurePoissonConfig,
                     PressurePoissonSolver,
                 )
@@ -426,8 +433,8 @@ class BenchmarkRunner:
                     grid_size=kwargs.get("grid_size", (32, 32, 32)),
                     max_iterations=kwargs.get("max_iterations", 50),
                     tolerance=kwargs.get("tolerance", 1e-5),
-                    precision=module.Precision.FP32,
-                    backend=module.Backend.CPU,
+                    precision=Precision.FP32,
+                    backend=Backend.CPU,
                     deterministic=True,
                     seed=self.seed,
                 )

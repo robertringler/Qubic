@@ -21,6 +21,10 @@ jobs:
     name: Benchmark (${{ matrix.backend }}, ${{ matrix.precision }})
     runs-on: ${{ matrix.runner }}
     
+    permissions:
+      contents: read
+      pull-requests: write
+    
     strategy:
       fail-fast: false
       matrix:
@@ -155,6 +159,9 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     
+    permissions:
+      contents: write
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -219,6 +226,10 @@ jobs:
     needs: aggregate-results
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      issues: write
     
     steps:
       - name: Checkout repository
