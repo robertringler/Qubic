@@ -24,6 +24,12 @@ ignore = [
 [lint.per-file-ignores]
 "__init__.py" = ["F401"]  # unused imports in __init__.py
 "tests/**" = ["S101"]     # use of assert in tests
+# Quantum computing files use standard mathematical notation (U, H, K for matrices/operators)
+"quasim/qc/*.py" = ["N806", "N803"]  # uppercase variables are mathematical convention
+"live_emulation_for_ci_validation.py" = ["N806", "N803"]
+"validate_block.py" = ["N806"]
+# gRPC service uses PascalCase function names to match proto definitions
+"quasim/api/grpc_service.py" = ["N802"]
 
 [lint.isort]
 known-first-party = ["quasim", "sdk", "quantum"]
