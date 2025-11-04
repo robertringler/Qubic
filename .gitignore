@@ -20,3 +20,6 @@ certs/*_certificate.json
 
 # Test artifacts
 .pytest_cache/
+
+# Mission validation reports (runtime generated)
+reports/

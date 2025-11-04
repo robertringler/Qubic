@@ -5,65 +5,64 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
-from .performance_comparison import ComparisonReport
 from .mission_validator import ValidationResult
+from .performance_comparison import ComparisonReport
 
 
 class ReportGenerator:
     """Generates detailed performance comparison reports.
-    
+
     Creates comprehensive reports comparing QuASIM simulations with real
     mission data, including statistical analysis, visualizations, and
     acceptance criteria evaluations.
     """
-    
+
     def __init__(self, output_dir: str = "reports"):
         """Initialize report generator.
-        
+
         Args:
             output_dir: Directory for output reports
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     def generate_validation_report(
         self,
         validation_result: ValidationResult,
         output_format: str = "json",
     ) -> str:
         """Generate validation report.
-        
+
         Args:
             validation_result: Validation result to report
             output_format: Output format ('json', 'markdown', 'html')
-            
+
         Returns:
             Path to generated report file
         """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+
         if output_format == "json":
             filename = f"validation_{timestamp}.json"
             filepath = self.output_dir / filename
-            
+
             with open(filepath, "w") as f:
                 json.dump(validation_result.to_dict(), f, indent=2)
-        
+
         elif output_format == "markdown":
             filename = f"validation_{timestamp}.md"
             filepath = self.output_dir / filename
-            
+
             content = self._generate_validation_markdown(validation_result)
             with open(filepath, "w") as f:
                 f.write(content)
-        
+
         else:
             raise ValueError(f"Unsupported output format: {output_format}")
-        
+
         return str(filepath)
-    
+
     def _generate_validation_markdown(self, result: ValidationResult) -> str:
         """Generate markdown validation report."""
         lines = [
@@ -74,7 +73,7 @@ class ReportGenerator:
             f"**Warnings:** {result.warning_count}",
             "",
         ]
-        
+
         if result.errors:
             lines.extend([
                 "## Errors",
@@ -83,7 +82,7 @@ class ReportGenerator:
             for error in result.errors:
                 lines.append(f"- {error}")
             lines.append("")
-        
+
         if result.warnings:
             lines.extend([
                 "## Warnings",
@@ -92,7 +91,7 @@ class ReportGenerator:
             for warning in result.warnings:
                 lines.append(f"- {warning}")
             lines.append("")
-        
+
         if result.metadata:
             lines.extend([
                 "## Metadata",
@@ -101,45 +100,45 @@ class ReportGenerator:
             for key, value in result.metadata.items():
                 lines.append(f"- **{key}:** {value}")
             lines.append("")
-        
+
         return "\n".join(lines)
-    
+
     def generate_comparison_report(
         self,
         comparison_report: ComparisonReport,
         output_format: str = "json",
     ) -> str:
         """Generate performance comparison report.
-        
+
         Args:
             comparison_report: Comparison report to output
             output_format: Output format ('json', 'markdown', 'html')
-            
+
         Returns:
             Path to generated report file
         """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+
         if output_format == "json":
             filename = f"comparison_{comparison_report.mission_id}_{timestamp}.json"
             filepath = self.output_dir / filename
-            
+
             with open(filepath, "w") as f:
                 json.dump(comparison_report.to_dict(), f, indent=2)
-        
+
         elif output_format == "markdown":
             filename = f"comparison_{comparison_report.mission_id}_{timestamp}.md"
             filepath = self.output_dir / filename
-            
+
             content = self._generate_comparison_markdown(comparison_report)
             with open(filepath, "w") as f:
                 f.write(content)
-        
+
         else:
             raise ValueError(f"Unsupported output format: {output_format}")
-        
+
         return str(filepath)
-    
+
     def _generate_comparison_markdown(self, report: ComparisonReport) -> str:
         """Generate markdown comparison report."""
         lines = [
@@ -159,7 +158,7 @@ class ReportGenerator:
             f"- **Average Correlation:** {report.summary.get('average_correlation', 0.0):.4f}",
             "",
         ]
-        
+
         if report.summary.get("failure_details"):
             lines.extend([
                 "## Failed Acceptance Criteria",
@@ -168,7 +167,7 @@ class ReportGenerator:
             for failure in report.summary["failure_details"]:
                 lines.append(f"- {failure}")
             lines.append("")
-        
+
         if report.metrics:
             lines.extend([
                 "## Detailed Metrics",
@@ -176,7 +175,7 @@ class ReportGenerator:
                 "| Variable | RMSE | MAE | Max Error | Correlation | Bias |",
                 "|----------|------|-----|-----------|-------------|------|",
             ])
-            
+
             for var, metrics in report.metrics.items():
                 lines.append(
                     f"| {var} | {metrics.rmse:.4f} | {metrics.mae:.4f} | "
@@ -184,9 +183,9 @@ class ReportGenerator:
                     f"{metrics.bias:.4f} |"
                 )
             lines.append("")
-        
+
         return "\n".join(lines)
-    
+
     def generate_combined_report(
         self,
         validation_result: ValidationResult,
@@ -194,12 +193,12 @@ class ReportGenerator:
         output_format: str = "markdown",
     ) -> str:
         """Generate combined validation and comparison report.
-        
+
         Args:
             validation_result: Validation result
             comparison_report: Comparison report
             output_format: Output format ('json', 'markdown')
-            
+
         Returns:
             Path to generated report file
         """
@@ -207,7 +206,7 @@ class ReportGenerator:
         ext = "json" if output_format == "json" else "md"
         filename = f"full_report_{comparison_report.mission_id}_{timestamp}.{ext}"
         filepath = self.output_dir / filename
-        
+
         if output_format == "json":
             combined = {
                 "validation": validation_result.to_dict(),
@@ -215,16 +214,16 @@ class ReportGenerator:
                 "timestamp": timestamp,
                 "overall_status": validation_result.is_valid and comparison_report.passed,
             }
-            
+
             with open(filepath, "w") as f:
                 json.dump(combined, f, indent=2)
-        
+
         elif output_format == "markdown":
             validation_md = self._generate_validation_markdown(validation_result)
             comparison_md = self._generate_comparison_markdown(comparison_report)
-            
+
             overall_status = validation_result.is_valid and comparison_report.passed
-            
+
             lines = [
                 "# QuASIM Mission Data Integration Report",
                 "",
@@ -239,18 +238,18 @@ class ReportGenerator:
                 "",
                 comparison_md,
             ]
-            
+
             with open(filepath, "w") as f:
                 f.write("\n".join(lines))
-        
+
         else:
             raise ValueError(f"Unsupported output format: {output_format}")
-        
+
         return str(filepath)
-    
+
     def list_reports(self) -> list[str]:
         """List all generated reports.
-        
+
         Returns:
             List of report file paths
         """

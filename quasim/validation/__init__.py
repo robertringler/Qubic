@@ -7,7 +7,7 @@ against QuASIM simulations, enabling performance analysis and model validation.
 from __future__ import annotations
 
 from .mission_validator import MissionDataValidator, ValidationResult
-from .performance_comparison import PerformanceComparator, ComparisonReport
+from .performance_comparison import ComparisonReport, PerformanceComparator
 from .report_generator import ReportGenerator
 
 __all__ = [
