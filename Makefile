@@ -1,4 +1,4 @@
-.PHONY: test validate fmt lint build bench pack deploy
+.PHONY: test validate fmt lint build bench pack deploy sanity-check
 
 ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -29,6 +29,10 @@ lint:
 # Validate infrastructure and run tests
 validate test:
 	@python3 scripts/test_full_stack.py
+
+# Run full stack sanity check (builds and tests Docker services)
+sanity-check:
+	@python3 scripts/sanity_check_full_stack.py
 
 # Build QuASIM components
 build:
