@@ -54,10 +54,16 @@ jobs:
         run: |
           echo "::group::Running QuASIM Validation Suite"
           # Generate test JSONs if needed
-          python live_emulation_for_ci_validation.py || true
+          if [ -f "live_emulation_for_ci_validation.py" ]; then
+            python live_emulation_for_ci_validation.py || echo "⚠️  Test JSON generation failed, continuing..."
+          fi
           # Run validation tests
           export PYTHONPATH="${GITHUB_WORKSPACE}:${PYTHONPATH}"
-          pytest validation_suite.py -v --tb=short || echo "Validation suite skipped (missing test files)"
+          if [ -f "validation_suite.py" ]; then
+            pytest validation_suite.py -v --tb=short || echo "⚠️  Validation suite tests failed or skipped"
+          else
+            echo "ℹ️  validation_suite.py not found, skipping"
+          fi
           echo "::endgroup::"
       
       - name: Upload certification test reports
@@ -282,7 +288,7 @@ jobs:
           cp -r test-reports/* release-bundle/
           
           # Create manifest
-          cat > release-bundle/MANIFEST.txt << 'MANIFEST'
+          cat > release-bundle/MANIFEST.txt << 'EOF'
           QuASIM Certification Data Package
           ==================================
           
@@ -301,7 +307,7 @@ jobs:
           - Seed determinism audit log (seed_audit.log)
           - Certification Data Package metadata (CDP_v1.0.json)
           - Certification test reports (HTML & JSON)
-          MANIFEST
+          EOF
           
           # Create archive
           cd release-bundle
@@ -321,10 +327,10 @@ jobs:
       - name: Attach bundle to release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: QuASIM-CDP-${{ github.event.release.tag_name }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: QuASIM-CDP-${{ github.event.release.tag_name }}.tar.gz
 
   # Job 4: Post-validation reporting
   certification-report:

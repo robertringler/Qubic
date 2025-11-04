@@ -117,7 +117,7 @@ These gates **block merges** if validation criteria are not met:
 - Missing required evidence items
 - Unverified critical evidence
 
-#### 3. Archive Release Artifacts
+#### 3. Archive Release Artifacts (`archive-release-artifacts`)
 
 **Purpose**: Create comprehensive certification bundles for releases
 
