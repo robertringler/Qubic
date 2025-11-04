@@ -40,15 +40,8 @@ build:
 
 # Run benchmarks
 bench:
-	@echo "Running QuASIM benchmarks..."
-	@if [ -f benchmarks/quasim_bench.py ]; then \
-	python3 benchmarks/quasim_bench.py ; \
-	fi
-	@if [ -f integrations/benchmarks/aero/run_benchmarks.py ]; then \
-	python3 integrations/benchmarks/aero/run_benchmarks.py ; \
-	else \
-	echo "Aerospace benchmarks not yet implemented"; \
-	fi
+	@echo "Running QuASIM comprehensive benchmark suite..."
+	@python3 tools/bench_all.py --iters 30 --warmup 3 --precision fp32 --backends auto --output-dir reports --seed 1337
 
 # Package artifacts (containers, helm charts)
 pack:

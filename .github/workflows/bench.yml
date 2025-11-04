@@ -1,0 +1,264 @@
+name: QuASIM Benchmarks
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: 'Number of benchmark iterations'
+        required: false
+        default: '30'
+      precisions:
+        description: 'Comma-separated list of precisions (fp32,fp16,fp8)'
+        required: false
+        default: 'fp32'
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        backend: [cpu]
+        precision: [fp32]
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for git comparisons
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install numpy
+        # Install optional dependencies if available
+        pip install jax[cpu] || echo "JAX not available, skipping"
+        pip install torch --index-url https://download.pytorch.org/whl/cpu || echo "PyTorch not available, skipping"
+
+    - name: Run benchmark suite
+      id: benchmark
+      run: |
+        python3 tools/bench_all.py \
+          --iters ${{ github.event.inputs.iterations || '30' }} \
+          --warmup 3 \
+          --precision ${{ github.event.inputs.precisions || matrix.precision }} \
+          --backends ${{ matrix.backend }} \
+          --output-dir reports \
+          --seed 1337
+
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: benchmark-results-${{ matrix.backend }}-${{ matrix.precision }}
+        path: |
+          reports/
+          !reports/*.md
+        retention-days: 30
+
+    - name: Upload benchmark summary
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: benchmark-summary-${{ matrix.backend }}-${{ matrix.precision }}
+        path: |
+          reports/summary.md
+          reports/regressions.md
+        retention-days: 90
+
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const summaryPath = 'reports/summary.md';
+          
+          if (!fs.existsSync(summaryPath)) {
+            console.log('Summary file not found, skipping PR comment');
+            return;
+          }
+          
+          const summary = fs.readFileSync(summaryPath, 'utf8');
+          const regressionsPath = 'reports/regressions.md';
+          let regressions = '';
+          
+          if (fs.existsSync(regressionsPath)) {
+            regressions = fs.readFileSync(regressionsPath, 'utf8');
+          }
+          
+          const body = `## 📊 QuASIM Benchmark Results
+          
+          Backend: **${{ matrix.backend }}** | Precision: **${{ matrix.precision }}**
+          
+          ${summary}
+          
+          ---
+          
+          ${regressions}
+          
+          <details>
+          <summary>📦 Artifacts</summary>
+          
+          - [Full benchmark results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - Artifact: \`benchmark-results-${{ matrix.backend }}-${{ matrix.precision }}\`
+          </details>
+          `;
+          
+          // Find existing comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('QuASIM Benchmark Results')
+          );
+          
+          if (botComment) {
+            // Update existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: body
+            });
+          } else {
+            // Create new comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+          }
+
+    - name: Check for regressions
+      if: always()
+      run: |
+        echo "Checking for performance regressions..."
+        if grep -q "regression" reports/regressions.md 2>/dev/null; then
+          echo "⚠️ Performance regressions detected!"
+          cat reports/regressions.md
+          # Don't fail the build for now, just warn
+          # exit 1
+        else
+          echo "✅ No regressions detected"
+        fi
+
+  publish-results:
+    name: Publish Results to Main
+    runs-on: ubuntu-latest
+    needs: benchmark
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download benchmark results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: benchmark-summary-*
+        path: benchmark-artifacts
+        merge-multiple: true
+
+    - name: Commit benchmark results
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        mkdir -p benchmarks/history
+        
+        # Copy summary with timestamp
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        SHORT_SHA=$(git rev-parse --short HEAD)
+        
+        if [ -f benchmark-artifacts/summary.md ]; then
+          cp benchmark-artifacts/summary.md benchmarks/latest_summary.md
+          cp benchmark-artifacts/summary.md "benchmarks/history/summary_${TIMESTAMP}_${SHORT_SHA}.md"
+          
+          git add benchmarks/
+          git commit -m "📊 Update benchmark results for ${SHORT_SHA}" || echo "No changes to commit"
+          git push || echo "Push failed, may need manual intervention"
+        fi
+
+    - name: Create/Update benchmark issue
+      if: success()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const shortSha = context.sha.substring(0, 8);
+          const title = `QuASIM Benchmarks @ ${shortSha}`;
+          
+          // Read summary
+          let summary = 'No summary available';
+          if (fs.existsSync('benchmark-artifacts/summary.md')) {
+            summary = fs.readFileSync('benchmark-artifacts/summary.md', 'utf8');
+          }
+          
+          const body = `# QuASIM Benchmark Results
+          
+          **Commit**: ${context.sha}
+          **Branch**: ${context.ref}
+          **Run**: [#${context.runNumber}](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+          
+          ${summary}
+          
+          ---
+          
+          ## Checklist
+          
+          - [x] Benchmarks executed
+          - [x] Results published
+          - [ ] Review performance trends
+          - [ ] Investigate any regressions
+          - [ ] Update optimization roadmap
+          `;
+          
+          // Search for existing issue
+          const { data: issues } = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'benchmark',
+            per_page: 100
+          });
+          
+          const existingIssue = issues.find(issue => issue.title.includes('QuASIM Benchmarks @'));
+          
+          if (existingIssue) {
+            // Update existing issue
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: existingIssue.number,
+              title: title,
+              body: body
+            });
+            console.log(`Updated issue #${existingIssue.number}`);
+          } else {
+            // Create new issue
+            const { data: newIssue } = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['benchmark', 'automated']
+            });
+            console.log(`Created issue #${newIssue.number}`);
+          }

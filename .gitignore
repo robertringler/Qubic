@@ -20,3 +20,9 @@ certs/*_certificate.json
 
 # Test artifacts
 .pytest_cache/
+
+# Benchmark artifacts (keep reports directory structure but exclude generated files)
+reports/kernels/
+reports/env.json
+reports/kernel_manifest.json
+reports/summary.json
