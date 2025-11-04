@@ -2,7 +2,7 @@
 
 ## Environment
 
-- **Commit**: `455b6295`
+- **Commit**: `ee8da844`
 - **Branch**: `copilot/execute-quasim-benchmark-suite-again`
 - **Dirty**: True
 
@@ -20,9 +20,9 @@
 
 | Kernel | Backend | Precision | p50 (ms) | p90 (ms) | Throughput (ops/s) |
 | --- | --- | --- | --- | --- | --- |
-| autonomous_systems | jax | fp32 | 0.011 | 0.015 | 77186.70 |
-| quasim_runtime | cpu | fp32 | 37.667 | 37.812 | 26.53 |
-| pressure_poisson | cuda | fp32 | 44.207 | 44.719 | 22.60 |
+| autonomous_systems | cpu | fp32 | 0.011 | 0.012 | 88447.05 |
+| quasim_runtime | cpu | fp32 | 38.594 | 38.885 | 25.87 |
+| pressure_poisson | cpu | fp32 | 44.430 | 44.697 | 22.46 |
 
 ## Resource Usage
 
@@ -31,10 +31,8 @@ No memory data available.
 ## Key Findings
 
 - **Fastest Kernel**: `autonomous_systems` (0.011 ms p50)
-- **Highest Throughput**: `autonomous_systems` (77186.70 ops/s)
-- **Backends Tested**: cpu, cuda, jax
+- **Highest Throughput**: `autonomous_systems` (88447.05 ops/s)
 
 ## Recommendations
 
-- **High Variance Detected**: 1 kernel(s) show >10% stddev. Consider investigating sources of non-determinism.
 - **Precision Testing**: Consider testing additional precisions (FP16, FP8) for speed vs. accuracy trade-offs.

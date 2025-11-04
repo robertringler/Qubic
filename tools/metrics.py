@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import platform
 import subprocess
 import time
@@ -115,9 +114,7 @@ class MetricsCollector:
             except ImportError:
                 logger.warning("PyTorch not available; ROCm metrics disabled")
 
-    def time_execution(
-        self, func: Callable, iterations: int = 30, warmup: int = 3
-    ) -> TimingResult:
+    def time_execution(self, func: Callable, iterations: int = 30, warmup: int = 3) -> TimingResult:
         """Time function execution with warmup.
 
         Args:
@@ -295,7 +292,7 @@ def load_json(input_path: Path) -> Any:
     Returns:
         Loaded data
     """
-    with open(input_path, "r") as f:
+    with open(input_path) as f:
         return json.load(f)
 
 
@@ -364,7 +361,9 @@ def get_system_info() -> Dict[str, Any]:
                 "available": True,
                 "version": torch.version.cuda,
                 "device_count": torch.cuda.device_count(),
-                "device_name": torch.cuda.get_device_name(0) if torch.cuda.device_count() > 0 else None,
+                "device_name": torch.cuda.get_device_name(0)
+                if torch.cuda.device_count() > 0
+                else None,
             }
         else:
             info["cuda"] = {"available": False}

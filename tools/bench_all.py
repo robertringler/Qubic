@@ -9,9 +9,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
-import json
 import logging
-import os
 import subprocess
 import sys
 import traceback
@@ -27,9 +25,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "runtime" / "python"))
 
 from tools.metrics import (
-    AccuracyResult,
     BenchmarkResult,
-    MemoryResult,
     MetricsCollector,
     TimingResult,
     generate_markdown_table,
@@ -419,9 +415,13 @@ class BenchmarkRunner:
 
         # Special handling for pressure_poisson - wrap main function
         if kernel.name == "pressure_poisson" and hasattr(module, "PressurePoissonSolver"):
+
             def wrapper(**kwargs):
-                from integrations.kernels.cfd.pressure_poisson import PressurePoissonConfig, PressurePoissonSolver
-                
+                from integrations.kernels.cfd.pressure_poisson import (
+                    PressurePoissonConfig,
+                    PressurePoissonSolver,
+                )
+
                 config = PressurePoissonConfig(
                     grid_size=kwargs.get("grid_size", (32, 32, 32)),
                     max_iterations=kwargs.get("max_iterations", 50),
@@ -429,11 +429,11 @@ class BenchmarkRunner:
                     precision=module.Precision.FP32,
                     backend=module.Backend.CPU,
                     deterministic=True,
-                    seed=self.seed
+                    seed=self.seed,
                 )
                 solver = PressurePoissonSolver(config)
                 return solver.solve()
-            
+
             return wrapper
 
         logger.warning(f"No benchmark function found for {kernel.name}")
@@ -712,7 +712,9 @@ class ReportGenerator:
 
         if successful:
             # Check for high variance
-            high_variance = [r for r in successful if r.timing.latency_ms_std > r.timing.latency_ms_mean * 0.1]
+            high_variance = [
+                r for r in successful if r.timing.latency_ms_std > r.timing.latency_ms_mean * 0.1
+            ]
             if high_variance:
                 lines.append(
                     f"- **High Variance Detected**: {len(high_variance)} kernel(s) show >10% stddev. "
@@ -810,7 +812,10 @@ def main():
         help="Comma-separated backends to use (default: auto)",
     )
     parser.add_argument(
-        "--output-dir", type=Path, default=Path("reports"), help="Output directory (default: reports)"
+        "--output-dir",
+        type=Path,
+        default=Path("reports"),
+        help="Output directory (default: reports)",
     )
     parser.add_argument(
         "--seed", type=int, default=1337, help="Random seed for reproducibility (default: 1337)"
@@ -820,9 +825,7 @@ def main():
         type=str,
         help="Git ref to compare against for regression detection (e.g., main)",
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
 
