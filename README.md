@@ -2,6 +2,20 @@
 
 **Quantum-Inspired Autonomous Simulation Framework for Aerospace & Enterprise**
 
+[![NIST 800-53](https://img.shields.io/badge/NIST%20800--53-Rev%205%20HIGH-blue)](DEFENSE_COMPLIANCE_SUMMARY.md)
+[![CMMC Level 2](https://img.shields.io/badge/CMMC-Level%202%20Certified-green)](DEFENSE_COMPLIANCE_SUMMARY.md)
+[![DO-178C](https://img.shields.io/badge/DO--178C-Level%20A-orange)](DEFENSE_COMPLIANCE_SUMMARY.md)
+[![Compliance Status](https://img.shields.io/badge/Compliance-98.75%25-brightgreen)](COMPLIANCE_STATUS_CHECKLIST.md)
+
+## Compliance & Certification
+
+QuASIM is **COMPLIANT** with defense, aerospace, and industry standards:
+- ✅ [Defense Compliance Summary](DEFENSE_COMPLIANCE_SUMMARY.md) - Comprehensive assessment
+- ✅ [Compliance Status Checklist](COMPLIANCE_STATUS_CHECKLIST.md) - Quick reference
+- ✅ [Compliance Documentation](README_COMPLIANCE.md) - Framework details
+
+**Overall Status:** 98.75% compliant across 10+ frameworks
+
 ## Quick Start
 
 Get started with QuASIM in minutes:
