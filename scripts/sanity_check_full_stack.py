@@ -97,7 +97,7 @@ def check_docker_available() -> bool:
     except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
         print_error("Docker is not available or not running")
         return False
-
+        subprocess.run(
 
 def validate_docker_compose_config() -> bool:
     """Validate docker-compose.yml configuration."""
