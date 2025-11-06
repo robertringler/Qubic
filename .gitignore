@@ -22,3 +22,9 @@ certs/*_certificate.json
 .pytest_cache/
 *.backup
 sbom.spdx.json
+
+# CLI generated files
+plan.json
+
+# Package build artifacts
+*.egg-info/
