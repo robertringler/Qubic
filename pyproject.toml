@@ -1,3 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quasim"
+version = "0.1.0"
+description = "Quantum-Accelerated Simulation Runtime"
+authors = [{name = "Sybernix Team"}]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "pyyaml>=6.0",
+    "click>=8.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "bandit[toml]>=1.7.0",
+]
+
+[project.scripts]
+quasim-hcal = "quasim.hcal.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["quasim*"]
+
 [tool.black]
 line-length = 100
 target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
@@ -41,6 +75,9 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 addopts = "-v --strict-markers"
+markers = [
+    "requires_hardware: marks tests as requiring physical hardware (deselect with '-m \"not requires_hardware\"')",
+]
 
 [tool.coverage.run]
 source = ["."]

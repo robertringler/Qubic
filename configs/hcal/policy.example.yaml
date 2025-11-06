@@ -1,0 +1,22 @@
+# HCAL Policy Configuration Example
+# This file defines hardware control policies for different environments
+
+environment: DEV  # Options: DEV, LAB, PROD
+
+# Allowed compute backends
+allowed_backends:
+  - cpu
+  - cuda
+  - rocm
+
+# Resource limits
+limits:
+  max_qubits: 20
+  max_circuits: 100
+  max_shots: 10000
+  timeout_seconds: 300
+
+# Additional configuration
+settings:
+  enable_telemetry: true
+  log_level: INFO
