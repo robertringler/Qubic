@@ -130,6 +130,9 @@ class QuantacosmorphysigeneticField:
     ...     print(f"t={state.time:.2f}, C={state.coherence:.3f}, S={state.entropy:.3f}")
     """
 
+    # Numerical stability threshold
+    EPSILON = 1e-10
+
     def __init__(self, parameters: Optional[QCMGParameters] = None):
         """
         Initialize QCMG field simulator.
@@ -241,9 +244,9 @@ class QuantacosmorphysigeneticField:
         norm_m = np.linalg.norm(self.phi_m)
         norm_i = np.linalg.norm(self.phi_i)
 
-        if norm_m > 1e-10:
+        if norm_m > self.EPSILON:
             self.phi_m = self.phi_m / norm_m
-        if norm_i > 1e-10:
+        if norm_i > self.EPSILON:
             self.phi_i = self.phi_i / norm_i
 
         self.time += dt
@@ -326,7 +329,7 @@ class QuantacosmorphysigeneticField:
         norm_m = np.linalg.norm(self.phi_m)
         norm_i = np.linalg.norm(self.phi_i)
 
-        if norm_m < 1e-10 or norm_i < 1e-10:
+        if norm_m < self.EPSILON or norm_i < self.EPSILON:
             return 0.0
 
         coherence = np.abs(inner_product) / (norm_m * norm_i)
@@ -344,12 +347,12 @@ class QuantacosmorphysigeneticField:
         prob_i = np.abs(self.phi_i) ** 2
 
         # Normalize
-        prob_m = prob_m / (np.sum(prob_m) + 1e-10)
-        prob_i = prob_i / (np.sum(prob_i) + 1e-10)
+        prob_m = prob_m / (np.sum(prob_m) + self.EPSILON)
+        prob_i = prob_i / (np.sum(prob_i) + self.EPSILON)
 
         # Entropy contributions
-        entropy_m = -np.sum(prob_m * np.log(prob_m + 1e-10))
-        entropy_i = -np.sum(prob_i * np.log(prob_i + 1e-10))
+        entropy_m = -np.sum(prob_m * np.log(prob_m + self.EPSILON))
+        entropy_i = -np.sum(prob_i * np.log(prob_i + self.EPSILON))
 
         # Combined entropy (tensor product)
         entropy = entropy_m + entropy_i
