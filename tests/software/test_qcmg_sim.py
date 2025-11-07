@@ -144,11 +144,12 @@ def test_field_history():
     field.initialize(mode="gaussian")
 
     # Evolve for a few steps
-    for _ in range(5):
+    num_steps = 5
+    for _ in range(num_steps):
         field.evolve()
 
     history = field.get_history()
-    assert len(history) == 6  # Initial + 5 steps
+    assert len(history) == 1 + num_steps  # Initial + num_steps
 
     # Check that history is ordered by time
     for i in range(1, len(history)):
