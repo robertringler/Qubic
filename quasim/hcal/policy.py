@@ -56,6 +56,8 @@ class PolicyValidator:
 
         with open(policy_path) as f:
             config = yaml.safe_load(f)
+            if config is None:
+                raise ValueError(f"Policy file is empty or invalid: {policy_path}")
 
         cls._validate_config(config)
 
