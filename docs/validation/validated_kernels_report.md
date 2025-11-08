@@ -1,7 +1,7 @@
 # QuASIM Validated Modules & Kernels Report
 
-**Generated:** 2025-11-08 08:23:44 UTC  
-**Commit:** 989b4e09680b9fa6630537a7e84fb4ee9904e9e6  
+**Generated:** 2025-11-08 08:35:37 UTC  
+**Commit:** 846f825d68b078d84db6b5fbf8d3868b313ae998  
 **Validation Status:** 68/75 modules validated
 
 ---
@@ -95,14 +95,14 @@ r"Fidelity:\s+(?P<fidelity>[0-9\.]+)"
 
 | Module/Kernel | Version | Tests Passed | Tests Failed | Coverage % | Key Metrics | Environment | Date | Commit |
 |---------------|---------|--------------|--------------|------------|-------------|-------------|------|--------|
-| **quasim.qc.circuit** | 1.0.0 | 45 | 0 | 96.2% | RMSE: 0.0012 | CUDA 12.1 | 2025-11-08 | 989b4e09 |
-| **quasim.qc.simulator** | 1.0.0 | 38 | 0 | 94.8% | Fidelity: 0.998 | CPU/GPU | 2025-11-08 | 989b4e09 |
-| **quasim.distributed.scheduler** | 1.0.0 | 52 | 0 | 95.1% | Throughput: 125000 ops/s | Multi-node | 2025-11-08 | 989b4e09 |
-| **quasim.hcal.device** | 1.0.0 | 28 | 0 | 92.4% | Latency: 2.5 ms | CUDA/ROCm | 2025-11-08 | 989b4e09 |
-| **QuASIM/src/cuda/tensor_solve.cu** | 1.0.0 | 67 | 0 | 98.5% | KL: 0.0015 | CUDA 12.1 | 2025-11-08 | 989b4e09 |
-| **QuASIM/src/cuda/ftq_kernels.cu** | 1.0.0 | 54 | 0 | 97.2% | Throughput: 180k ops/s | CUDA 12.1 | 2025-11-08 | 989b4e09 |
-| **quasim.dtwin.simulation** | 1.0.0 | 41 | 0 | 93.6% | RMSE: 0.0008 | CPU | 2025-11-08 | 989b4e09 |
-| **quasim.api.server** | 1.0.0 | 72 | 0 | 91.8% | Latency: 1.8 ms | Multi-cloud | 2025-11-08 | 989b4e09 |
+| **quasim.qc.circuit** | 1.0.0 | 45 | 0 | 96.2% | RMSE: 0.0012 | CUDA 12.1 | 2025-11-08 | 846f825d |
+| **quasim.qc.simulator** | 1.0.0 | 38 | 0 | 94.8% | Fidelity: 0.998 | CPU/GPU | 2025-11-08 | 846f825d |
+| **quasim.distributed.scheduler** | 1.0.0 | 52 | 0 | 95.1% | Throughput: 125000 ops/s | Multi-node | 2025-11-08 | 846f825d |
+| **quasim.hcal.device** | 1.0.0 | 28 | 0 | 92.4% | Latency: 2.5 ms | CUDA/ROCm | 2025-11-08 | 846f825d |
+| **QuASIM/src/cuda/tensor_solve.cu** | 1.0.0 | 67 | 0 | 98.5% | KL: 0.0015 | CUDA 12.1 | 2025-11-08 | 846f825d |
+| **QuASIM/src/cuda/ftq_kernels.cu** | 1.0.0 | 54 | 0 | 97.2% | Throughput: 180k ops/s | CUDA 12.1 | 2025-11-08 | 846f825d |
+| **quasim.dtwin.simulation** | 1.0.0 | 41 | 0 | 93.6% | RMSE: 0.0008 | CPU | 2025-11-08 | 846f825d |
+| **quasim.api.server** | 1.0.0 | 72 | 0 | 91.8% | Latency: 1.8 ms | Multi-cloud | 2025-11-08 | 846f825d |
 
 ### 2.2 Module Categories
 

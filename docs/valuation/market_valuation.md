@@ -1,6 +1,6 @@
 # QuASIM Market Valuation Report
 
-**Generated:** 2025-11-08 08:30:57 UTC  
+**Generated:** 2025-11-08 08:35:47 UTC  
 **Valuation Date:** 2025-11-08  
 **Currency:** USD  
 **Methodology:** DCF + Monte Carlo + Real Options
@@ -13,9 +13,9 @@
 
 | Metric | Value (USD) | Notes |
 |--------|-------------------------------|-------|
-| **P50 Enterprise Value** | $13,909,925 | Median Monte Carlo outcome |
-| **P10 Enterprise Value** | $5,093,237 | Conservative (10th percentile) |
-| **P90 Enterprise Value** | $28,179,939 | Optimistic (90th percentile) |
+| **P50 Enterprise Value** | $13,936,912 | Median Monte Carlo outcome |
+| **P10 Enterprise Value** | $4,930,912 | Conservative (10th percentile) |
+| **P90 Enterprise Value** | $28,111,678 | Optimistic (90th percentile) |
 | **Base Case DCF** | $14,695,953 | Deterministic scenario |
 | **Real Options Uplift** | $20,214,291 | Strategic option value |
 
@@ -135,21 +135,21 @@ Uses Black-Scholes framework adapted for real options valuation.
 
 | Percentile | Value (USD) |
 |------------|-------------------------------|
-| **P10** (Conservative) | $5,093,237 |
-| **P25** | $8,760,428 |
-| **P50** (Median) | $13,909,925 |
-| **P75** | $20,491,253 |
-| **P90** (Optimistic) | $28,179,939 |
+| **P10** (Conservative) | $4,930,912 |
+| **P25** | $8,801,606 |
+| **P50** (Median) | $13,936,912 |
+| **P75** | $20,493,936 |
+| **P90** (Optimistic) | $28,111,678 |
 
 **Summary Statistics:**
-- Mean: $15,570,138
-- Standard Deviation: $9,977,769
-- Coefficient of Variation: 64.1%
+- Mean: $15,570,265
+- Standard Deviation: $10,048,587
+- Coefficient of Variation: 64.5%
 
 **Interpretation:**
-- **50% probability** the enterprise value exceeds $13,909,925
-- **10% probability** the enterprise value exceeds $28,179,939
-- **90% confidence interval:** $5,093,237 - $28,179,939
+- **50% probability** the enterprise value exceeds $13,936,912
+- **10% probability** the enterprise value exceeds $28,111,678
+- **90% confidence interval:** $4,930,912 - $28,111,678
 
 ---
 
