@@ -1,26 +1,19 @@
 """Tests for Fortune 500 QuASIM Integration Analysis modules."""
+
 import csv
 import json
-from pathlib import Path
 import sys
 import tempfile
+from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from analysis.fortune500_quasim_integration import (
-    CompanyProfile,
-    QIIComponents,
-    calculate_economic_leverage,
-    calculate_integration_compatibility,
-    calculate_qii,
-    calculate_strategic_value,
-    calculate_technical_feasibility,
-    enrich_company_data,
-    generate_synthetic_fortune500,
-    analyze_company,
-    aggregate_sector_analysis,
-)
+    CompanyProfile, QIIComponents, aggregate_sector_analysis, analyze_company,
+    calculate_economic_leverage, calculate_integration_compatibility,
+    calculate_qii, calculate_strategic_value, calculate_technical_feasibility,
+    enrich_company_data, generate_synthetic_fortune500)
 
 
 def test_company_profile_creation():
@@ -318,7 +311,7 @@ def test_data_matrix_export():
         export_data_matrix(analyses, temp_path)
 
         # Read back and verify
-        with open(temp_path, "r") as f:
+        with open(temp_path) as f:
             reader = csv.DictReader(f)
             rows = list(reader)
 
@@ -347,7 +340,8 @@ def test_json_export():
         sectors[sector_name] = aggregate_sector_analysis(sector_analyses, sector_name)
 
     # Calculate correlation
-    from analysis.fortune500_quasim_integration import calculate_correlation_matrix
+    from analysis.fortune500_quasim_integration import \
+        calculate_correlation_matrix
 
     correlation_data = calculate_correlation_matrix(analyses)
 
@@ -358,7 +352,7 @@ def test_json_export():
         export_json_summary(analyses, sectors, correlation_data, temp_path)
 
         # Read back and verify
-        with open(temp_path, "r") as f:
+        with open(temp_path) as f:
             data = json.load(f)
 
         assert "metadata" in data
@@ -377,7 +371,8 @@ def test_json_export():
 
 def test_integration_pathways():
     """Test integration pathway identification."""
-    from analysis.fortune500_quasim_integration import identify_integration_pathways
+    from analysis.fortune500_quasim_integration import \
+        identify_integration_pathways
 
     # High compatibility company
     company = CompanyProfile(
@@ -411,7 +406,8 @@ def test_integration_pathways():
 
 def test_adoption_timeline():
     """Test adoption timeline determination."""
-    from analysis.fortune500_quasim_integration import determine_adoption_timeline
+    from analysis.fortune500_quasim_integration import \
+        determine_adoption_timeline
 
     assert determine_adoption_timeline(0.85) == "2025-2026"
     assert determine_adoption_timeline(0.65) == "2026-2027"

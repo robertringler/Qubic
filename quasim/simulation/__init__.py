@@ -20,6 +20,8 @@ from .quantacosmic import (
     propagate_field,
     revultra_temporal_curvature,
 )
+from .qcmg_field import (FieldState, QCMGParameters,
+                         QuantacosmorphysigeneticField)
 
 __all__ = [
     "QuantacosmorphysigeneticField",

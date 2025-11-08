@@ -5,7 +5,7 @@ Example usage of the NVIDIA NVML backend.
 This demonstrates how to use the NVMLBackend for GPU management.
 """
 
-from quasim.hardware import NVMLBackend, NVML_AVAILABLE
+from quasim.hardware import NVML_AVAILABLE, NVMLBackend
 
 
 def main():

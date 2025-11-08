@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from quasim.simulation import FieldState, QCMGParameters, QuantacosmorphysigeneticField
+from quasim.simulation import (FieldState, QCMGParameters,
+                               QuantacosmorphysigeneticField)
 
 
 def test_qcmg_parameters_defaults():
@@ -54,13 +55,13 @@ def test_field_state_copy():
         time=2.0,
     )
     state_copy = state.copy()
-    
+
     # Verify values are equal
     assert state_copy.field_values == state.field_values
     assert state_copy.momentum == state.momentum
     assert state_copy.energy == state.energy
     assert state_copy.time == state.time
-    
+
     # Verify it's a deep copy
     assert state_copy is not state
     assert state_copy.field_values is not state.field_values
@@ -70,7 +71,7 @@ def test_qcmg_field_initialization():
     """Test QuantacosmorphysigeneticField initialization."""
     params = QCMGParameters(field_dimension=4)
     field = QuantacosmorphysigeneticField(params)
-    
+
     assert field.parameters.field_dimension == 4
     assert not field._initialized
     assert len(field.history) == 0
@@ -81,7 +82,7 @@ def test_qcmg_field_initialize():
     params = QCMGParameters(field_dimension=3)
     field = QuantacosmorphysigeneticField(params)
     field.initialize()
-    
+
     assert field._initialized
     assert len(field.state.field_values) == 3
     assert len(field.state.momentum) == 3
@@ -94,7 +95,7 @@ def test_qcmg_field_evolve():
     """Test field evolution."""
     params = QCMGParameters(field_dimension=2, coupling_strength=0.5)
     field = QuantacosmorphysigeneticField(params)
-    
+
     # Initialize with non-zero momentum
     initial_state = FieldState(
         field_values=[1 + 0j, 0 + 1j],
@@ -103,10 +104,10 @@ def test_qcmg_field_evolve():
         time=0.0,
     )
     field.initialize(initial_state)
-    
+
     # Evolve the field
     evolved_state = field.evolve(time_delta=0.1)
-    
+
     assert evolved_state.time > 0.0
     assert evolved_state.energy >= 0.0
     assert len(field.history) == 2  # initial + evolved
@@ -117,9 +118,9 @@ def test_qcmg_field_simulate():
     params = QCMGParameters(field_dimension=2, evolution_steps=10)
     field = QuantacosmorphysigeneticField(params)
     field.initialize()
-    
+
     trajectory = field.simulate(num_steps=5)
-    
+
     assert len(trajectory) == 5
     assert all(isinstance(state, FieldState) for state in trajectory)
     assert trajectory[-1].time > trajectory[0].time
@@ -130,7 +131,7 @@ def test_qcmg_field_get_state():
     params = QCMGParameters(field_dimension=2)
     field = QuantacosmorphysigeneticField(params)
     field.initialize()
-    
+
     state = field.get_state()
     assert isinstance(state, FieldState)
     assert state is not field.state  # Should be a copy
@@ -142,10 +143,10 @@ def test_qcmg_field_reset():
     field = QuantacosmorphysigeneticField(params)
     field.initialize()
     field.evolve()
-    
+
     # Reset the field
     field.reset()
-    
+
     assert not field._initialized
     assert len(field.history) == 0
     assert len(field.state.field_values) == 0

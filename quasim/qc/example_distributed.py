@@ -12,8 +12,10 @@ from __future__ import annotations
 
 import numpy as np
 
-from quasim.qc.quasim_dist import init_cluster, initialize_zero_state, profile, shard_state
-from quasim.qc.quasim_multi import MultiQubitSimulator, create_bell_plus, create_ghz_state_exact
+from quasim.qc.quasim_dist import (init_cluster, initialize_zero_state,
+                                   profile, shard_state)
+from quasim.qc.quasim_multi import (MultiQubitSimulator, create_bell_plus,
+                                    create_ghz_state_exact)
 from quasim.qc.quasim_tn import TensorNetworkEngine
 
 
@@ -144,7 +146,7 @@ def example_distributed():
 
     # Initialize cluster (will use fallback if JAX/PyTorch not available)
     ctx = init_cluster(backend="jax", mesh_shape=(1, 1), seed=12345)
-    print(f"Initialized cluster:")
+    print("Initialized cluster:")
     print(f"  Backend: {ctx.backend}")
     print(f"  Rank: {ctx.global_rank}/{ctx.world_size}")
     print(f"  Device: {ctx.device}")
@@ -160,7 +162,7 @@ def example_distributed():
 
     # Profile
     prof = profile(ctx)
-    print(f"\nProfile:")
+    print("\nProfile:")
     print(f"  World size: {prof['world_size']}")
     print(f"  Wall time: {prof['wall_time_s']:.4f}s")
 
