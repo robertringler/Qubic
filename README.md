@@ -56,8 +56,8 @@ Full list and triage: [Patentables](docs/ip/patentables.md).
 ---
 
 ## Market Valuation (as of 2025-11-08)
-- **P50 Enterprise Value:** $1,173,000 (USD)
-- **Range (P10–P90):** $822,000 – $1,524,000
+- **P50 Enterprise Value:** $13,909,925 (USD)
+- **Range (P10–P90):** $5,093,237 – $28,179,939
 - Scenario DCFs and methodology: [Market Valuation Report](docs/valuation/market_valuation.md).
 
 ---
