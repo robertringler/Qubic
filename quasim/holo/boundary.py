@@ -37,17 +37,17 @@ def bulk_boundary_hamiltonian(
     """
     n_bulk = bulk_H.shape[0]
     n_boundary = boundary_H.shape[0]
-    
+
     # Create identity matrices
     I_bulk = np.eye(n_bulk, dtype=complex)
     I_boundary = np.eye(n_boundary, dtype=complex)
-    
+
     # Construct tensor product terms
     H_total = (
         np.kron(bulk_H, I_boundary)
         + np.kron(I_bulk, boundary_H)
     )
-    
+
     # Add coupling term (simplified as local interaction)
     if coupling_strength != 0:
         # Coupling between bulk and boundary degrees of freedom
@@ -57,7 +57,7 @@ def bulk_boundary_hamiltonian(
             if idx < len(coupling):
                 coupling[idx, idx] = coupling_strength
         H_total += coupling
-    
+
     return H_total
 
 
@@ -94,17 +94,17 @@ def evolve_open_boundary(
         1
     )
     state = U @ initial_state
-    
+
     # Apply dissipation (simplified decay)
     if dissipation_rate > 0:
         decay_factor = np.exp(-dissipation_rate * dt / 2)
         state *= decay_factor
-    
+
     # Renormalize
     norm = np.linalg.norm(state)
     if norm > 1e-14:
         state /= norm
-    
+
     return state
 
 
@@ -133,7 +133,7 @@ def check_probability_conservation(
     norm_squared = np.vdot(evolved_state, evolved_state).real
     deviation = abs(norm_squared - 1.0)
     is_conserved = deviation < tolerance
-    
+
     return is_conserved, float(deviation)
 
 
@@ -160,16 +160,16 @@ def boundary_projection(
     """
     # Reshape state into bulk ⊗ boundary structure
     state_reshaped = bulk_state.reshape(n_bulk, n_boundary)
-    
+
     # Compute reduced density matrix for boundary
     # ρ_boundary = Tr_bulk(|ψ⟩⟨ψ|)
     rho_boundary = np.zeros((n_boundary, n_boundary), dtype=complex)
-    
+
     for i in range(n_bulk):
         rho_boundary += np.outer(state_reshaped[i], state_reshaped[i].conj())
-    
+
     # Return diagonal (measurement probabilities) as a vector
     boundary_state = np.diag(rho_boundary)
     boundary_state = boundary_state / np.sum(boundary_state.real)  # Renormalize
-    
+
     return boundary_state

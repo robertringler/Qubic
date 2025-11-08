@@ -8,7 +8,7 @@ This module creates visualizations for the Fortune 500 analysis including:
 """
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import numpy as np
 
@@ -554,7 +554,7 @@ def main():
         print("Error: Analysis data not found. Please run fortune500_quasim_integration.py first.")
         return
 
-    with open(json_path, "r") as f:
+    with open(json_path) as f:
         data = json.load(f)
 
     # 1. QII Distribution Histogram

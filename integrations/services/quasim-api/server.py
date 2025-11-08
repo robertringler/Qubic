@@ -11,17 +11,14 @@ This service provides:
 
 from __future__ import annotations
 
-import json
 import logging
-import time
 import uuid
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 try:
-    from fastapi import FastAPI, HTTPException, Header, status
+    from fastapi import FastAPI, Header, HTTPException, status
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import JSONResponse
     from pydantic import BaseModel, Field
@@ -65,13 +62,13 @@ if FASTAPI_AVAILABLE:
         config: Dict[str, Any] = Field(..., description="Job configuration")
         priority: int = Field(default=5, ge=1, le=10, description="Job priority (1-10)")
         timeout_seconds: Optional[int] = Field(default=3600, description="Job timeout")
-        
+
     class JobSubmitResponse(BaseModel):
         """Response after job submission."""
         job_id: str = Field(..., description="Unique job identifier")
         status: JobStatus = Field(..., description="Initial job status")
         submitted_at: str = Field(..., description="Submission timestamp")
-        
+
     class JobStatusResponse(BaseModel):
         """Job status information."""
         job_id: str
@@ -82,13 +79,13 @@ if FASTAPI_AVAILABLE:
         completed_at: Optional[str] = None
         progress: float = Field(default=0.0, ge=0.0, le=1.0)
         message: Optional[str] = None
-        
+
     class JobCancelResponse(BaseModel):
         """Response to job cancellation."""
         job_id: str
         status: JobStatus
         cancelled_at: str
-        
+
     class ArtifactInfo(BaseModel):
         """Artifact metadata."""
         artifact_id: str
@@ -97,7 +94,7 @@ if FASTAPI_AVAILABLE:
         size_bytes: int
         content_type: str
         created_at: str
-        
+
     class MetricsResponse(BaseModel):
         """System metrics."""
         timestamp: str
@@ -108,12 +105,12 @@ if FASTAPI_AVAILABLE:
         avg_queue_time_s: float
         avg_execution_time_s: float
         worker_utilization: float
-        
+
     class ValidationRequest(BaseModel):
         """Request to validate job configuration."""
         job_type: JobType
         config: Dict[str, Any]
-        
+
     class ValidationResponse(BaseModel):
         """Validation result."""
         valid: bool
@@ -134,7 +131,7 @@ def create_app() -> Any:
     if not FASTAPI_AVAILABLE:
         logger.error("FastAPI not installed; returning mock app")
         return None
-    
+
     app = FastAPI(
         title="QuASIM API",
         description="Quantum-Accelerated Simulation Runtime API",
@@ -142,7 +139,7 @@ def create_app() -> Any:
         docs_url="/docs",
         openapi_url="/openapi.json"
     )
-    
+
     # CORS middleware
     # In production, configure allowed origins via environment variables
     import os
@@ -154,7 +151,7 @@ def create_app() -> Any:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
     # Health check
     @app.get("/health", tags=["Health"])
     def health_check():
@@ -164,7 +161,7 @@ def create_app() -> Any:
             "version": "0.1.0",
             "timestamp": datetime.utcnow().isoformat()
         }
-    
+
     @app.get("/readiness", tags=["Health"])
     def readiness_check():
         """Readiness check for Kubernetes."""
@@ -176,7 +173,7 @@ def create_app() -> Any:
                 "storage": "ok"
             }
         }
-    
+
     # Job management endpoints
     @app.post("/jobs/submit", response_model=JobSubmitResponse, tags=["Jobs"])
     def submit_job(
@@ -201,11 +198,11 @@ def create_app() -> Any:
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid API key"
                 )
-            logger.info(f"Request authenticated with API key")
-        
+            logger.info("Request authenticated with API key")
+
         job_id = str(uuid.uuid4())
         timestamp = datetime.utcnow().isoformat()
-        
+
         job_data = {
             "job_id": job_id,
             "status": JobStatus.QUEUED,
@@ -219,17 +216,17 @@ def create_app() -> Any:
             "progress": 0.0,
             "message": "Job queued for execution"
         }
-        
+
         job_store[job_id] = job_data
-        
+
         logger.info(f"Job submitted: {job_id} (type: {request.job_type})")
-        
+
         return JobSubmitResponse(
             job_id=job_id,
             status=JobStatus.QUEUED,
             submitted_at=timestamp
         )
-    
+
     @app.get("/jobs/{job_id}/status", response_model=JobStatusResponse, tags=["Jobs"])
     def get_job_status(job_id: str):
         """Get status of a specific job.
@@ -245,10 +242,10 @@ def create_app() -> Any:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Job not found: {job_id}"
             )
-        
+
         job_data = job_store[job_id]
         return JobStatusResponse(**job_data)
-    
+
     @app.post("/jobs/{job_id}/cancel", response_model=JobCancelResponse, tags=["Jobs"])
     def cancel_job(job_id: str):
         """Cancel a running or queued job.
@@ -264,28 +261,28 @@ def create_app() -> Any:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Job not found: {job_id}"
             )
-        
+
         job_data = job_store[job_id]
-        
+
         if job_data["status"] in [JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Cannot cancel job in status: {job_data['status']}"
             )
-        
+
         timestamp = datetime.utcnow().isoformat()
         job_data["status"] = JobStatus.CANCELLED
         job_data["completed_at"] = timestamp
         job_data["message"] = "Job cancelled by user"
-        
+
         logger.info(f"Job cancelled: {job_id}")
-        
+
         return JobCancelResponse(
             job_id=job_id,
             status=JobStatus.CANCELLED,
             cancelled_at=timestamp
         )
-    
+
     @app.get("/artifacts/{artifact_id}", tags=["Artifacts"])
     def get_artifact(artifact_id: str):
         """Retrieve a job artifact.
@@ -302,7 +299,7 @@ def create_app() -> Any:
             "download_url": f"/artifacts/{artifact_id}/download",
             "expires_at": datetime.utcnow().isoformat()
         }
-    
+
     @app.get("/metrics", response_model=MetricsResponse, tags=["Monitoring"])
     def get_metrics():
         """Get system metrics (Prometheus-compatible).
@@ -316,7 +313,7 @@ def create_app() -> Any:
         running = sum(1 for j in job_store.values() if j["status"] == JobStatus.RUNNING)
         completed = sum(1 for j in job_store.values() if j["status"] == JobStatus.COMPLETED)
         failed = sum(1 for j in job_store.values() if j["status"] == JobStatus.FAILED)
-        
+
         return MetricsResponse(
             timestamp=datetime.utcnow().isoformat(),
             jobs_queued=queued,
@@ -327,7 +324,7 @@ def create_app() -> Any:
             avg_execution_time_s=30.0,
             worker_utilization=0.45
         )
-    
+
     @app.get("/profiles", tags=["Monitoring"])
     def get_profiles():
         """Get performance profiles for different job types.
@@ -354,7 +351,7 @@ def create_app() -> Any:
                 }
             }
         }
-    
+
     @app.post("/validate", response_model=ValidationResponse, tags=["Validation"])
     def validate_config(request: ValidationRequest):
         """Validate job configuration without submitting.
@@ -367,24 +364,24 @@ def create_app() -> Any:
         """
         errors = []
         warnings = []
-        
+
         # Basic validation
         if not request.config:
             errors.append("Configuration cannot be empty")
-        
+
         # Job-type specific validation
         if request.job_type == JobType.CFD:
             if "mesh" not in request.config:
                 errors.append("CFD jobs require 'mesh' in config")
             if "solver" not in request.config:
                 warnings.append("No solver specified; will use default")
-        
+
         return ValidationResponse(
             valid=len(errors) == 0,
             errors=errors,
             warnings=warnings
         )
-    
+
     return app
 
 
@@ -393,7 +390,7 @@ def main():
     if not FASTAPI_AVAILABLE:
         print("FastAPI not installed. Install with: pip install fastapi uvicorn")
         return 1
-    
+
     try:
         import uvicorn
         app = create_app()
@@ -401,7 +398,7 @@ def main():
     except ImportError:
         print("uvicorn not installed. Install with: pip install uvicorn")
         return 1
-    
+
     return 0
 
 

@@ -47,14 +47,14 @@ def two_time_correlation(
     # Evolution operators
     U_1 = np.linalg.matrix_power(np.eye(len(hamiltonian)) - 1j * hamiltonian * time_1, 1)
     U_2 = np.linalg.matrix_power(np.eye(len(hamiltonian)) - 1j * hamiltonian * time_2, 1)
-    
+
     # Time-evolved operators
     A_t1 = U_1.conj().T @ observable_A @ U_1
     B_t2 = U_2.conj().T @ observable_B @ U_2
-    
+
     # Correlation
     correlation = state.conj() @ A_t1 @ B_t2 @ state
-    
+
     return complex(correlation)
 
 
@@ -86,18 +86,18 @@ def process_tensor_choi(
         Pollock et al. (2018), "Non-Markovian quantum processes"
     """
     dim = hamiltonian.shape[0]
-    
+
     # Total evolution operator
     total_time = dt * n_steps
     U = np.linalg.matrix_power(np.eye(dim) - 1j * hamiltonian * dt, n_steps)
-    
+
     # Choi matrix: Λ = |U⟩⟩⟨⟨U| where |U⟩⟩ = (I ⊗ U)|I⟩⟩
     # Vectorize U
     U_vec = U.flatten()
-    
+
     # Choi matrix
     choi = np.outer(U_vec, U_vec.conj())
-    
+
     return choi
 
 
@@ -136,19 +136,19 @@ def temporal_bell_inequality(
     """
     if len(measurements) != 4 or len(times) != 4:
         raise ValueError("Need exactly 4 measurements and 4 times")
-    
+
     A, B, C, D = measurements
     t1, t2, t3, t4 = times
-    
+
     # Compute correlations
     C_12 = two_time_correlation(state, A, B, hamiltonian, t1, t2).real
     C_23 = two_time_correlation(state, B, C, hamiltonian, t2, t3).real
     C_34 = two_time_correlation(state, C, D, hamiltonian, t3, t4).real
     C_14 = two_time_correlation(state, A, D, hamiltonian, t1, t4).real
-    
+
     # CHSH combination
     K = abs(C_12 + C_23 + C_34 - C_14)
-    
+
     return float(K)
 
 
@@ -175,7 +175,7 @@ def memory_kernel(
     """
     # Time derivative of correlation function
     dt = times[1] - times[0] if len(times) > 1 else 1.0
-    
+
     # Simplified: K(t) ≈ -dC(t,0)/dt
     if len(correlation_function.shape) == 2:
         # 2D correlation matrix
@@ -183,7 +183,7 @@ def memory_kernel(
     else:
         # 1D correlation function
         kernel = -np.gradient(correlation_function.real, dt)
-    
+
     return kernel
 
 
@@ -209,10 +209,10 @@ def quantum_coherence_measure(
     # Off-diagonal elements
     n = density_matrix.shape[0]
     coherence = 0.0
-    
+
     for i in range(n):
         for j in range(n):
             if i != j:
                 coherence += np.abs(density_matrix[i, j]) ** 2
-    
+
     return float(coherence)

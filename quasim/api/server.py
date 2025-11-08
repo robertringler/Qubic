@@ -12,7 +12,7 @@ from typing import Any
 
 class SimulationRequest:
     """Request model for quantum simulation."""
-    
+
     def __init__(
         self,
         circuit_spec: dict[str, Any],
@@ -26,7 +26,7 @@ class SimulationRequest:
 
 class SimulationResponse:
     """Response model for quantum simulation."""
-    
+
     def __init__(
         self,
         job_id: str,
@@ -40,7 +40,7 @@ class SimulationResponse:
 
 class DigitalTwinRequest:
     """Request model for digital twin simulation."""
-    
+
     def __init__(
         self,
         twin_id: str,
@@ -56,7 +56,7 @@ class DigitalTwinRequest:
 
 class OptimizationRequest:
     """Request model for optimization."""
-    
+
     def __init__(
         self,
         problem_type: str,
@@ -82,7 +82,7 @@ def create_app() -> Any:
     #     description="Quantum-Accelerated Simulation Runtime",
     #     version="0.1.0"
     # )
-    
+
     # Configure CORS
     # app.add_middleware(
     #     CORSMiddleware,
@@ -91,37 +91,37 @@ def create_app() -> Any:
     #     allow_methods=["*"],
     #     allow_headers=["*"],
     # )
-    
+
     class MockApp:
         """Mock FastAPI app for demonstration."""
-        
+
         def __init__(self):
             self.title = "QuASIM API"
             self.version = "0.1.0"
             self.routes = []
-        
+
         def get(self, path: str):
             """Mock GET route decorator."""
             def decorator(func):
                 self.routes.append({"method": "GET", "path": path, "handler": func})
                 return func
             return decorator
-        
+
         def post(self, path: str):
             """Mock POST route decorator."""
             def decorator(func):
                 self.routes.append({"method": "POST", "path": path, "handler": func})
                 return func
             return decorator
-    
+
     app = MockApp()
-    
+
     # Health check endpoint
     @app.get("/health")
     def health_check():
         """Health check endpoint."""
         return {"status": "healthy", "version": "0.1.0"}
-    
+
     # Quantum simulation endpoints
     @app.post("/api/v1/qc/simulate")
     def simulate_circuit(request: SimulationRequest):
@@ -140,7 +140,7 @@ def create_app() -> Any:
             status="queued",
             results=None
         )
-    
+
     @app.get("/api/v1/qc/jobs/{job_id}")
     def get_simulation_status(job_id: str):
         """Get status of a simulation job.
@@ -159,7 +159,7 @@ def create_app() -> Any:
                 "probabilities": [],
             }
         }
-    
+
     # Digital twin endpoints
     @app.post("/api/v1/dtwin/create")
     def create_digital_twin(request: DigitalTwinRequest):
@@ -176,7 +176,7 @@ def create_app() -> Any:
             "system_type": request.system_type,
             "status": "initialized"
         }
-    
+
     @app.post("/api/v1/dtwin/{twin_id}/simulate")
     def simulate_digital_twin(twin_id: str, time_steps: int = 100):
         """Run digital twin simulation.
@@ -193,7 +193,7 @@ def create_app() -> Any:
             "trajectory": [],
             "status": "completed"
         }
-    
+
     # Optimization endpoints
     @app.post("/api/v1/opt/optimize")
     def run_optimization(request: OptimizationRequest):
@@ -211,7 +211,7 @@ def create_app() -> Any:
             "status": "running",
             "algorithm": request.algorithm
         }
-    
+
     # Cluster management endpoints
     @app.get("/api/v1/cluster/status")
     def get_cluster_status():
@@ -226,5 +226,5 @@ def create_app() -> Any:
             "backend": "cuda",
             "utilization": 0.45
         }
-    
+
     return app

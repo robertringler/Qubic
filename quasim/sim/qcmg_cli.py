@@ -58,9 +58,9 @@ def main():
         default=None,
         help="Export results to JSON file (default: None)",
     )
-    
+
     args = parser.parse_args()
-    
+
     # Create parameters
     params = QCMGParameters(
         grid_size=args.grid_size,
@@ -68,17 +68,17 @@ def main():
         coupling_strength=args.coupling_strength,
         random_seed=args.random_seed,
     )
-    
+
     # Initialize field
     print(f"Initializing QCMG field (mode={args.mode})...")
     field = QuantacosmorphysigeneticField(params)
     field.initialize(mode=args.mode)
-    
+
     # Run simulation
     print(f"Running {args.iterations} iterations...")
     for i in range(args.iterations):
         state = field.evolve()
-        
+
         if (i + 1) % 10 == 0:
             print(
                 f"  Step {i + 1:4d}: "
@@ -86,7 +86,7 @@ def main():
                 f"S={state.entropy:.4f}, "
                 f"E={state.energy:.4f}"
             )
-    
+
     # Final state
     final_state = field.get_state()
     print("\nFinal state:")
@@ -94,12 +94,12 @@ def main():
     print(f"  Coherence: {final_state.coherence:.4f}")
     print(f"  Entropy:   {final_state.entropy:.4f}")
     print(f"  Energy:    {final_state.energy:.4f}")
-    
+
     # Export if requested
     if args.export:
         print(f"\nExporting to {args.export}...")
         export_data = field.export_state()
-        
+
         # Convert numpy arrays to lists for JSON serialization
         export_data["final_state"] = {
             "time": final_state.time,
@@ -113,12 +113,12 @@ def main():
                 "phi_i_imag": final_state.phi_i.imag.tolist(),
             },
         }
-        
+
         with open(args.export, "w") as f:
             json.dump(export_data, f, indent=2)
-        
+
         print(f"Results saved to {args.export}")
-    
+
     return 0
 
 

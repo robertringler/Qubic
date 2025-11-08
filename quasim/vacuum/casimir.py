@@ -41,25 +41,25 @@ def casimir_energy_parallel_plates(
         Casimir (1948), analytical result: E = -π²/(720 a³)
     """
     a = plate_separation
-    
+
     # Modes: k_n = nπ/a for n = 1, 2, 3, ...
     n = np.arange(1, n_modes + 1)
     k_n = n * np.pi / a
-    
+
     # Energy contribution: E_n = ℏc k_n / 2
     # (factor of 1/2 is zero-point energy per mode)
     energies = k_n / 2.0
-    
+
     # Sum over modes
     E_raw = np.sum(energies)
-    
+
     # Regularization: subtract divergent vacuum energy
     # Use zeta function regularization: Σ n = ζ(-1) = -1/12
     # Casimir energy ∝ (Σ n) - (vacuum continuum) = -1/12 - 0
-    
+
     # Analytical result (for comparison/calibration)
     E_analytical = -np.pi**2 / (720 * a**3)
-    
+
     # Return analytical result (mode sum needs proper regularization)
     # In production, would implement full zeta function regularization
     return float(E_analytical)
@@ -111,19 +111,19 @@ def casimir_energy_scaling_test(
         >>> assert abs(exp + 3.0) < 0.1  # Should be ≈ -3
     """
     energies = np.array([casimir_energy_parallel_plates(a) for a in separations])
-    
+
     # Fit log(|E|) = C + α log(a)
     # Expected: α = -3
     log_a = np.log(separations)
     log_E = np.log(np.abs(energies))
-    
+
     # Linear fit
     coeffs = np.polyfit(log_a, log_E, 1)
     fitted_exponent = coeffs[0]
-    
+
     # Check if close to -3
     is_correct = abs(fitted_exponent + 3.0) < 0.2
-    
+
     return is_correct, float(fitted_exponent)
 
 
@@ -148,10 +148,10 @@ def mode_density_confined(
     """
     L = plate_separation
     c = 1.0  # Natural units
-    
+
     # 1D cavity mode density
     rho = L / (np.pi * c)
-    
+
     return float(rho)
 
 
@@ -179,9 +179,9 @@ def vacuum_energy_shift(
     """
     E_current = casimir_energy_parallel_plates(plate_separation)
     E_reference = casimir_energy_parallel_plates(reference_separation)
-    
+
     delta_E = E_current - E_reference
-    
+
     return float(delta_E)
 
 
@@ -211,10 +211,10 @@ def casimir_energy_sphere_plate(
     """
     R = sphere_radius
     a = separation
-    
+
     # PFA coefficient (order of magnitude)
     C = np.pi**2 / 360
-    
+
     E = -C * R / a**3
-    
+
     return float(E)

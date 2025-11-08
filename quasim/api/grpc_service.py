@@ -20,11 +20,11 @@ class QuASIMService:
     
     In production, this would be generated from Protocol Buffer definitions.
     """
-    
+
     def __init__(self):
         """Initialize gRPC service."""
         self.name = "QuASIMService"
-    
+
     def SimulateCircuit(self, request: dict[str, Any]) -> dict[str, Any]:
         """Execute quantum circuit simulation via gRPC.
         
@@ -39,7 +39,7 @@ class QuASIMService:
             "status": "completed",
             "results": {}
         }
-    
+
     def CreateDigitalTwin(self, request: dict[str, Any]) -> dict[str, Any]:
         """Create digital twin via gRPC.
         
@@ -53,7 +53,7 @@ class QuASIMService:
             "twin_id": request.get("twin_id", ""),
             "status": "initialized"
         }
-    
+
     def SubmitOptimization(self, request: dict[str, Any]) -> dict[str, Any]:
         """Submit optimization task via gRPC.
         
@@ -67,7 +67,7 @@ class QuASIMService:
             "job_id": f"grpc_opt_{hash(str(request))}",
             "status": "queued"
         }
-    
+
     def GetClusterStatus(self, request: dict[str, Any]) -> dict[str, Any]:
         """Get distributed cluster status via gRPC.
         
@@ -101,23 +101,23 @@ def create_grpc_server(port: int = 50051) -> Any:
     # quasim_pb2_grpc.add_QuASIMServiceServicer_to_server(QuASIMService(), server)
     # server.add_insecure_port(f'[::]:{port}')
     # return server
-    
+
     class MockGRPCServer:
         """Mock gRPC server for demonstration."""
-        
+
         def __init__(self, port: int):
             self.port = port
             self.service = QuASIMService()
             self.running = False
-        
+
         def start(self):
             """Start the gRPC server."""
             self.running = True
             print(f"Mock gRPC server started on port {self.port}")
-        
+
         def stop(self, grace: int = 5):
             """Stop the gRPC server."""
             self.running = False
             print(f"Mock gRPC server stopped (grace period: {grace}s)")
-    
+
     return MockGRPCServer(port)

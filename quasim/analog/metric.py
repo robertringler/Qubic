@@ -39,17 +39,17 @@ def refractive_index_to_metric(
         Unruh (1981), "Experimental Black-Hole Evaporation?"
     """
     n_points = len(refractive_index)
-    
+
     # Simplified 2x2 metric (time, space)
     metric = np.zeros((n_points, 2, 2))
-    
+
     for i in range(n_points):
         n = refractive_index[i]
-        
+
         # Metric components
         g_tt = -1.0  # Time-time component
         g_xx = n**2  # Spatial component
-        
+
         # Include flow if provided
         if flow_velocity is not None:
             v = flow_velocity[i]
@@ -57,7 +57,7 @@ def refractive_index_to_metric(
             metric[i] = [[g_tt, g_tx], [g_tx, g_xx]]
         else:
             metric[i] = [[g_tt, 0], [0, g_xx]]
-    
+
     return metric
 
 
@@ -90,34 +90,34 @@ def geodesic_propagation(
         >>> x, p = geodesic_propagation(0.5, 1.0, g, 100, 0.01)
     """
     n_points = len(metric)
-    
+
     positions = np.zeros(n_steps)
     momenta = np.zeros(n_steps)
-    
+
     positions[0] = initial_position
     momenta[0] = initial_momentum
-    
+
     for step in range(1, n_steps):
         x = positions[step - 1]
         p = momenta[step - 1]
-        
+
         # Discrete position index
         idx = int(x * n_points) % n_points
-        
+
         # Extract metric at current position
         g = metric[idx]
-        
+
         # Simplified geodesic evolution (Hamilton's equations)
         # dx/dt = ∂H/∂p
         # dp/dt = -∂H/∂x
-        
+
         # Velocity from metric
         g_inv = np.linalg.inv(g)
         v = g_inv[1, 1] * p  # Simplified
-        
+
         # Update position
         positions[step] = x + v * dt
-        
+
         # Update momentum (force from metric gradient)
         if idx < n_points - 1:
             g_next = metric[idx + 1]
@@ -125,12 +125,12 @@ def geodesic_propagation(
             force = -0.5 * metric_gradient * p**2
         else:
             force = 0
-        
+
         momenta[step] = p + force * dt
-        
+
         # Keep in bounds
         positions[step] = positions[step] % 1.0
-    
+
     return positions, momenta
 
 
@@ -159,21 +159,21 @@ def check_normalization_preservation(
         >>> is_ok, dev = check_normalization_preservation(psi, g)
     """
     n_points = len(wavefunction)
-    
+
     # Compute measure √|g| for each point
     sqrt_g = np.zeros(n_points)
     for i in range(n_points):
         g = metric[i]
         det_g = np.linalg.det(g)
         sqrt_g[i] = np.sqrt(np.abs(det_g))
-    
+
     # Integrate |ψ|² √g dx
     integrand = np.abs(wavefunction) ** 2 * sqrt_g
     norm = np.sum(integrand) / n_points  # Normalized by grid spacing
-    
+
     deviation = abs(norm - 1.0)
     is_normalized = deviation < tolerance
-    
+
     return is_normalized, float(deviation)
 
 
@@ -197,19 +197,19 @@ def effective_potential_from_metric(
     """
     n_points = len(metric)
     potential = np.zeros(n_points)
-    
+
     for i in range(n_points):
         if i < n_points - 1:
             # Spatial gradient of spatial metric component
             g_xx_curr = metric[i, 1, 1]
             g_xx_next = metric[i + 1, 1, 1]
             grad_g = (g_xx_next - g_xx_curr) * n_points
-            
+
             # Effective potential
             potential[i] = 0.5 * grad_g
         else:
             potential[i] = potential[i - 1]
-    
+
     return potential
 
 
@@ -237,14 +237,14 @@ def acoustic_black_hole_metric(
         Unruh (1981), Barcelo et al. (2005)
     """
     x = np.linspace(0, 1, n_points)
-    
+
     # Flow velocity increasing toward horizon
     v = flow_strength * np.tanh(10 * (x - horizon_position))
-    
+
     # Refractive index (inverse of sound speed)
     n = np.ones(n_points) / (1.0 + 0.5 * v**2)
-    
+
     # Generate metric with flow
     metric = refractive_index_to_metric(n, v)
-    
+
     return metric

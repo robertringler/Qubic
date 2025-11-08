@@ -43,23 +43,23 @@ def tdgl_evolution_step(
     """
     # Compute |ψ|²
     psi_abs_sq = np.abs(order_parameter) ** 2
-    
+
     # Compute Laplacian using finite differences (periodic BC)
     laplacian = np.zeros_like(order_parameter)
     n = len(order_parameter)
-    
+
     for i in range(n):
         laplacian[i] = (
             order_parameter[(i + 1) % n]
             - 2 * order_parameter[i]
             + order_parameter[(i - 1) % n]
         )
-    
+
     # TDGL evolution
     rhs = -gamma * (alpha * order_parameter + beta * psi_abs_sq * order_parameter - laplacian)
-    
+
     order_parameter_new = order_parameter + dt * rhs
-    
+
     return order_parameter_new
 
 
@@ -86,13 +86,13 @@ def compute_structure_factor(
     """
     # Fourier transform
     psi_k = np.fft.fft(order_parameter)
-    
+
     # Structure factor
     S_k = np.abs(psi_k) ** 2
-    
+
     # Normalize
     S_k /= len(order_parameter)
-    
+
     return S_k
 
 
@@ -122,13 +122,13 @@ def detect_crystallization(
     # Find peak (excluding DC component at k=0)
     peak_index = np.argmax(structure_factor[1:]) + 1
     peak_height = float(structure_factor[peak_index])
-    
+
     # Compute background as median
     background = np.median(structure_factor)
-    
+
     # Check if peak is significant
     is_crystallized = peak_height > threshold * background
-    
+
     return is_crystallized, int(peak_index), peak_height
 
 
@@ -168,16 +168,16 @@ def simulate_crystallization(
     # Initialize with noise
     rng = np.random.RandomState(42)  # Deterministic for testing
     psi = noise_amplitude * (rng.randn(n_grid) + 1j * rng.randn(n_grid))
-    
+
     structure_factor_history = []
-    
+
     for step in range(n_steps):
         # Evolve TDGL
         psi = tdgl_evolution_step(psi, alpha, beta, gamma, dt)
-        
+
         # Record structure factor periodically
         if step % (n_steps // 10) == 0:
             S_k = compute_structure_factor(psi)
             structure_factor_history.append(S_k)
-    
+
     return psi, np.array(structure_factor_history)

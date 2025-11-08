@@ -43,30 +43,30 @@ def compute_berry_phase(
     n_steps = len(eigenvectors)
     if n_steps < 2:
         return 0.0
-    
+
     # Ensure eigenvectors are normalized
     eigenvectors = eigenvectors / np.linalg.norm(eigenvectors, axis=1, keepdims=True)
-    
+
     # Compute Berry connection: A = i⟨ψ|∇ψ⟩
     berry_connection = 0.0
-    
+
     for i in range(n_steps - 1):
         psi_current = eigenvectors[i]
         psi_next = eigenvectors[i + 1]
-        
+
         # Compute overlap ⟨ψ_i|ψ_{i+1}⟩
         overlap = np.vdot(psi_current, psi_next)
-        
+
         # Accumulate phase: γ ≈ Σ Im[log(⟨ψ_i|ψ_{i+1}⟩)]
         berry_connection += np.angle(overlap)
-    
+
     # Normalize to [-π, π]
     gamma = berry_connection
     while gamma > np.pi:
         gamma -= 2 * np.pi
     while gamma < -np.pi:
         gamma += 2 * np.pi
-    
+
     return float(gamma)
 
 
@@ -100,34 +100,34 @@ def evolve_with_berry_phase(
     """
     state = initial_state.copy()
     eigenvectors_history = []
-    
+
     for params in parameter_path:
         H = hamiltonian_func(params)
-        
+
         # Diagonalize Hamiltonian
         eigenvalues, eigenvectors = np.linalg.eigh(H)
-        
+
         # Project state onto instantaneous eigenbasis
         coeffs = eigenvectors.conj().T @ state
-        
+
         # Store dominant eigenvector
         dominant_idx = np.argmax(np.abs(coeffs))
         eigenvectors_history.append(eigenvectors[:, dominant_idx])
-        
+
         # Evolve dynamical phase
         phase_factors = np.exp(-1j * eigenvalues * dt)
         coeffs *= phase_factors
-        
+
         # Reconstruct state
         state = eigenvectors @ coeffs
-        
+
         # Renormalize
         state /= np.linalg.norm(state)
-    
+
     # Compute Berry phase from collected eigenvectors
     eigenvectors_array = np.array(eigenvectors_history)
     berry_phase = compute_berry_phase(eigenvectors_array, parameter_path)
-    
+
     return state, berry_phase
 
 

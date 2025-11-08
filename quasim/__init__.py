@@ -30,7 +30,7 @@ class Config:
         backend: Compute backend ('cpu', 'cuda', 'rocm')
         seed: Random seed for deterministic simulations
     """
-    
+
     simulation_precision: str = "fp32"
     max_workspace_mb: int = 1024
     backend: str = "cpu"
@@ -39,7 +39,7 @@ class Config:
 
 class Runtime:
     """QuASIM simulation runtime context."""
-    
+
     def __init__(self, config: Config):
         """Initialize runtime with configuration.
         
@@ -49,17 +49,17 @@ class Runtime:
         self.config = config
         self.average_latency = 0.0
         self._initialized = False
-    
+
     def __enter__(self):
         """Enter runtime context."""
         self._initialized = True
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Exit runtime context."""
         self._initialized = False
         return False
-    
+
     def simulate(self, circuit: list[list[complex]]) -> list[complex]:
         """Simulate quantum circuit.
         
@@ -71,17 +71,17 @@ class Runtime:
         """
         if not self._initialized:
             raise RuntimeError("Runtime not initialized. Use 'with runtime(config)' context.")
-        
+
         # Simplified simulation - in production would use actual quantum simulation
         result = []
         for gate in circuit:
             # Average the complex values for each gate
             avg = sum(gate) / len(gate) if gate else 0j
             result.append(avg)
-        
+
         # Set a non-zero latency to indicate operation completed
         self.average_latency = 0.001  # 1ms simulated latency
-        
+
         return result
 
 

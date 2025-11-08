@@ -39,14 +39,14 @@ def compute_emission_intensity(
         >>> I = compute_emission_intensity(psi, d, t)
     """
     intensity = np.zeros(len(time_points))
-    
+
     for i, t in enumerate(time_points):
         # Compute expectation value of dipole operator
         dipole_expectation = state.conj() @ dipole_operator @ state
-        
+
         # Intensity is square of dipole moment
         intensity[i] = np.abs(dipole_expectation) ** 2
-    
+
     return intensity
 
 
@@ -84,16 +84,16 @@ def rabi_oscillation(
     """
     # Generalized Rabi frequency
     omega_eff = np.sqrt(omega_rabi**2 + detuning**2)
-    
+
     # Excited state population
     population_excited = (
         (omega_rabi**2 / (omega_rabi**2 + detuning**2))
         * np.sin(omega_eff * time_points / 2) ** 2
     )
-    
+
     # Ground state population (conservation)
     population_ground = 1.0 - population_excited
-    
+
     return population_excited, population_ground
 
 
@@ -126,13 +126,13 @@ def interference_pattern(
     # Normalize states
     state_1 = state_1 / np.linalg.norm(state_1)
     state_2 = state_2 / np.linalg.norm(state_2)
-    
+
     # Compute cross-term ⟨1|O|2⟩
     cross_term = state_1.conj() @ observable @ state_2
-    
+
     # Include phase and extract real part (interference)
     interference = 2 * np.real(cross_term * np.exp(1j * relative_phase))
-    
+
     return float(interference)
 
 
@@ -165,15 +165,15 @@ def multi_state_superposition_intensity(
     """
     n_states = len(amplitudes)
     intensity = np.zeros(len(time_points))
-    
+
     for t_idx, t in enumerate(time_points):
         # Construct time-evolved state
         state_t = amplitudes * np.exp(-1j * energies * t)
-        
+
         # Compute dipole expectation
         dipole_exp = state_t.conj() @ dipole_matrix @ state_t
-        
+
         # Intensity
         intensity[t_idx] = np.abs(dipole_exp) ** 2
-    
+
     return intensity

@@ -20,20 +20,20 @@ class DistributedExecutor:
         cluster_config: Ray cluster configuration
         jax_config: JAX-specific configuration
     """
-    
+
     num_workers: int = 4
     backend: str = "cuda"
     cluster_config: dict[str, Any] = field(default_factory=dict)
     jax_config: dict[str, Any] = field(default_factory=dict)
     _initialized: bool = False
-    
+
     def __post_init__(self) -> None:
         """Validate executor configuration."""
         if self.backend not in ("cuda", "hip"):
             raise ValueError(f"Backend must be 'cuda' or 'hip', got {self.backend}")
         if self.num_workers < 1:
             raise ValueError("Number of workers must be positive")
-    
+
     def initialize(self) -> None:
         """Initialize the distributed execution environment.
         
@@ -46,22 +46,22 @@ class DistributedExecutor:
         """
         if self._initialized:
             return
-        
+
         # Configure JAX backend
         jax_backend = "gpu" if self.backend in ("cuda", "hip") else "cpu"
-        
+
         # Ray initialization (simplified - production would use actual Ray)
         cluster_info = {
             "num_workers": self.num_workers,
             "backend": self.backend,
             "jax_backend": jax_backend,
         }
-        
+
         self._initialized = True
         print(f"Initialized distributed executor: {cluster_info}")
-    
+
     def submit_task(
-        self, 
+        self,
         func: Callable,
         *args: Any,
         **kwargs: Any
@@ -78,12 +78,12 @@ class DistributedExecutor:
         """
         if not self._initialized:
             self.initialize()
-        
+
         # In production, this would use Ray's remote() API
         task_id = f"task_{id(func)}_{hash(str(args))}"
-        
+
         return task_id
-    
+
     def map(
         self,
         func: Callable,
@@ -105,18 +105,18 @@ class DistributedExecutor:
         """
         if not self._initialized:
             self.initialize()
-        
+
         # Simplified parallel map - production would use Ray
         results = []
         batch_size = batch_size or max(1, len(items) // self.num_workers)
-        
+
         for i in range(0, len(items), batch_size):
             batch = items[i:i + batch_size]
             batch_results = [func(item) for item in batch]
             results.extend(batch_results)
-        
+
         return results
-    
+
     def scatter(self, data: Any) -> str:
         """Scatter data to all workers for shared access.
         
@@ -131,11 +131,11 @@ class DistributedExecutor:
         """
         if not self._initialized:
             self.initialize()
-        
+
         # Production would use Ray's put() API
         ref_id = f"ref_{hash(str(data))}"
         return ref_id
-    
+
     def gather(self, task_ids: list[str]) -> list[Any]:
         """Gather results from distributed tasks.
         
@@ -147,7 +147,7 @@ class DistributedExecutor:
         """
         # Production would use Ray's get() API
         return [f"result_{tid}" for tid in task_ids]
-    
+
     def shutdown(self) -> None:
         """Shutdown the distributed execution environment.
         
@@ -155,10 +155,10 @@ class DistributedExecutor:
         """
         if not self._initialized:
             return
-        
+
         self._initialized = False
         print("Distributed executor shutdown complete")
-    
+
     def get_cluster_info(self) -> dict[str, Any]:
         """Get information about the cluster state.
         
@@ -171,7 +171,7 @@ class DistributedExecutor:
             "initialized": self._initialized,
             "available_gpus": self._get_available_gpus(),
         }
-    
+
     def _get_available_gpus(self) -> int:
         """Query number of available GPUs.
         
@@ -193,15 +193,15 @@ class TensorExecutor:
         precision: Computation precision ('fp32', 'fp16', 'fp8')
         device_mesh: Device mesh for multi-GPU tensor parallelism
     """
-    
+
     precision: str = "fp32"
     device_mesh: list[int] = field(default_factory=list)
-    
+
     def __post_init__(self) -> None:
         """Validate tensor executor configuration."""
         if self.precision not in ("fp32", "fp16", "fp8"):
-            raise ValueError(f"Precision must be 'fp32', 'fp16', or 'fp8'")
-    
+            raise ValueError("Precision must be 'fp32', 'fp16', or 'fp8'")
+
     def matmul(self, a: list[list[float]], b: list[list[float]]) -> list[list[float]]:
         """Distributed matrix multiplication.
         
@@ -217,7 +217,7 @@ class TensorExecutor:
         # Simplified - production would use actual JAX operations
         # and handle device placement automatically
         return [[0.0 for _ in range(len(b[0]))] for _ in range(len(a))]
-    
+
     def tensor_contract(
         self,
         tensors: list[Any],

@@ -42,37 +42,37 @@ def effective_mass_hamiltonian(
     """
     n = len(mass_profile)
     H = np.zeros((n, n), dtype=complex)
-    
+
     # Kinetic energy: T = -∇ · (1/m(r)) ∇
     # Discretized as: T_ij = (1/(m_i+1 + m_i))(ψ_{i+1} - ψ_i) - ...
-    
+
     for i in range(n):
         # Diagonal term
         if i > 0:
             m_left = (mass_profile[i] + mass_profile[i - 1]) / 2
             H[i, i] += 1.0 / (2 * m_left * dx**2)
-        
+
         if i < n - 1:
             m_right = (mass_profile[i] + mass_profile[i + 1]) / 2
             H[i, i] += 1.0 / (2 * m_right * dx**2)
-        
+
         # Off-diagonal terms
         if i > 0:
             m_left = (mass_profile[i] + mass_profile[i - 1]) / 2
             H[i, i - 1] = -1.0 / (2 * m_left * dx**2)
-        
+
         if i < n - 1:
             m_right = (mass_profile[i] + mass_profile[i + 1]) / 2
             H[i, i + 1] = -1.0 / (2 * m_right * dx**2)
-    
+
     # Add potential energy
     if potential is not None:
         for i in range(n):
             H[i, i] += potential[i]
-    
+
     # Make Hermitian (fix numerical errors)
     H = (H + H.conj().T) / 2
-    
+
     return H
 
 
@@ -99,12 +99,12 @@ def dispersion_relation(
     """
     # Diagonalize Hamiltonian
     eigenvalues, eigenvectors = np.linalg.eigh(hamiltonian)
-    
+
     # Generate k-points (for 1D system)
     n = len(hamiltonian)
     k_max = np.pi / lattice_constant
     wavevectors = np.linspace(-k_max, k_max, n)
-    
+
     return wavevectors, eigenvalues
 
 
@@ -134,25 +134,25 @@ def test_dispersion_parabolic(
     """
     # Get dispersion
     k, E = dispersion_relation(hamiltonian, 1.0)
-    
+
     # Find ground state energy
     E_0 = np.min(E)
-    
+
     # Fit parabolic dispersion near k=0 (lowest few states)
     n_fit = min(5, len(E))
     E_fit = np.sort(E)[:n_fit] - E_0
     k_eff = np.arange(n_fit)  # Effective k-index
-    
+
     # E(k) ≈ k²/2m → m ≈ k²/2E
     if E_fit[1] > 1e-10:  # Avoid division by zero
         extracted_mass = k_eff[1] ** 2 / (2 * E_fit[1])
     else:
         extracted_mass = 0.0
-    
+
     # Check if close to expected
     relative_error = abs(extracted_mass - effective_mass_expected) / effective_mass_expected
     is_parabolic = relative_error < tolerance
-    
+
     return is_parabolic, float(extracted_mass)
 
 
@@ -185,12 +185,12 @@ def heterostructure_hamiltonian(
     # Mass profile with discontinuity at center
     mass_profile = np.ones(n_points) * mass_left
     mass_profile[n_points // 2 :] = mass_right
-    
+
     # Potential with barrier
     potential = np.zeros(n_points)
     potential[n_points // 2 - 2 : n_points // 2 + 2] = barrier_height
-    
+
     # Construct Hamiltonian
     H = effective_mass_hamiltonian(mass_profile, dx, potential)
-    
+
     return H

@@ -38,19 +38,19 @@ def fractional_laplacian_fft(
         Laskin (2000), "Fractional quantum mechanics"
     """
     n = len(wavefunction)
-    
+
     # Fourier transform
     psi_k = np.fft.fft(wavefunction)
-    
+
     # Wavevectors
     k = 2 * np.pi * np.fft.fftfreq(n, dx)
-    
+
     # Apply fractional Laplacian in Fourier space
     psi_k_frac = (np.abs(k) ** (2 * alpha)) * psi_k
-    
+
     # Inverse transform
     result = np.fft.ifft(psi_k_frac)
-    
+
     return result
 
 
@@ -83,19 +83,19 @@ def fractional_schrodinger_step(
     """
     # Kinetic energy term (fractional Laplacian)
     kinetic = fractional_laplacian_fft(wavefunction, alpha, dx)
-    
+
     # Potential energy term
     potential_term = potential * wavefunction
-    
+
     # Hamiltonian action
     H_psi = kinetic + potential_term
-    
+
     # Time evolution (first-order)
     psi_new = wavefunction - 1j * dt * H_psi
-    
+
     # Normalize
     psi_new /= np.linalg.norm(psi_new)
-    
+
     return psi_new
 
 
@@ -135,20 +135,20 @@ def anomalous_diffusion_propagator(
         G = np.zeros_like(x)
         G[len(G) // 2] = 1.0 / (x[1] - x[0]) if len(x) > 1 else 1.0
         return G
-    
+
     # Anomalous diffusion exponent
     beta = 2 * alpha
-    
+
     # Scaling
     width = (diffusion_coeff * t) ** (1.0 / alpha)
-    
+
     # Propagator (Gaussian-like with power-law tails)
     G = np.exp(-(np.abs(x) ** beta) / (beta * width**beta))
-    
+
     # Normalize
     dx = x[1] - x[0] if len(x) > 1 else 1.0
     G /= np.sum(G) * dx
-    
+
     return G
 
 
@@ -180,12 +180,12 @@ def measure_diffusion_exponent(
     """
     # Mean-square displacement
     msd = positions**2
-    
+
     # Exclude t=0 to avoid log(0)
     valid = times > 0
     log_t = np.log(times[valid])
     log_msd = np.log(msd[valid] + 1e-10)  # Add small offset to avoid log(0)
-    
+
     # Fit log(MSD) = log(D) + β log(t)
     if len(log_t) > 1:
         coeffs = np.polyfit(log_t, log_msd, 1)
@@ -195,7 +195,7 @@ def measure_diffusion_exponent(
     else:
         exponent_beta = 1.0
         D = 1.0
-    
+
     return float(exponent_beta), float(D)
 
 
@@ -223,7 +223,7 @@ def levy_flight_step(
     """
     # Use Chambers-Mallows-Stuck algorithm
     rng = np.random.RandomState()
-    
+
     if alpha == 2.0:
         # Gaussian limit
         step = rng.normal(0, scale)
@@ -231,7 +231,7 @@ def levy_flight_step(
         # Simplified Lévy: use Pareto-like distribution
         u = rng.uniform(-np.pi / 2, np.pi / 2)
         w = rng.exponential(1.0)
-        
+
         # Lévy step
         if alpha != 1.0:
             step = scale * (
@@ -241,7 +241,7 @@ def levy_flight_step(
             )
         else:
             step = scale * np.tan(u)
-    
+
     return float(current_position + step)
 
 
@@ -269,7 +269,7 @@ def fractal_dimension_capacity(
         >>> D = fractal_dimension_capacity(x, sizes)
     """
     counts = []
-    
+
     for epsilon in box_sizes:
         if epsilon > 0:
             # Count boxes
@@ -278,16 +278,16 @@ def fractal_dimension_capacity(
             counts.append(n_boxes)
         else:
             counts.append(1)
-    
+
     # Fit log(N) vs log(1/ε)
     log_epsilon = np.log(box_sizes)
     log_counts = np.log(np.array(counts) + 1)
-    
+
     # Slope gives -D
     if len(log_epsilon) > 1:
         coeffs = np.polyfit(log_epsilon, log_counts, 1)
         D = -coeffs[0]
     else:
         D = 1.0
-    
+
     return float(D)

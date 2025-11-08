@@ -28,7 +28,6 @@ try:
 except ImportError:
     AIOHTTP_AVAILABLE = False
 
-import json
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
@@ -56,7 +55,7 @@ class Job:
 
 class QuASIMClient:
     """High-level client for QuASIM API."""
-    
+
     def __init__(
         self,
         api_url: str = "http://localhost:8000",
@@ -76,13 +75,13 @@ class QuASIMClient:
         self.api_key = api_key
         self.timeout = timeout
         self.max_retries = max_retries
-        
+
         self.headers = {}
         if api_key:
             self.headers["X-API-Key"] = api_key
-        
+
         logger.info(f"QuASIM client initialized: {self.api_url}")
-    
+
     def _make_request(
         self,
         method: str,
@@ -100,13 +99,13 @@ class QuASIMClient:
             Response data
         """
         url = f"{self.api_url}{endpoint}"
-        
+
         for attempt in range(self.max_retries):
             try:
                 # In production, would use requests library
                 # For now, simulate response
                 logger.debug(f"{method} {url}")
-                
+
                 if endpoint == "/health":
                     return {"status": "healthy"}
                 elif endpoint == "/jobs/submit":
@@ -122,17 +121,17 @@ class QuASIMClient:
                         "status": "completed",
                         "progress": 1.0
                     }
-                
+
                 return {}
-                
+
             except Exception as e:
                 if attempt == self.max_retries - 1:
                     raise
                 logger.warning(f"Request failed (attempt {attempt + 1}): {e}")
                 time.sleep(2 ** attempt)  # Exponential backoff
-        
+
         raise RuntimeError("Max retries exceeded")
-    
+
     def submit_job(
         self,
         job_type: str,
@@ -150,25 +149,25 @@ class QuASIMClient:
             Job object
         """
         logger.info(f"Submitting {job_type} job")
-        
+
         data = {
             "job_type": job_type,
             "config": config,
             "priority": priority
         }
-        
+
         response = self._make_request("POST", "/jobs/submit", data)
-        
+
         job = Job(
             job_id=response["job_id"],
             status=JobStatus(response["status"]),
             job_type=job_type,
             submitted_at=response["submitted_at"]
         )
-        
+
         logger.info(f"Job submitted: {job.job_id}")
         return job
-    
+
     def submit_cfd(
         self,
         mesh_file: str | Path,
@@ -190,9 +189,9 @@ class QuASIMClient:
             "boundary_conditions": boundary_conditions or {},
             **config
         }
-        
+
         return self.submit_job("cfd", cfd_config)
-    
+
     def submit_fea(
         self,
         mesh_file: str | Path,
@@ -214,9 +213,9 @@ class QuASIMClient:
             "material": material_properties,
             "loads": load_cases
         }
-        
+
         return self.submit_job("fea", fea_config)
-    
+
     def submit_orbital_mc(
         self,
         num_trajectories: int,
@@ -238,9 +237,9 @@ class QuASIMClient:
             "initial_conditions": initial_conditions,
             "perturbations": perturbations or {}
         }
-        
+
         return self.submit_job("orbital_mc", mc_config)
-    
+
     def get_status(self, job_id: str) -> Job:
         """Get job status.
         
@@ -251,7 +250,7 @@ class QuASIMClient:
             Job object with current status
         """
         response = self._make_request("GET", f"/jobs/{job_id}/status")
-        
+
         return Job(
             job_id=response["job_id"],
             status=JobStatus(response["status"]),
@@ -259,7 +258,7 @@ class QuASIMClient:
             submitted_at="",
             progress=response.get("progress", 0.0)
         )
-    
+
     def cancel_job(self, job_id: str) -> bool:
         """Cancel a running job.
         
@@ -272,7 +271,7 @@ class QuASIMClient:
         logger.info(f"Cancelling job {job_id}")
         response = self._make_request("POST", f"/jobs/{job_id}/cancel")
         return response.get("status") == "cancelled"
-    
+
     def wait_for_completion(
         self,
         job_id: str,
@@ -290,21 +289,21 @@ class QuASIMClient:
             Completed job object
         """
         logger.info(f"Waiting for job {job_id} to complete")
-        
+
         start_time = time.time()
-        
+
         while time.time() - start_time < timeout:
             job = self.get_status(job_id)
-            
+
             if job.status in [JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED]:
                 logger.info(f"Job {job_id} finished: {job.status}")
                 return job
-            
+
             logger.debug(f"Job {job_id} status: {job.status} ({job.progress:.1%})")
             time.sleep(poll_interval)
-        
+
         raise TimeoutError(f"Job {job_id} did not complete within {timeout}s")
-    
+
     def download_artifact(self, artifact_id: str, output_path: Path) -> bool:
         """Download job artifact.
         
@@ -316,13 +315,13 @@ class QuASIMClient:
             True if downloaded successfully
         """
         logger.info(f"Downloading artifact {artifact_id} to {output_path}")
-        
+
         # In production, would download actual artifact
         output_path.write_text(f"# Artifact {artifact_id}\n")
-        
+
         logger.info(f"Artifact downloaded to {output_path}")
         return True
-    
+
     async def submit_job_async(
         self,
         job_type: str,
@@ -340,11 +339,11 @@ class QuASIMClient:
         if not AIOHTTP_AVAILABLE:
             logger.warning("aiohttp not available; falling back to sync")
             return self.submit_job(job_type, config)
-        
+
         # In production, would use aiohttp
         await asyncio.sleep(0.1)
         return self.submit_job(job_type, config)
-    
+
     def health_check(self) -> bool:
         """Check API health.
         
@@ -362,11 +361,11 @@ class QuASIMClient:
 def main():
     """Example usage."""
     client = QuASIMClient(api_url="http://localhost:8000")
-    
+
     # Health check
     if client.health_check():
         print("✅ API is healthy")
-    
+
     # Submit CFD job
     job = client.submit_cfd(
         mesh_file="wing.msh",
@@ -376,10 +375,10 @@ def main():
             "tolerance": 1e-6
         }
     )
-    
+
     print(f"Job submitted: {job.job_id}")
     print(f"Status: {job.status}")
-    
+
     # Wait for completion (mock)
     # result = client.wait_for_completion(job.job_id)
     # print(f"Job completed: {result.status}")

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 from .problems import OptimizationProblem
 
@@ -23,19 +23,19 @@ class QuantumOptimizer:
         backend: Computation backend for quantum simulation
         max_iterations: Maximum number of optimization iterations
     """
-    
+
     algorithm: str = "qaoa"
     backend: str = "cpu"
     max_iterations: int = 100
-    
+
     def __post_init__(self) -> None:
         """Validate optimizer configuration."""
         valid_algorithms = {"qa", "qaoa", "vqe", "hybrid"}
         if self.algorithm not in valid_algorithms:
             raise ValueError(f"Algorithm must be one of {valid_algorithms}")
-    
+
     def optimize(
-        self, 
+        self,
         problem: OptimizationProblem,
         initial_params: dict[str, Any] | None = None
     ) -> dict[str, Any]:
@@ -53,7 +53,7 @@ class QuantumOptimizer:
                 - convergence: Whether the algorithm converged
         """
         initial_params = initial_params or {}
-        
+
         if self.algorithm == "qaoa":
             return self._optimize_qaoa(problem, initial_params)
         elif self.algorithm == "qa":
@@ -62,9 +62,9 @@ class QuantumOptimizer:
             return self._optimize_vqe(problem, initial_params)
         else:  # hybrid
             return self._optimize_hybrid(problem, initial_params)
-    
+
     def _optimize_qaoa(
-        self, 
+        self,
         problem: OptimizationProblem,
         initial_params: dict[str, Any]
     ) -> dict[str, Any]:
@@ -78,13 +78,13 @@ class QuantumOptimizer:
         iterations = 0
         best_solution = problem.get_random_solution()
         best_value = problem.evaluate(best_solution)
-        
+
         for i in range(self.max_iterations):
             iterations += 1
             # QAOA parameter update (simplified)
             candidate = problem.get_random_solution()
             value = problem.evaluate(candidate)
-            
+
             if problem.is_minimization:
                 if value < best_value:
                     best_solution = candidate
@@ -93,7 +93,7 @@ class QuantumOptimizer:
                 if value > best_value:
                     best_solution = candidate
                     best_value = value
-        
+
         return {
             "solution": best_solution,
             "objective_value": best_value,
@@ -101,9 +101,9 @@ class QuantumOptimizer:
             "convergence": True,
             "algorithm": "qaoa",
         }
-    
+
     def _optimize_annealing(
-        self, 
+        self,
         problem: OptimizationProblem,
         initial_params: dict[str, Any]
     ) -> dict[str, Any]:
@@ -113,7 +113,7 @@ class QuantumOptimizer:
         """
         best_solution = problem.get_random_solution()
         best_value = problem.evaluate(best_solution)
-        
+
         return {
             "solution": best_solution,
             "objective_value": best_value,
@@ -121,9 +121,9 @@ class QuantumOptimizer:
             "convergence": True,
             "algorithm": "quantum_annealing",
         }
-    
+
     def _optimize_vqe(
-        self, 
+        self,
         problem: OptimizationProblem,
         initial_params: dict[str, Any]
     ) -> dict[str, Any]:
@@ -133,7 +133,7 @@ class QuantumOptimizer:
         """
         best_solution = problem.get_random_solution()
         best_value = problem.evaluate(best_solution)
-        
+
         return {
             "solution": best_solution,
             "objective_value": best_value,
@@ -141,9 +141,9 @@ class QuantumOptimizer:
             "convergence": True,
             "algorithm": "vqe",
         }
-    
+
     def _optimize_hybrid(
-        self, 
+        self,
         problem: OptimizationProblem,
         initial_params: dict[str, Any]
     ) -> dict[str, Any]:
@@ -154,7 +154,7 @@ class QuantumOptimizer:
         """
         best_solution = problem.get_random_solution()
         best_value = problem.evaluate(best_solution)
-        
+
         return {
             "solution": best_solution,
             "objective_value": best_value,
