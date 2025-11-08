@@ -5,9 +5,9 @@ Symbolic and numerical simulation engines for quantum-classical systems.
 """
 
 from .qcmg_field import (
-    QuantacosmorphysigeneticField,
-    QCMGParameters,
     FieldState,
+    QCMGParameters,
+    QuantacosmorphysigeneticField,
 )
 
 __all__ = [

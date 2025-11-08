@@ -37,7 +37,7 @@ def main():
 
     # Get initial state
     state = field.get_state()
-    print(f"\nInitial state:")
+    print("\nInitial state:")
     print(f"  Time: {state.time:.3f}")
     print(f"  Coherence: {state.coherence:.4f}")
     print(f"  Entropy: {state.entropy:.4f}")
@@ -63,7 +63,7 @@ def main():
 
     # Export final state
     export = field.export_state()
-    print(f"\nFinal state export:")
+    print("\nFinal state export:")
     print(f"  QCMG version: {export['qcmg_version']}")
     print(f"  History length: {export['metadata']['history_length']}")
     print(f"  State bounded: {export['metadata']['bounded']}")
