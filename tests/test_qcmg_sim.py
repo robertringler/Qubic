@@ -26,7 +26,6 @@ import pytest
 
 from quasim.sim import (
     QCMGParameters,
-    FieldState,
     QuantacosmomorphysigeneticField,
 )
 
