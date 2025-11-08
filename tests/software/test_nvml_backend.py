@@ -14,37 +14,35 @@ sys.modules['pynvml'] = mock_pynvml
 class TestNVMLBackendWithoutNVML(unittest.TestCase):
     """Test NVMLBackend behavior when pynvml is not available."""
 
-    def test_initialization_without_pynvml(self):
-        """Test backend initialization when pynvml is not available."""
+    def _get_nvml_backend(self):
+        """Helper to patch NVML_AVAILABLE and return a new NVMLBackend instance."""
         with patch('quasim.hardware.backends.nvml_backend.NVML_AVAILABLE', False):
             from quasim.hardware.backends.nvml_backend import NVMLBackend
-            backend = NVMLBackend()
-            assert not backend.initialized
+            return NVMLBackend()
+
+    def test_initialization_without_pynvml(self):
+        """Test backend initialization when pynvml is not available."""
+        backend = self._get_nvml_backend()
+        assert not backend.initialized
 
     def test_list_devices_without_pynvml(self):
         """Test list_devices returns empty list when not initialized."""
-        with patch('quasim.hardware.backends.nvml_backend.NVML_AVAILABLE', False):
-            from quasim.hardware.backends.nvml_backend import NVMLBackend
-            backend = NVMLBackend()
-            devices = backend.list_devices()
-            assert devices == []
+        backend = self._get_nvml_backend()
+        devices = backend.list_devices()
+        assert devices == []
 
     def test_get_state_without_pynvml(self):
         """Test get_state returns empty dict when not initialized."""
-        with patch('quasim.hardware.backends.nvml_backend.NVML_AVAILABLE', False):
-            from quasim.hardware.backends.nvml_backend import NVMLBackend
-            backend = NVMLBackend()
-            state = backend.get_state("GPU0")
-            assert state == {}
+        backend = self._get_nvml_backend()
+        state = backend.get_state("GPU0")
+        assert state == {}
 
     def test_apply_setpoint_without_pynvml(self):
         """Test apply_setpoint returns error when not initialized."""
-        with patch('quasim.hardware.backends.nvml_backend.NVML_AVAILABLE', False):
-            from quasim.hardware.backends.nvml_backend import NVMLBackend
-            backend = NVMLBackend()
-            result = backend.apply_setpoint("GPU0", "power_limit_w", 250)
-            assert not result["success"]
-            assert "error" in result
+        backend = self._get_nvml_backend()
+        result = backend.apply_setpoint("GPU0", "power_limit_w", 250)
+        assert not result["success"]
+        assert "error" in result
 
 
 class TestNVMLBackendWithMock(unittest.TestCase):
