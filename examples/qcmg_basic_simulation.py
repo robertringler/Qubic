@@ -136,7 +136,7 @@ def visualize_results(field: QuantacosmomorphysigeneticField):
         E0 = energies[0]
         gamma = field.params.dissipation_rate * 2  # Theoretical decay rate
         E_fit = E0 * np.exp(-gamma * np.array(times))
-        ax4.plot(times, E_fit, "k--", linewidth=1.5, alpha=0.7, label=f"Theory: E₀ exp(-2γt)")
+        ax4.plot(times, E_fit, "k--", linewidth=1.5, alpha=0.7, label="Theory: $E_0 \\, \\exp(-2\\gamma t)$")
         ax4.legend(fontsize=10)
 
     plt.tight_layout()
