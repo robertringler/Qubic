@@ -37,6 +37,7 @@ class CalibrationLoop:
         objective_fn: Callable[[Dict[str, Any]], float],
         convergence_threshold: float = 0.01,
         max_iterations: int = 100,
+        random_seed: int = 42,
     ):
         """Initialize calibration loop.
 
@@ -46,12 +47,15 @@ class CalibrationLoop:
             objective_fn: Function to compute objective value (lower is better).
             convergence_threshold: Convergence threshold for objective.
             max_iterations: Maximum number of iterations.
+            random_seed: Random seed for deterministic behavior (default: 42).
         """
         self.measure_fn = measure_fn
         self.apply_fn = apply_fn
         self.objective_fn = objective_fn
         self.convergence_threshold = convergence_threshold
         self.max_iterations = max_iterations
+        self.random_seed = random_seed
+        self.rng = np.random.RandomState(random_seed)
 
     def run(
         self,
@@ -208,13 +212,13 @@ class CalibrationLoop:
             # Add noise to each parameter
             for key in sample:
                 if isinstance(sample[key], (int, float)):
-                    noise = np.random.normal(0, 0.05 * sample[key])
+                    noise = self.rng.normal(0, 0.05 * sample[key])
                     sample[key] = sample[key] + noise
 
             samples.append(sample)
 
             # Evaluate cost (in dry-run, use random cost)
-            cost = np.random.random()
+            cost = self.rng.random()
             costs.append(cost)
 
         # Weight samples by cost

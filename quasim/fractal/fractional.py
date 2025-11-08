@@ -203,6 +203,7 @@ def levy_flight_step(
     current_position: float,
     alpha: float,
     scale: float = 1.0,
+    seed: int | None = 42,
 ) -> float:
     """Generate single step of Lévy flight for anomalous transport.
 
@@ -213,16 +214,17 @@ def levy_flight_step(
         current_position: Current position x
         alpha: Lévy exponent (0 < α ≤ 2)
         scale: Scale parameter
+        seed: Random seed for reproducibility (default: 42)
 
     Returns:
         New position after Lévy flight
 
     Example:
         >>> x = 0.0
-        >>> x_new = levy_flight_step(x, 1.5, 1.0)
+        >>> x_new = levy_flight_step(x, 1.5, 1.0, seed=42)
     """
     # Use Chambers-Mallows-Stuck algorithm
-    rng = np.random.RandomState()
+    rng = np.random.RandomState(seed)
 
     if alpha == 2.0:
         # Gaussian limit

@@ -6,9 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "quasim"
 version = "0.1.0"
 description = "Quantum-Accelerated Simulation Runtime"
-authors = [{name = "Sybernix Team"}]
+authors = [{name = "QuASIM Team"}]
 readme = "README.md"
 requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
 dependencies = [
     "numpy>=1.24.0",
     "pyyaml>=6.0",
@@ -24,28 +25,6 @@ dev = [
     "mypy>=1.0.0",
     "bandit[toml]>=1.7.0",
 ]
-
-[project.scripts]
-quasim-hcal = "quasim.hcal.cli:main"
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["quasim*"]
-description = "Quantum-Inspired Autonomous Simulation platform"
-readme = "README.md"
-requires-python = ">=3.8"
-license = {text = "Apache-2.0"}
-authors = [
-    {name = "QuASIM Team"}
-]
-
-[tool.setuptools]
-packages = ["quasim", "quasim.api", "quasim.distributed", "quasim.dtwin", "quasim.opt", "quasim.qc", "quasim.hcal"]
-
-[project.scripts]
-quasim-hcal = "quasim.hcal.cli:cli"
-
-[project.optional-dependencies]
 hcal = [
     "pyyaml>=6.0",
     "click>=8.0",
@@ -57,6 +36,13 @@ hcal-nvidia = [
 hcal-amd = [
     "pyrsmi>=1.0",
 ]
+
+[project.scripts]
+quasim-hcal = "quasim.hcal.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["quasim*"]
 
 [tool.black]
 line-length = 100
@@ -119,9 +105,4 @@ precision = 2
 show_missing = true
 skip_covered = false
 
-[tool.setuptools]
-packages = [
-    "quasim",
-    "quasim.simulation",
-    "quasim.simulation.quantacosmic",
-]
+

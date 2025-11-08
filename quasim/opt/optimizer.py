@@ -22,11 +22,15 @@ class QuantumOptimizer:
         algorithm: Optimization algorithm ('qa', 'qaoa', 'vqe', 'hybrid')
         backend: Computation backend for quantum simulation
         max_iterations: Maximum number of optimization iterations
+        convergence_tolerance: Convergence tolerance for objective value (default: 1e-6)
+        random_seed: Random seed for reproducibility (default: 42)
     """
 
     algorithm: str = "qaoa"
     backend: str = "cpu"
     max_iterations: int = 100
+    convergence_tolerance: float = 1e-6
+    random_seed: int = 42
 
     def __post_init__(self) -> None:
         """Validate optimizer configuration."""
@@ -69,11 +73,18 @@ class QuantumOptimizer:
         QAOA is particularly effective for combinatorial optimization problems
         like graph coloring, Max-Cut, and portfolio optimization.
         """
+        import numpy as np
+
+        # Set random seed for deterministic behavior
+        np.random.seed(self.random_seed)
+
         # Simplified QAOA implementation
         # Production version would use quantum circuits and parameter optimization
         iterations = 0
         best_solution = problem.get_random_solution()
         best_value = problem.evaluate(best_solution)
+        prev_value = best_value
+        converged = False
 
         for i in range(self.max_iterations):
             iterations += 1
@@ -83,18 +94,28 @@ class QuantumOptimizer:
 
             if problem.is_minimization:
                 if value < best_value:
+                    prev_value = best_value
                     best_solution = candidate
                     best_value = value
+                    # Check convergence
+                    if abs(best_value - prev_value) < self.convergence_tolerance:
+                        converged = True
+                        break
             else:
                 if value > best_value:
+                    prev_value = best_value
                     best_solution = candidate
                     best_value = value
+                    # Check convergence
+                    if abs(best_value - prev_value) < self.convergence_tolerance:
+                        converged = True
+                        break
 
         return {
             "solution": best_solution,
             "objective_value": best_value,
             "iterations": iterations,
-            "convergence": True,
+            "convergence": converged,
             "algorithm": "qaoa",
         }
 
