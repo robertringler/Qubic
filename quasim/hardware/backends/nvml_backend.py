@@ -115,7 +115,7 @@ class NVMLBackend:
                 "sm_clock_mhz": sm_clock,
                 "mem_clock_mhz": mem_clock,
                 "fan_percent": fan_speed,
-                "ecc_enabled": bool(ecc_current) if ecc_current is not None else None,
+                "ecc_enabled": (ecc_current == pynvml.NVML_FEATURE_ENABLED) if ecc_current is not None else None,
             }
 
         except Exception as e:
