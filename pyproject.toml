@@ -118,3 +118,10 @@ omit = [
 precision = 2
 show_missing = true
 skip_covered = false
+
+[tool.setuptools]
+packages = [
+    "quasim",
+    "quasim.simulation",
+    "quasim.simulation.quantacosmic",
+]
