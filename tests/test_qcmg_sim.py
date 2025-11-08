@@ -24,7 +24,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from quasim.sim import QCMGParameters, FieldState, QuantacosmorphysigeneticField
+from quasim.sim import QCMGParameters, QuantacosmorphysigeneticField
 
 
 class TestQCMGParameters:
@@ -57,6 +57,7 @@ class TestQCMGParameters:
         assert params.interaction_strength == 0.02
         assert params.thermal_noise == 0.002
         assert params.random_seed == 42
+
 
 class TestFieldInitialization:
     """Test field initialization modes."""

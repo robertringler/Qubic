@@ -19,9 +19,11 @@ import click
 @click.version_option(version="0.1.0")
 def cli():
     """QuASIM Hardware Calibration and Analysis Layer (HCAL) CLI.
-    
+
     Tools for monitoring and managing hardware resources for quantum simulation.
     """
+
+
 """CLI interface for HCAL."""
 
 import json
@@ -84,6 +86,8 @@ def validate_policy(policy_path: Path) -> None:
     except (FileNotFoundError, ValueError) as e:
         click.echo(f"✗ Policy validation failed: {e}", err=True)
         sys.exit(1)
+
+
 from typing import Optional
 
 from . import HCAL, Policy
@@ -97,6 +101,7 @@ except ImportError:
     click = None  # type: ignore
 
 if HAS_CLICK and click is not None:
+
     @click.group()
     def cli():
         """HCAL - Hardware Control Abstraction Layer CLI."""
@@ -112,11 +117,13 @@ if HAS_CLICK and click is not None:
                 hcal = HCAL.from_policy(Path(policy))
             else:
                 # Use default policy
-                default_policy = Policy({
-                    "environment": "DEV",
-                    "allowed_backends": ["nvml", "rocm_smi"],
-                    "device_allowlist": [],
-                })
+                default_policy = Policy(
+                    {
+                        "environment": "DEV",
+                        "allowed_backends": ["nvml", "rocm_smi"],
+                        "device_allowlist": [],
+                    }
+                )
                 hcal = HCAL(default_policy)
 
             topology = hcal.discover(full=True)
@@ -142,11 +149,13 @@ if HAS_CLICK and click is not None:
             if policy:
                 hcal = HCAL.from_policy(Path(policy))
             else:
-                default_policy = Policy({
-                    "environment": "DEV",
-                    "allowed_backends": ["nvml"],
-                    "device_allowlist": ["GPU0", "GPU1"],
-                })
+                default_policy = Policy(
+                    {
+                        "environment": "DEV",
+                        "allowed_backends": ["nvml"],
+                        "device_allowlist": ["GPU0", "GPU1"],
+                    }
+                )
                 hcal = HCAL(default_policy)
 
             device_list = devices.split(",") if devices and devices.strip() else None
@@ -172,12 +181,14 @@ if HAS_CLICK and click is not None:
             if policy:
                 hcal = HCAL.from_policy(Path(policy))
             else:
-                default_policy = Policy({
-                    "environment": "DEV",
-                    "allowed_backends": ["nvml"],
-                    "device_allowlist": ["GPU0", "GPU1"],
-                    "limits": {"power_watts_max": 300},
-                })
+                default_policy = Policy(
+                    {
+                        "environment": "DEV",
+                        "allowed_backends": ["nvml"],
+                        "device_allowlist": ["GPU0", "GPU1"],
+                        "limits": {"power_watts_max": 300},
+                    }
+                )
                 hcal = HCAL(default_policy)
 
             with open(plan_file) as f:
@@ -196,6 +207,7 @@ def main():
         print("Error: click package not installed", file=sys.stderr)
         print("Install with: pip install click", file=sys.stderr)
         sys.exit(1)
+
 
 import click
 
@@ -219,6 +231,7 @@ def status():
     # Check for NVIDIA GPU
     try:
         import pynvml
+
         pynvml.nvmlInit()
         device_count = pynvml.nvmlDeviceGetCount()
         click.echo(f"✓ NVIDIA GPUs detected: {device_count}")
@@ -227,7 +240,7 @@ def status():
             handle = pynvml.nvmlDeviceGetHandleByIndex(i)
             name = pynvml.nvmlDeviceGetName(handle)
             if isinstance(name, bytes):
-                name = name.decode('utf-8')
+                name = name.decode("utf-8")
             memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
             total_gb = memory_info.total / (1024**3)
             free_gb = memory_info.free / (1024**3)
@@ -236,13 +249,16 @@ def status():
 
         pynvml.nvmlShutdown()
     except ImportError:
-        click.echo("✗ NVIDIA GPU support not available (install with: pip install quasim[hcal-nvidia])")
+        click.echo(
+            "✗ NVIDIA GPU support not available (install with: pip install quasim[hcal-nvidia])"
+        )
     except Exception as e:
         click.echo(f"✗ Error accessing NVIDIA GPUs: {e}")
 
     # Check for AMD GPU
     try:
         import pyrsmi
+
         pyrsmi.rsmi_init()
         device_count = pyrsmi.rsmi_num_monitor_devices()
         click.echo(f"✓ AMD GPUs detected: {device_count}")
@@ -259,8 +275,8 @@ def status():
 
 
 @cli.command()
-@click.option('--config', '-c', type=click.Path(exists=True), help='Path to configuration file')
-@click.option('--output', '-o', type=click.Path(), help='Output path for calibration results')
+@click.option("--config", "-c", type=click.Path(exists=True), help="Path to configuration file")
+@click.option("--output", "-o", type=click.Path(), help="Output path for calibration results")
 def calibrate(config, output):
     """Run hardware calibration procedures."""
     click.echo("Running hardware calibration...")
@@ -276,8 +292,8 @@ def calibrate(config, output):
 
 
 @cli.command()
-@click.option('--duration', '-d', default=60, help='Monitoring duration in seconds')
-@click.option('--interval', '-i', default=1, help='Sampling interval in seconds')
+@click.option("--duration", "-d", default=60, help="Monitoring duration in seconds")
+@click.option("--interval", "-i", default=1, help="Sampling interval in seconds")
 def monitor(duration, interval):
     """Monitor hardware resources in real-time."""
     import time
@@ -310,24 +326,28 @@ def info():
     deps = []
     try:
         import yaml
+
         deps.append("pyyaml")
     except ImportError:
         pass
 
     try:
         import numpy
+
         deps.append("numpy")
     except ImportError:
         pass
 
     try:
         import pynvml
+
         deps.append("nvidia-ml-py (NVIDIA support)")
     except ImportError:
         pass
 
     try:
         import pyrsmi
+
         deps.append("pyrsmi (AMD support)")
     except ImportError:
         pass
@@ -338,8 +358,10 @@ def info():
         click.echo("No optional dependencies installed")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
+
+
 @click.option("--json-output", is_flag=True, help="Output in JSON format")
 def discover(json_output: bool):
     """Discover hardware topology."""
@@ -394,9 +416,7 @@ def discover(json_output: bool):
         click.echo(f"\nInterconnects ({len(topology.interconnects)}):")
         for interconnect in topology.interconnects:
             itype = interconnect.interconnect_type.value
-            click.echo(
-                f"  {interconnect.source} <-> {interconnect.destination} ({itype})"
-            )
+            click.echo(f"  {interconnect.source} <-> {interconnect.destination} ({itype})")
             if interconnect.bandwidth_gbps:
                 click.echo(f"    Bandwidth: {interconnect.bandwidth_gbps} GB/s")
 

@@ -16,10 +16,8 @@ from typing import Any, Dict, Optional, Tuple
 
 from quasim.hcal.actuator import Actuator
 from quasim.hcal.backends.nvidia_nvml import NvidiaNvmlBackend
-from quasim.hcal.loops.calibration import (CalibrationResult, bias_trim_v1,
-                                           power_sweep)
-from quasim.hcal.policy import (DeviceLimits, Environment, PolicyEngine,
-                                PolicyViolation, Policy)
+from quasim.hcal.loops.calibration import CalibrationResult, bias_trim_v1, power_sweep
+from quasim.hcal.policy import DeviceLimits, Environment, Policy, PolicyEngine, PolicyViolation
 from quasim.hcal.sensors import SensorManager, TelemetryReading
 from quasim.hcal.topology import TopologyDiscovery
 
@@ -46,7 +44,10 @@ class HCAL:
         self.policy_engine = PolicyEngine(policy_path)
 
         # Override dry_run if policy requires it (check if method exists)
-        if hasattr(self.policy_engine, 'is_dry_run_default') and self.policy_engine.is_dry_run_default():
+        if (
+            hasattr(self.policy_engine, "is_dry_run_default")
+            and self.policy_engine.is_dry_run_default()
+        ):
             dry_run = True
 
         self.dry_run = dry_run
@@ -72,7 +73,7 @@ class HCAL:
         policy_path: Path,
         enable_actuation: bool = False,
         audit_log_dir: Optional[Path] = None,
-    ) -> "HCAL":
+    ) -> HCAL:
         """Create HCAL instance from policy file.
 
         Args:
@@ -137,9 +138,7 @@ class HCAL:
 
         return self.sensor_manager.read_telemetry(device_id, backend)
 
-    def calibrate_bias_trim(
-        self, device_id: str, max_iterations: int = 20
-    ) -> CalibrationResult:
+    def calibrate_bias_trim(self, device_id: str, max_iterations: int = 20) -> CalibrationResult:
         """Run bias trim calibration.
 
         Args:
@@ -162,9 +161,7 @@ class HCAL:
 
         return bias_trim_v1(device_id, backend, measure_fn, apply_fn)
 
-    def run_power_sweep(
-        self, device_id: str, power_range: Tuple[float, float], steps: int = 10
-    ):
+    def run_power_sweep(self, device_id: str, power_range: Tuple[float, float], steps: int = 10):
         """Run power sweep calibration.
 
         Args:

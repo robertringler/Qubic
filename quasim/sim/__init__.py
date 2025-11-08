@@ -76,7 +76,9 @@ class QuantacosmorphysigeneticField:
         if params.random_seed is not None:
             np.random.seed(params.random_seed)
 
-    def initialize(self, mode: Literal["gaussian", "uniform", "zero", "soliton", "random"] = "gaussian") -> None:
+    def initialize(
+        self, mode: Literal["gaussian", "uniform", "zero", "soliton", "random"] = "gaussian"
+    ) -> None:
         """Initialize the field with a specific configuration.
 
         Args:
@@ -110,7 +112,7 @@ class QuantacosmorphysigeneticField:
             y = np.linspace(-3, 3, size)
             x_grid, y_grid = np.meshgrid(x, y)
             self._field = np.exp(-(x_grid**2 + y_grid**2) / 0.5)
-            
+
         elif mode == "random":
             # Random field configuration (alias for uniform for backward compatibility)
             self._field = np.random.uniform(0, 1, (size, size))
