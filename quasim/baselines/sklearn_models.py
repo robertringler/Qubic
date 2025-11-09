@@ -1,7 +1,5 @@
 """Scikit-learn baseline models."""
 
-import numpy as np
-from numpy.typing import NDArray
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.svm import LinearSVC, LinearSVR

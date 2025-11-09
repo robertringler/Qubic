@@ -79,7 +79,7 @@ def f1_score(y_true: NDArray, y_pred: NDArray, average: str = "weighted") -> flo
         F1 score
     """
     from sklearn.metrics import f1_score as sklearn_f1
-    
+
     return float(sklearn_f1(y_true, y_pred, average=average, zero_division=0))
 
 
@@ -101,15 +101,15 @@ def measure_latency(model: Any, X: Any, n_runs: int = 100) -> dict[str, float]:
         Dictionary with p50 and p95 latencies in milliseconds
     """
     latencies = []
-    
+
     for _ in range(n_runs):
         start = time.perf_counter()
         _ = model.predict(X)
         end = time.perf_counter()
         latencies.append((end - start) * 1000)  # Convert to ms
-    
+
     latencies = np.array(latencies)
-    
+
     return {
         "p50_ms": float(np.percentile(latencies, 50)),
         "p95_ms": float(np.percentile(latencies, 95)),
@@ -136,11 +136,11 @@ def measure_throughput(model: Any, X: Any, duration_sec: float = 1.0) -> float:
     """
     start = time.perf_counter()
     count = 0
-    
+
     while time.perf_counter() - start < duration_sec:
         _ = model.predict(X)
         count += 1
-    
+
     elapsed = time.perf_counter() - start
     return count / elapsed
 
@@ -159,9 +159,9 @@ def estimate_model_size_mb(model: Any) -> float:
         Estimated size in MB
     """
     import sys
-    
+
     size_bytes = sys.getsizeof(model)
-    
+
     # Try to get more accurate size for sklearn models
     if hasattr(model, "__dict__"):
         for attr in model.__dict__.values():
@@ -169,7 +169,7 @@ def estimate_model_size_mb(model: Any) -> float:
                 size_bytes += attr.nbytes
             else:
                 size_bytes += sys.getsizeof(attr)
-    
+
     return size_bytes / (1024 * 1024)
 
 
@@ -192,14 +192,14 @@ def estimate_energy_proxy(latency_ms: float, throughput: float = None) -> float:
     """
     # Assume typical CPU TDP of 65W
     tdp_watts = 65.0
-    
+
     # Energy = Power × Time
     # Convert latency to seconds
     time_sec = latency_ms / 1000.0
-    
+
     # Energy in Joules
     energy_joules = tdp_watts * time_sec
-    
+
     return energy_joules
 
 
@@ -218,15 +218,15 @@ def compute_stability_margin(scores: list[float]) -> float:
     """
     if len(scores) < 2:
         return 1.0
-    
+
     scores_array = np.array(scores)
     mean = np.mean(scores_array)
     std = np.std(scores_array)
-    
+
     if mean < 1e-10:
         return 0.0
-    
+
     cv = std / mean  # Coefficient of variation
     stability = 1.0 - min(cv, 1.0)
-    
+
     return float(stability)

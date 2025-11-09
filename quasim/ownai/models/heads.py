@@ -16,13 +16,13 @@ class ClassificationHead:
     bias : NDArray | None
         Bias vector
     """
-    
+
     def __init__(self, input_dim: int, n_classes: int):
         self.input_dim = input_dim
         self.n_classes = n_classes
         self.weights: NDArray[np.float32] | None = None
         self.bias: NDArray[np.float32] | None = None
-    
+
     def initialize(self, seed: int = 42) -> None:
         """Initialize weights and biases.
         
@@ -36,7 +36,7 @@ class ClassificationHead:
         scale = np.sqrt(2.0 / (self.input_dim + self.n_classes))
         self.weights = np.random.randn(self.input_dim, self.n_classes).astype(np.float32) * scale
         self.bias = np.zeros(self.n_classes, dtype=np.float32)
-    
+
     def forward(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """Forward pass.
         
@@ -52,10 +52,10 @@ class ClassificationHead:
         """
         if self.weights is None or self.bias is None:
             self.initialize()
-        
+
         logits = x @ self.weights + self.bias
         return logits
-    
+
     def predict(self, x: NDArray[np.float32]) -> NDArray[np.int64]:
         """Predict class labels.
         
@@ -83,12 +83,12 @@ class RegressionHead:
     bias : float | None
         Bias term
     """
-    
+
     def __init__(self, input_dim: int):
         self.input_dim = input_dim
         self.weights: NDArray[np.float32] | None = None
         self.bias: float | None = None
-    
+
     def initialize(self, seed: int = 42) -> None:
         """Initialize weights and bias.
         
@@ -101,7 +101,7 @@ class RegressionHead:
         scale = np.sqrt(2.0 / self.input_dim)
         self.weights = np.random.randn(self.input_dim, 1).astype(np.float32) * scale
         self.bias = 0.0
-    
+
     def forward(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """Forward pass.
         
@@ -117,10 +117,10 @@ class RegressionHead:
         """
         if self.weights is None or self.bias is None:
             self.initialize()
-        
+
         predictions = (x @ self.weights).squeeze() + self.bias
         return predictions.astype(np.float32)
-    
+
     def predict(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
         """Predict continuous values.
         

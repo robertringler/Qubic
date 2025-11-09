@@ -1,9 +1,8 @@
 """Data loaders for various datasets (tabular, text, vision, time-series)."""
 
 import hashlib
-import os
 from pathlib import Path
-from typing import Any, Literal
+from typing import Literal
 
 import numpy as np
 
@@ -48,13 +47,13 @@ def load_tabular(
     """
     if cache_dir is None:
         cache_dir = get_cache_dir()
-    
+
     cache_dir.mkdir(parents=True, exist_ok=True)
-    
+
     if name == "wine":
         # Generate synthetic wine-like dataset
         from sklearn.datasets import make_classification
-        
+
         X, y = make_classification(
             n_samples=1000,
             n_features=13,
@@ -64,11 +63,11 @@ def load_tabular(
             random_state=42,
         )
         return X.astype(np.float32), y.astype(np.int64)
-    
+
     elif name == "adult":
         # Generate synthetic adult-like dataset
         from sklearn.datasets import make_classification
-        
+
         X, y = make_classification(
             n_samples=10000,
             n_features=14,
@@ -78,11 +77,11 @@ def load_tabular(
             random_state=42,
         )
         return X.astype(np.float32), y.astype(np.int64)
-    
+
     elif name == "higgs-mini":
         # Generate synthetic higgs-like dataset
         from sklearn.datasets import make_classification
-        
+
         X, y = make_classification(
             n_samples=50000,
             n_features=28,
@@ -92,7 +91,7 @@ def load_tabular(
             random_state=42,
         )
         return X.astype(np.float32), y.astype(np.int64)
-    
+
     else:
         raise ValueError(f"Unknown tabular dataset: {name}")
 
@@ -125,17 +124,17 @@ def load_text(
     """
     if cache_dir is None:
         cache_dir = get_cache_dir()
-    
+
     cache_dir.mkdir(parents=True, exist_ok=True)
-    
+
     if name == "imdb-mini":
         # Generate synthetic text data
         texts = []
         labels = []
-        
+
         positive_words = ["excellent", "amazing", "wonderful", "great", "fantastic", "love"]
         negative_words = ["terrible", "awful", "horrible", "bad", "worst", "hate"]
-        
+
         np.random.seed(42)
         for i in range(1000):
             label = i % 2
@@ -143,25 +142,25 @@ def load_text(
                 words = np.random.choice(positive_words, size=np.random.randint(10, 20))
             else:
                 words = np.random.choice(negative_words, size=np.random.randint(10, 20))
-            
+
             text = " ".join(words) + " movie."
             texts.append(text)
             labels.append(label)
-        
+
         return texts, np.array(labels, dtype=np.int64)
-    
+
     elif name == "agnews-mini":
         # Generate synthetic news data
         texts = []
         labels = []
-        
+
         topics = [
             ["sports", "game", "team", "player", "score", "win"],
             ["business", "market", "stock", "company", "profit", "trade"],
             ["technology", "computer", "software", "internet", "digital", "tech"],
             ["politics", "government", "election", "policy", "president", "vote"],
         ]
-        
+
         np.random.seed(42)
         for i in range(1000):
             label = i % 4
@@ -169,9 +168,9 @@ def load_text(
             text = " ".join(words) + " news."
             texts.append(text)
             labels.append(label)
-        
+
         return texts, np.array(labels, dtype=np.int64)
-    
+
     else:
         raise ValueError(f"Unknown text dataset: {name}")
 
@@ -204,9 +203,9 @@ def load_vision(
     """
     if cache_dir is None:
         cache_dir = get_cache_dir()
-    
+
     cache_dir.mkdir(parents=True, exist_ok=True)
-    
+
     if name == "cifar10-subset":
         # Generate synthetic CIFAR-10-like data
         np.random.seed(42)
@@ -214,7 +213,7 @@ def load_vision(
         images = np.random.rand(n_samples, 3, 32, 32).astype(np.float32)
         labels = np.random.randint(0, 10, size=n_samples, dtype=np.int64)
         return images, labels
-    
+
     elif name == "mnist-1k":
         # Generate synthetic MNIST-like data
         np.random.seed(42)
@@ -222,7 +221,7 @@ def load_vision(
         images = np.random.rand(n_samples, 1, 28, 28).astype(np.float32)
         labels = np.random.randint(0, 10, size=n_samples, dtype=np.int64)
         return images, labels
-    
+
     else:
         raise ValueError(f"Unknown vision dataset: {name}")
 
@@ -255,44 +254,44 @@ def load_timeseries(
     """
     if cache_dir is None:
         cache_dir = get_cache_dir()
-    
+
     cache_dir.mkdir(parents=True, exist_ok=True)
-    
+
     if name == "etth1-mini":
         # Generate synthetic time series data
         np.random.seed(42)
         n_samples = 1000
         seq_len = 96
         n_features = 7
-        
+
         sequences = np.random.randn(n_samples, seq_len, n_features).astype(np.float32)
         # Target is next value
         targets = np.random.randn(n_samples).astype(np.float32)
-        
+
         return sequences, targets
-    
+
     elif name == "synthetic-arma":
         # Generate ARMA-like synthetic data
         np.random.seed(42)
         n_samples = 1000
         seq_len = 50
-        
+
         sequences = []
         targets = []
-        
+
         for _ in range(n_samples):
             # Simple AR(1) process
             x = np.zeros(seq_len + 1)
             for t in range(1, seq_len + 1):
                 x[t] = 0.7 * x[t - 1] + np.random.randn() * 0.3
-            
+
             sequences.append(x[:seq_len].reshape(-1, 1))
             targets.append(x[seq_len])
-        
+
         sequences = np.array(sequences, dtype=np.float32)
         targets = np.array(targets, dtype=np.float32)
-        
+
         return sequences, targets
-    
+
     else:
         raise ValueError(f"Unknown time series dataset: {name}")

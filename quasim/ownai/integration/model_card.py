@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 from quasim.ownai.eval.benchmark import BenchmarkResult
 
@@ -27,24 +26,24 @@ def generate_model_card(
         Model description
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # Filter results for this model
     model_results = [r for r in results if r.model_name == model_name]
-    
+
     if not model_results:
         return
-    
+
     # Compute aggregated metrics
     primary_scores = [r.primary_metric for r in model_results]
     latencies = [r.latency_p50 for r in model_results]
-    
+
     avg_primary = sum(primary_scores) / len(primary_scores)
     avg_latency = sum(latencies) / len(latencies)
-    
+
     # Check determinism
     hashes = [r.prediction_hash for r in model_results]
     deterministic = len(set(hashes)) == len(set((r.task, r.dataset, r.seed) for r in model_results))
-    
+
     # Generate card
     card = f"""# Model Card: {model_name}
 
@@ -77,7 +76,7 @@ This model is designed for deterministic, auditable AI tasks including:
 ### Tasks Evaluated
 
 """
-    
+
     # Group by task
     task_groups = {}
     for r in model_results:
@@ -85,21 +84,21 @@ This model is designed for deterministic, auditable AI tasks including:
         if task_key not in task_groups:
             task_groups[task_key] = []
         task_groups[task_key].append(r)
-    
+
     for task_key, group in sorted(task_groups.items()):
         card += f"\n#### {task_key}\n\n"
         card += "| Metric | Value |\n"
         card += "|--------|-------|\n"
-        
+
         primary_mean = sum(r.primary_metric for r in group) / len(group)
         secondary_mean = sum(r.secondary_metric for r in group) / len(group)
         latency_mean = sum(r.latency_p50 for r in group) / len(group)
-        
+
         card += f"| Primary Metric | {primary_mean:.4f} |\n"
         card += f"| Secondary Metric | {secondary_mean:.4f} |\n"
         card += f"| Latency (p50) | {latency_mean:.2f} ms |\n"
         card += f"| Runs | {len(group)} |\n"
-    
+
     card += """
 
 ## Model Architecture
@@ -152,6 +151,6 @@ This model is designed for transparent, auditable AI applications. Users should:
 - QGH: Quantum-inspired causal history tracking
 - TERC: Tier-based observability framework
 """
-    
+
     with open(output_path, "w") as f:
         f.write(card)

@@ -1,6 +1,5 @@
 """Data preprocessing utilities."""
 
-from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -16,11 +15,11 @@ class StandardScaler:
     std_ : NDArray | None
         Standard deviation of training data
     """
-    
+
     def __init__(self):
         self.mean_: NDArray[np.float32] | None = None
         self.std_: NDArray[np.float32] | None = None
-    
+
     def fit(self, X: NDArray[np.float32]) -> "StandardScaler":
         """Compute mean and std for later scaling.
         
@@ -38,7 +37,7 @@ class StandardScaler:
         # Avoid division by zero
         self.std_[self.std_ == 0] = 1.0
         return self
-    
+
     def transform(self, X: NDArray[np.float32]) -> NDArray[np.float32]:
         """Scale data using computed mean and std.
         
@@ -54,9 +53,9 @@ class StandardScaler:
         """
         if self.mean_ is None or self.std_ is None:
             raise ValueError("Scaler not fitted. Call fit() first.")
-        
+
         return (X - self.mean_) / self.std_
-    
+
     def fit_transform(self, X: NDArray[np.float32]) -> NDArray[np.float32]:
         """Fit and transform in one step.
         
@@ -83,12 +82,12 @@ class SimpleTokenizer:
     max_length : int
         Maximum sequence length
     """
-    
+
     def __init__(self, max_length: int = 128):
         self.vocab: dict[str, int] = {"<PAD>": 0, "<UNK>": 1}
         self.max_length = max_length
         self.next_id = 2
-    
+
     def fit(self, texts: list[str]) -> "SimpleTokenizer":
         """Build vocabulary from texts.
         
@@ -107,7 +106,7 @@ class SimpleTokenizer:
                     self.vocab[word] = self.next_id
                     self.next_id += 1
         return self
-    
+
     def transform(self, texts: list[str]) -> NDArray[np.int64]:
         """Convert texts to token IDs.
         
@@ -122,14 +121,14 @@ class SimpleTokenizer:
             Token IDs of shape (len(texts), max_length)
         """
         result = np.zeros((len(texts), self.max_length), dtype=np.int64)
-        
+
         for i, text in enumerate(texts):
             words = text.lower().split()[: self.max_length]
             for j, word in enumerate(words):
                 result[i, j] = self.vocab.get(word, 1)  # 1 is <UNK>
-        
+
         return result
-    
+
     def fit_transform(self, texts: list[str]) -> NDArray[np.int64]:
         """Fit vocabulary and transform in one step.
         
@@ -162,10 +161,10 @@ def normalize_images(images: NDArray[np.float32]) -> NDArray[np.float32]:
     images = images.astype(np.float32)
     min_val = images.min()
     max_val = images.max()
-    
+
     if max_val - min_val < 1e-10:
         return images
-    
+
     return (images - min_val) / (max_val - min_val)
 
 
@@ -192,16 +191,16 @@ def create_sliding_windows(
     """
     if data.ndim == 1:
         data = data.reshape(-1, 1)
-    
+
     n_timesteps, n_features = data.shape
     windows = []
     targets = []
-    
+
     for i in range(0, n_timesteps - window_size, stride):
         window = data[i : i + window_size]
         target = data[i + window_size, 0]  # Predict first feature
-        
+
         windows.append(window)
         targets.append(target)
-    
+
     return np.array(windows, dtype=np.float32), np.array(targets, dtype=np.float32)

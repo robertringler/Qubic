@@ -26,7 +26,7 @@ class QuasimOwnConfig:
     deterministic : bool
         Enable deterministic PyTorch operations (default: True)
     """
-    
+
     seed: int = 1337
     mixed_precision: bool = False
     cache_dir: Path = Path(".cache/quasim_datasets")
@@ -34,7 +34,7 @@ class QuasimOwnConfig:
     precision: Literal["fp32", "fp16", "bf16"] = "fp32"
     cpu_only: bool = True
     deterministic: bool = True
-    
+
     def __post_init__(self):
         """Ensure directories exist."""
         self.cache_dir.mkdir(parents=True, exist_ok=True)

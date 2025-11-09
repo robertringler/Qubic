@@ -17,13 +17,13 @@ class TinyCNN:
     seed : int
         Random seed for determinism (default: 42)
     """
-    
+
     def __init__(self, n_classes: int = 10, seed: int = 42):
         self.n_classes = n_classes
         self.seed = seed
-        
+
         set_seed(self.seed)
-        
+
         # Use RandomForest as a simple baseline
         self.model = RandomForestClassifier(
             n_estimators=50,
@@ -31,7 +31,7 @@ class TinyCNN:
             random_state=seed,
             n_jobs=1,
         )
-    
+
     def _flatten_images(self, images: NDArray[np.float32]) -> NDArray[np.float32]:
         """Flatten image tensors to vectors.
         
@@ -47,7 +47,7 @@ class TinyCNN:
         """
         batch_size = images.shape[0]
         return images.reshape(batch_size, -1)
-    
+
     def fit(self, X: NDArray[np.float32], y: NDArray[np.int64]) -> "TinyCNN":
         """Train the CNN.
         
@@ -63,13 +63,13 @@ class TinyCNN:
         self
         """
         set_seed(self.seed)
-        
+
         # Flatten images for sklearn
         X_flat = self._flatten_images(X)
-        
+
         self.model.fit(X_flat, y)
         return self
-    
+
     def predict(self, X: NDArray[np.float32]) -> NDArray[np.int64]:
         """Make predictions.
         
@@ -85,7 +85,7 @@ class TinyCNN:
         """
         X_flat = self._flatten_images(X)
         return self.model.predict(X_flat)
-    
+
     def predict_proba(self, X: NDArray[np.float32]) -> NDArray[np.float32]:
         """Predict class probabilities.
         

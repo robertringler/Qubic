@@ -17,14 +17,14 @@ class QGHLedger:
     ledger_path : Path
         Path to the ledger file
     """
-    
+
     def __init__(self, ledger_path: Path | None = None):
         if ledger_path is None:
             ledger_path = Path("runs/.qgh_ledger.jsonl")
-        
+
         self.ledger_path = ledger_path
         self.ledger_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     def append_run(
         self,
         run_id: str,
@@ -64,11 +64,11 @@ class QGHLedger:
             "prediction_hash": prediction_hash,
             "metadata": metadata or {},
         }
-        
+
         # Append to ledger
         with open(self.ledger_path, "a") as f:
             f.write(json.dumps(record) + "\n")
-    
+
     def read_ledger(self) -> list[dict[str, Any]]:
         """Read all records from the ledger.
         
@@ -79,15 +79,15 @@ class QGHLedger:
         """
         if not self.ledger_path.exists():
             return []
-        
+
         records = []
-        with open(self.ledger_path, "r") as f:
+        with open(self.ledger_path) as f:
             for line in f:
                 if line.strip():
                     records.append(json.loads(line))
-        
+
         return records
-    
+
     def verify_consensus(
         self,
         model: str,
@@ -114,7 +114,7 @@ class QGHLedger:
             True if all matching runs have the same prediction hash
         """
         records = self.read_ledger()
-        
+
         # Filter matching records
         matching = [
             r
@@ -124,10 +124,10 @@ class QGHLedger:
             and r["dataset"] == dataset
             and r["seed"] == seed
         ]
-        
+
         if len(matching) < 2:
             return True  # Not enough data to compare
-        
+
         # Check if all hashes are identical
         hashes = [r["prediction_hash"] for r in matching]
         return len(set(hashes)) == 1

@@ -21,7 +21,7 @@ class DeterministicMLP:
     seed : int
         Random seed for determinism (default: 42)
     """
-    
+
     def __init__(
         self,
         task: str = "classification",
@@ -33,9 +33,9 @@ class DeterministicMLP:
         self.hidden_dims = hidden_dims
         self.max_iter = max_iter
         self.seed = seed
-        
+
         set_seed(self.seed)
-        
+
         if task == "classification":
             self.model = MLPClassifier(
                 hidden_layer_sizes=hidden_dims,
@@ -56,7 +56,7 @@ class DeterministicMLP:
             )
         else:
             raise ValueError(f"Unknown task: {task}")
-    
+
     def fit(self, X: NDArray[np.float32], y: NDArray) -> "DeterministicMLP":
         """Train the MLP.
         
@@ -74,7 +74,7 @@ class DeterministicMLP:
         set_seed(self.seed)
         self.model.fit(X, y)
         return self
-    
+
     def predict(self, X: NDArray[np.float32]) -> NDArray:
         """Make predictions.
         
@@ -89,7 +89,7 @@ class DeterministicMLP:
             Predictions
         """
         return self.model.predict(X)
-    
+
     def predict_proba(self, X: NDArray[np.float32]) -> NDArray[np.float32]:
         """Predict class probabilities (classification only).
         

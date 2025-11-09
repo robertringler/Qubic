@@ -55,12 +55,12 @@ def save_results_csv(results: list[BenchmarkResult], output_path: Path) -> None:
         Output CSV file path
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     dict_list = results_to_dict_list(results)
-    
+
     if not dict_list:
         return
-    
+
     with open(output_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=dict_list[0].keys())
         writer.writeheader()
@@ -78,9 +78,9 @@ def save_results_json(results: list[BenchmarkResult], output_path: Path) -> None
         Output JSON file path
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     dict_list = results_to_dict_list(results)
-    
+
     with open(output_path, "w") as f:
         json.dump(dict_list, f, indent=2)
 
@@ -100,28 +100,28 @@ def generate_summary_table(results: list[BenchmarkResult]) -> dict[str, dict[str
     """
     # Group by (task, model)
     groups = {}
-    
+
     for r in results:
         key = (r.task, r.model_name)
         if key not in groups:
             groups[key] = []
         groups[key].append(r)
-    
+
     # Compute summary statistics
     summary = {}
-    
+
     for (task, model), group_results in groups.items():
         key = f"{task}_{model}"
-        
+
         primary_scores = [r.primary_metric for r in group_results]
         secondary_scores = [r.secondary_metric for r in group_results]
         latencies = [r.latency_p50 for r in group_results]
         energies = [r.energy_proxy for r in group_results]
-        
+
         # Check determinism
         hashes = [r.prediction_hash for r in group_results]
         deterministic = len(set(hashes)) == 1
-        
+
         summary[key] = {
             "task": task,
             "model": model,
@@ -135,7 +135,7 @@ def generate_summary_table(results: list[BenchmarkResult]) -> dict[str, dict[str
             "deterministic": deterministic,
             "n_runs": len(group_results),
         }
-    
+
     return summary
 
 
@@ -156,9 +156,9 @@ def generate_markdown_report(
         Report title
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     summary = generate_summary_table(results)
-    
+
     # Generate report
     lines = [
         f"# {title}",
@@ -170,18 +170,18 @@ def generate_markdown_report(
         "## Summary by Task and Model",
         "",
     ]
-    
+
     # Group by task
     tasks = sorted(set(s["task"] for s in summary.values()))
-    
+
     for task in tasks:
         lines.append(f"### {task}")
         lines.append("")
         lines.append("| Model | Primary Metric | Secondary Metric | Latency (ms) | Stability | Deterministic |")
         lines.append("|-------|---------------|------------------|--------------|-----------|---------------|")
-        
+
         task_summaries = {k: v for k, v in summary.items() if v["task"] == task}
-        
+
         for key in sorted(task_summaries.keys()):
             s = task_summaries[key]
             det_str = "✅" if s["deterministic"] else "❌"
@@ -190,30 +190,30 @@ def generate_markdown_report(
                 f"{s['secondary_mean']:.4f} ± {s['secondary_std']:.4f} | "
                 f"{s['latency_mean']:.2f} | {s['stability_margin']:.3f} | {det_str} |"
             )
-        
+
         lines.append("")
-    
+
     # Add reliability-per-watt ranking
     lines.append("## Reliability-per-Watt Ranking")
     lines.append("")
     lines.append("Computed as: `(stability × primary_metric) / energy_proxy`")
     lines.append("")
-    
+
     reliabilities = []
     for key, s in summary.items():
         reliability = (s["stability_margin"] * s["primary_mean"]) / (s["energy_mean"] + 1e-10)
         reliabilities.append((reliability, s["task"], s["model"]))
-    
+
     reliabilities.sort(reverse=True)
-    
+
     lines.append("| Rank | Task | Model | Reliability-per-Watt |")
     lines.append("|------|------|-------|---------------------|")
-    
+
     for i, (rel, task, model) in enumerate(reliabilities[:10], 1):
         lines.append(f"| {i} | {task} | {model} | {rel:.6f} |")
-    
+
     lines.append("")
-    
+
     # Write report
     with open(output_path, "w") as f:
         f.write("\n".join(lines))
@@ -238,15 +238,15 @@ def generate_ascii_chart(values: list[float], labels: list[str], max_width: int 
     """
     if not values:
         return ""
-    
+
     max_val = max(values)
     if max_val == 0:
         max_val = 1.0
-    
+
     lines = []
     for label, value in zip(labels, values):
         bar_len = int((value / max_val) * max_width)
         bar = "█" * bar_len
         lines.append(f"{label:15s} | {bar} {value:.4f}")
-    
+
     return "\n".join(lines)

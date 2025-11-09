@@ -31,23 +31,23 @@ def set_seed(seed: int = 1337) -> None:
     """
     # Set Python random seed
     random.seed(seed)
-    
+
     # Set NumPy seed
     np.random.seed(seed)
-    
+
     # Set PyTorch seed if available
     try:
         import torch
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
-        
+
         # Enable deterministic operations
         torch.use_deterministic_algorithms(True, warn_only=True)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
     except ImportError:
         pass
-    
+
     # Set environment variables for additional determinism
     os.environ["PYTHONHASHSEED"] = str(seed)
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
@@ -103,10 +103,10 @@ def hash_preds(predictions: Any) -> str:
         predictions = predictions.detach().cpu().numpy()
     elif hasattr(predictions, "cpu"):
         predictions = predictions.cpu().numpy()
-    
+
     # Ensure it's a numpy array
     predictions = np.asarray(predictions)
-    
+
     return hash_array(predictions)
 
 
@@ -140,17 +140,17 @@ def verify_determinism(func, *args, seed: int = 1337, n_runs: int = 2, **kwargs)
     True
     """
     hashes = []
-    
+
     for _ in range(n_runs):
         set_seed(seed)
         result = func(*args, **kwargs)
-        
+
         # Convert result to hashable format
         if isinstance(result, (list, tuple)):
             result = np.array(result)
-        
+
         h = hash_preds(result)
         hashes.append(h)
-    
+
     # All hashes should be identical
     return len(set(hashes)) == 1

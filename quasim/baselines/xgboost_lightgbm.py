@@ -1,7 +1,5 @@
 """XGBoost and LightGBM baseline models with tiny configs."""
 
-import numpy as np
-from numpy.typing import NDArray
 
 from quasim.ownai.determinism import set_seed
 
@@ -23,7 +21,7 @@ def get_xgboost_classifier(seed: int = 42, n_estimators: int = 50):
     """
     try:
         from xgboost import XGBClassifier
-        
+
         set_seed(seed)
         return XGBClassifier(
             n_estimators=n_estimators,
@@ -54,7 +52,7 @@ def get_xgboost_regressor(seed: int = 42, n_estimators: int = 50):
     """
     try:
         from xgboost import XGBRegressor
-        
+
         set_seed(seed)
         return XGBRegressor(
             n_estimators=n_estimators,
@@ -85,7 +83,7 @@ def get_lightgbm_classifier(seed: int = 42, n_estimators: int = 50):
     """
     try:
         from lightgbm import LGBMClassifier
-        
+
         set_seed(seed)
         return LGBMClassifier(
             n_estimators=n_estimators,
@@ -117,7 +115,7 @@ def get_lightgbm_regressor(seed: int = 42, n_estimators: int = 50):
     """
     try:
         from lightgbm import LGBMRegressor
-        
+
         set_seed(seed)
         return LGBMRegressor(
             n_estimators=n_estimators,

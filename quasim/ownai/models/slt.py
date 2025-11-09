@@ -35,7 +35,7 @@ class SymbolicLatentTransformer:
     use_symbolic : bool
         Whether to use symbolic REVULTRA features (default: True)
     """
-    
+
     def __init__(
         self,
         task: str = "tabular-cls",
@@ -49,9 +49,9 @@ class SymbolicLatentTransformer:
         self.max_depth = max_depth
         self.seed = seed
         self.use_symbolic = use_symbolic
-        
+
         set_seed(self.seed)
-        
+
         # Determine if classification or regression
         if "cls" in task:
             self.model = RandomForestClassifier(
@@ -71,10 +71,10 @@ class SymbolicLatentTransformer:
             self.is_classification = False
         else:
             raise ValueError(f"Unknown task: {task}")
-        
+
         self.tokenizer = None
         self.scaler = None
-    
+
     def _extract_features(self, X: any) -> NDArray[np.float32]:
         """Extract features including symbolic latents.
         
@@ -93,37 +93,37 @@ class SymbolicLatentTransformer:
             # Text data - extract symbolic latents
             if self.use_symbolic:
                 symbolic_feats = extract_symbolic_latents_batch(X)
-                
+
                 # For text, we'll use symbolic features directly
                 # In a full implementation, we'd combine with embeddings
                 return symbolic_feats
             else:
                 # Simple bag-of-words representation
                 from quasim.ownai.data.preprocess import SimpleTokenizer
-                
+
                 if self.tokenizer is None:
                     self.tokenizer = SimpleTokenizer(max_length=64)
                     self.tokenizer.fit(X)
-                
+
                 token_ids = self.tokenizer.transform(X)
                 # Simple aggregation: mean of token IDs
                 features = np.mean(token_ids, axis=1, keepdims=True).astype(np.float32)
                 return features
-        
+
         # Handle numeric input
         else:
             X = np.asarray(X, dtype=np.float32)
-            
+
             if self.use_symbolic:
                 # Extract symbolic latents from numeric data
                 symbolic_feats = extract_symbolic_latents_numeric(X)
-                
+
                 # Concatenate with original features
                 features = np.concatenate([X, symbolic_feats], axis=1)
                 return features
             else:
                 return X
-    
+
     def fit(self, X: any, y: NDArray) -> "SymbolicLatentTransformer":
         """Train the Symbolic-Latent Transformer.
         
@@ -139,15 +139,15 @@ class SymbolicLatentTransformer:
         self
         """
         set_seed(self.seed)
-        
+
         # Extract features including symbolic latents
         features = self._extract_features(X)
-        
+
         # Train the model
         self.model.fit(features, y)
-        
+
         return self
-    
+
     def predict(self, X: any) -> NDArray:
         """Make predictions.
         
@@ -163,7 +163,7 @@ class SymbolicLatentTransformer:
         """
         features = self._extract_features(X)
         return self.model.predict(features)
-    
+
     def predict_proba(self, X: any) -> NDArray[np.float32]:
         """Predict class probabilities (classification only).
         
@@ -179,7 +179,7 @@ class SymbolicLatentTransformer:
         """
         if not self.is_classification:
             raise ValueError("predict_proba only available for classification")
-        
+
         features = self._extract_features(X)
         return self.model.predict_proba(features)
 
