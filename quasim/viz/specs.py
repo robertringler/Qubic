@@ -8,7 +8,7 @@ from dataclasses import dataclass
 class FlowFrameSpec:
     """
     Specification for a single frame of the QuASIM flow visualization.
-    
+
     Attributes:
         frame_idx: Frame index in the sequence
         time: Current time in the simulation
