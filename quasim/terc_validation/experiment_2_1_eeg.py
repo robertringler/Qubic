@@ -29,8 +29,8 @@ def compute_eeg_correlation(eeg_signal: np.ndarray, consciousness_metric: np.nda
 
     # Compute p-value (simplified)
     n = len(eeg_signal)
-    correlation * np.sqrt((n - 2) / (1 - correlation**2))
-    p_value = 2 * (1 - 0.999)  # Simplified, would use scipy.stats
+    # Note: In production, would compute actual p-value using scipy.stats
+    p_value = 2 * (1 - 0.999)  # Simplified placeholder
 
     return {
         "correlation": float(correlation),

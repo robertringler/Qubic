@@ -531,10 +531,6 @@ class PolicyEngine:
             return True
         return self.policy.dry_run_default
 
-    DEV = "DEV"
-    LAB = "LAB"
-    PROD = "PROD"
-
 
 class PolicyViolationError(Exception):
     """Exception raised when a policy is violated."""
