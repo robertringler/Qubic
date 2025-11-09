@@ -25,6 +25,11 @@ dev = [
     "mypy>=1.0.0",
     "bandit[toml]>=1.7.0",
 ]
+terc = [
+    "scipy>=1.10.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.7.0",
+]
 hcal = [
     "pyyaml>=6.0",
     "click>=8.0",
