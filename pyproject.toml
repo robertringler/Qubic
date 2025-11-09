@@ -25,6 +25,18 @@ dev = [
     "mypy>=1.0.0",
     "bandit[toml]>=1.7.0",
 ]
+ownai = [
+    "torch>=2.0.0",
+    "scikit-learn>=1.3.0",
+    "xgboost>=2.0.0",
+    "lightgbm>=4.0.0",
+    "transformers>=4.30.0",
+    "datasets>=2.14.0",
+    "pandas>=2.0.0",
+    "scipy>=1.11.0",
+    "pillow>=10.0.0",
+    "matplotlib>=3.7.0",
+]
 hcal = [
     "pyyaml>=6.0",
     "click>=8.0",
@@ -42,6 +54,7 @@ quasim-hcal = "quasim.hcal.cli:main"
 quasim-revultra = "quasim.cli.revultra_cli:cli"
 quasim-qgh = "quasim.cli.qgh_cli:cli"
 quasim-terc-obs = "quasim.cli.terc_obs_cli:cli"
+quasim-own = "quasim.cli.quasim_own:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]
