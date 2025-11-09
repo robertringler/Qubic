@@ -40,3 +40,9 @@ plan.json
 # Package build artifacts
 *.egg-info/
 coverage.json
+
+# QuASIM-Own runtime directories
+runs/
+reports/
+.cache/quasim_datasets/
+
