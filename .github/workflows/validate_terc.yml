@@ -12,11 +12,17 @@ on:
         required: false
         default: 'all'
 
+permissions:
+  contents: read
+
 jobs:
   validate_terc:
     name: TERC Validation Suite
     runs-on: ubuntu-latest
-    
+
+    permissions:
+      contents: read
+
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
@@ -128,7 +134,10 @@ jobs:
     name: TERC Integration Test
     runs-on: ubuntu-latest
     needs: validate_terc
-    
+
+    permissions:
+      contents: read
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
