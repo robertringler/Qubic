@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 A comprehensive automated system for code review, auto-fixing, and PR merging:
 
 **Workflows:**
+
 - `.github/workflows/code-review-autofix.yml` - Automated code review and fixing workflow
   - Security scanning with Bandit
   - Secret detection in code
@@ -30,6 +31,7 @@ A comprehensive automated system for code review, auto-fixing, and PR merging:
   - Automatic branch cleanup after merge
 
 **Scripts:**
+
 - Enhanced `scripts/pr_auto_resolver.py` with:
   - Improved logging and progress reporting
   - Better error handling and recovery
@@ -37,10 +39,12 @@ A comprehensive automated system for code review, auto-fixing, and PR merging:
   - Enhanced commit messages
 
 **Documentation:**
+
 - `docs/AUTO_MERGE_SYSTEM.md` - Complete system documentation with setup instructions, usage guide, and troubleshooting
 - `docs/CODE_QUALITY_SUMMARY.md` - Detailed analysis of code quality improvements and metrics
 
 **Impact:**
+
 - Fixed 1,664 lint errors automatically (67.4% reduction)
 - Modified 78 files with automated fixes
 - All 11 unit tests passing
