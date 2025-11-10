@@ -626,6 +626,116 @@ docker run --gpus all -p 8000:8000 quasim:cuda
 
 ---
 
+## Pilot Demonstration: QuASIM × SpaceX/NASA
+
+A sanitized, deterministic pilot demonstration showcasing QuASIM's trajectory optimization capabilities for aerospace applications. This demo runs profile-shaped MECO (Main Engine Cutoff) and hot-staging simulations with reproducible outputs.
+
+### Features
+
+![Deterministic](https://img.shields.io/badge/Deterministic-reproducible-green)
+![RMSE](https://img.shields.io/badge/RMSE-%3C2%25%20(surrogate)-blue)
+![Fidelity](https://img.shields.io/badge/Fidelity-%E2%89%A50.97-purple)
+
+- **Deterministic Execution**: Fixed seeds ensure bit-for-bit reproducible results across runs
+- **CPU-Only Dependencies**: Runs on standard CI runners with numpy and matplotlib only
+- **Fast Runtime**: < 30s per profile on standard hardware
+- **Public-Safe**: No proprietary kernels, datasets, or credentials
+- **Profile-Aware**: Supports custom MECO/hot-staging mission profiles
+
+### Quick Start
+
+#### Python (Direct)
+
+```bash
+# Install dependencies
+pip install -r requirements-demo.txt
+
+# Run Falcon 9 Stage 1 demo
+python quasim_spacex_demo.py --profile configs/meco_profiles/spacex_f9_stage1.json
+
+# Run Starship hot-staging demo
+python quasim_spacex_demo.py --profile configs/meco_profiles/starship_hotstaging.json
+```
+
+#### Make Targets
+
+```bash
+# Run individual profiles
+make spacex-demo      # Falcon 9 Stage 1
+make starship-demo    # Starship hot-staging
+
+# Run all profiles
+make demo-all
+```
+
+#### Docker
+
+```bash
+# Build and run with Docker Compose
+docker compose up --build spacex-demo
+
+# Or build and run manually
+docker build -t quasim-spacex-demo .
+docker run quasim-spacex-demo
+```
+
+### Output Artifacts
+
+Each demo run generates a JSON report containing:
+
+- **Optimized Parameters**: Best thrust shaping coefficient (alpha)
+- **Trajectory Metrics**: Peak altitude, MECO altitude/velocity/time
+- **Validation Metrics**: RMSE percentage, fidelity score
+- **Optimization History**: Generation-by-generation fitness evolution
+- **Visualization**: Base64-encoded PNG plots (altitude & velocity vs. time)
+
+Example output files:
+- `spacex_f9_stage1_demo_report.json` (Falcon 9 demo)
+- `starship_hotstaging_demo_report.json` (Starship demo)
+
+### Mission Profiles
+
+Two reference profiles are included:
+
+1. **SpaceX Falcon 9 Stage 1** (`configs/meco_profiles/spacex_f9_stage1.json`)
+   - MECO time: 162s
+   - Target altitude: 80 km
+   - Target velocity: 2.1 km/s
+
+2. **Starship Hot-Staging** (`configs/meco_profiles/starship_hotstaging.json`)
+   - MECO time: 170s
+   - Target altitude: 90 km
+   - Target velocity: 2.3 km/s
+
+### Validation Anchors
+
+The demo validates against surrogate/shaping targets:
+- **RMSE < 2%**: Trajectory accuracy relative to profile targets
+- **Fidelity ≥ 0.97**: Campaign anchor consistency metric
+- **Deterministic**: Identical outputs across runs with same seed
+
+**Note**: These are simplified surrogate models for demonstration purposes only. Not flight-validated. Actual QuASIM production deployments use cuQuantum tensor network simulation with DO-178C Level A certification posture.
+
+### CI Integration
+
+The pilot demo runs automatically in CI on every push:
+
+- Validates both profiles in < 60s combined runtime
+- Uploads artifacts to GitHub Actions
+- Verifies deterministic reproducibility
+- See [`.github/workflows/spacex-demo.yml`](.github/workflows/spacex-demo.yml)
+
+### Legal & Compliance
+
+Placeholder templates for partnership discussions:
+- [Mutual NDA](legal/QuASIM_SpaceX_Mutual_NDA_v1.0.txt)
+- [Letter of Intent](legal/QuASIM_SpaceX_LOI_Pilot_v1.0.txt)
+
+**Classification**: UNCLASSIFIED // PUBLIC  
+**Export Control**: No ITAR-controlled technical data included
+
+---
+
 ## Appendix: Benchmarking
 
 QuASIM performance validated against IBM Qiskit Aer (2-5× faster, 20+ qubits), Google Cirq (3-8× faster with GPU), and classical solvers (10-100× speedup for quantum-inspired optimization) on NVIDIA A100/H100/GH200, AMD MI250X/MI300X, AWS P4d/P5, Azure ND-series, and GCP A2/G2 instances.
