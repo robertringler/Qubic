@@ -187,7 +187,7 @@ def main():
         seed=args.seed,
     )
 
-    print(f"\nOptimization complete!")
+    print("\nOptimization complete!")
     print(f"  Best alpha: {best_alpha:.6f}")
     print(f"  Best fitness: {best_fitness:.6f}")
 

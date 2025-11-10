@@ -53,3 +53,4 @@ artifacts/flows/*.gif
 # SpaceX/NASA Pilot demo outputs (runtime-generated)
 *_demo_report.json
 
+*_demo_report.json

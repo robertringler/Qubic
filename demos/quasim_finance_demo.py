@@ -189,7 +189,7 @@ def main():
         seed=args.seed,
     )
 
-    print(f"\nOptimization complete!")
+    print("\nOptimization complete!")
     print(f"  Best alpha: {best_alpha:.6f}")
     print(f"  VaR (95%): {best_metrics['target_var_pct']:.2f}%")
     print(f"  Expected Return: {best_metrics['target_return_pct']:.2f}%")

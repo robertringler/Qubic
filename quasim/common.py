@@ -9,7 +9,6 @@ multiple industry verticals. Extracted from quasim_spacex_demo.py.
 import base64
 import io
 import json
-from pathlib import Path
 from typing import Callable
 
 import matplotlib
@@ -142,7 +141,7 @@ def create_visualization_generic(
 
     x_data = np.array(metrics[x_key])
 
-    for i, (ax, y_key, label, title) in enumerate(zip(axes, y_keys, labels, titles)):
+    for _i, (ax, y_key, label, title) in enumerate(zip(axes, y_keys, labels, titles)):
         y_data = np.array(metrics[y_key])
         ax.plot(x_data, y_data, "b-", linewidth=2, label=label)
 
