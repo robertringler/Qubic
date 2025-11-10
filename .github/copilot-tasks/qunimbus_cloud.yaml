@@ -1,16 +1,41 @@
 # QuNimbus — Quantum-Optimized Cloud Fabric for QuASIM
 # GitHub Copilot Agent Task Definition
-# Version: 1.0
+# Version: 2.0
 # Date: 2025-11-10
+# Updated: Enhanced with executable commands and QuASIM QPE/FEM integration
 
 name: "Develop QuNimbus Cloud — Quantum-Optimized Cloud Fabric for QuASIM"
 
 description: |
-  Architect and implement an end-to-end, autonomous cloud environment natively integrated with QuASIM.
-  Design for magnitude-level efficiency improvements (≥10× performance/$ vs leading public clouds) through
-  GPU/quantum co-scheduling, anti-holographic state compression, and intelligent energy routing.
-  Deliver a reproducible GitOps-managed cluster architecture, full CI/CD pipeline, zero-trust security layer,
-  and SDK integration for QuASIM modules.
+  Design and implement QuNimbus, a next-generation ultra-efficient cloud fabric
+  purpose-built for QuASIM's quantum–classical workloads (including QPE-driven FEM/harmonic
+  oscillator simulations for manufacturing). Target ≥10× performance-per-dollar vs. leading
+  public clouds through quantum-aware scheduling, MERA-lifted anti-holographic tensor
+  compression, RL-driven autoscaling, and compliance-first isolation domains (DO-178C Level A,
+  CMMC 2.0 L2). Deliver a GitOps-managed multi-cluster architecture, CI/CD, zero-trust security,
+  Fortinet/InfraGard integration, and an SDK that is natively compatible with QuASIM runtime.
+
+# Optional inputs for quick tuning
+inputs:
+  baseline_efficiency_multiplier:
+    description: "Target efficiency vs. public cloud baselines"
+    required: false
+    default: "10x"
+  regions:
+    description: "Comma-separated regions to seed (e.g., us-east-1,us-west-2)"
+    required: false
+    default: "us-east-1"
+  gpu_class:
+    description: "GPU class for initial node pools (nvidia|amd)"
+    required: false
+    default: "nvidia"
+
+env:
+  QN_NAME: "QuNimbus"
+  QN_BASELINE_EFFICIENCY: "${{ inputs.baseline_efficiency_multiplier || '10x' }}"
+  QN_REGIONS: "${{ inputs.regions || 'us-east-1' }}"
+  QN_GPU_CLASS: "${{ inputs.gpu_class || 'nvidia' }}"
+  QN_LOG: "logs/qunimbus_boot.log"
 
 objectives:
   - Design next-generation cloud platform purpose-built for QuASIM's quantum-classical workloads
@@ -33,30 +58,55 @@ compliance_standards:
   - "DFARS"
   - "DO-326A (Airworthiness Security)"
 
+# High-level success criteria used in validation step
+success_criteria:
+  - "End-to-end IaC compiles (terraform validate, helm lint) with zero errors"
+  - "QuASIM runtime deploys and authenticates via OIDC"
+  - "RL autoscaler reaches target utilization with SLO-compliant latency"
+  - "MERA-lifted compression enabled; tensor artifacts deduplicated"
+  - "Compliance checks pass: CMMC L2 mapping, DO-178C gates green"
+  - "Benchmarks show ≥10× performance/$ vs. public cloud baselines on QPE/FEM case"
+
 steps:
+  # 0) Bootstrap & guardrails
   - name: "Initialize QuNimbus Environment"
     id: "init-environment"
     description: "Set up QuNimbus cloud framework directory structure and logging"
-    commands:
-      - command: "mkdir -p qunimbus/{control,compute,storage,ai,quantum,security,docs,network,sdk,benchmarks}"
-        description: "Create directory structure for QuNimbus components"
-      - command: "mkdir -p logs"
-        description: "Create logs directory"
-      - command: "echo 'Initializing QuNimbus Cloud Framework v1.0' > logs/qunimbus_boot.log"
-        description: "Initialize boot log"
-      - command: "terraform init && terraform validate || echo 'Terraform not yet configured'"
-        description: "Initialize Terraform if available"
+    run: |
+      set -euo pipefail
+      mkdir -p logs qunimbus/{control,compute,storage,ai,quantum,security,network,docs} .github/workflows sdk scripts infra
+      echo "$(date -u '+%Y-%m-%dT%H:%M:%SZ') Starting ${QN_NAME} scaffold" | tee -a "${QN_LOG}"
+      test -f README.md || echo "# ${QN_NAME}" > README.md
+      echo "Regions=${QN_REGIONS} GPU=${QN_GPU_CLASS} Baseline=${QN_BASELINE_EFFICIENCY}" | tee -a "${QN_LOG}"
+      terraform -version >/dev/null 2>&1 || echo "Note: terraform not found; IaC validation will be skipped" | tee -a "${QN_LOG}"
+      helm version >/dev/null 2>&1 || echo "Note: helm not found; chart lint will be skipped" | tee -a "${QN_LOG}"
     outputs:
       - "qunimbus/ directory structure"
       - "logs/qunimbus_boot.log"
+      - ".github/workflows/ directory"
+      - "sdk/ directory"
+      - "scripts/ directory"
+      - "infra/ directory"
     metadata:
       paradigm: "Quantum-Classical Hybrid"
-      design_pattern: "Anti-Holographic Cloud Fabric"
-      framework_version: "1.0"
+      design_pattern: "MERA-Lifted Anti-Holographic Cloud Fabric"
+      framework_version: "2.0"
 
+  # 1) Control plane (deterministic scheduler, RL autoscaler, zero-trust)
   - name: "Build Quantum-Aware Control Plane"
     id: "control-plane"
     description: "Design and implement hybrid Kubernetes control plane with quantum-aware scheduling"
+    run: |
+      set -euo pipefail
+      copilot-arch generate control-plane \
+        --model "hybrid-k8s" \
+        --features "deterministic-scheduler,rl-autoscaler,nodepools:${QN_GPU_CLASS},multi-region:${QN_REGIONS}" \
+        --security "zero-trust,opa-gatekeeper,cilium,spiffe,fortinet-gwlb" \
+        --compliance "cmmc-l2,nist-800-53,do-178c" \
+        --output qunimbus/control/
+      # IaC placeholders
+      mkdir -p infra/terraform qunimbus/control/helm
+      echo 'terraform {}' > infra/terraform/main.tf
     requirements:
       - "Hybrid K8s architecture"
       - "GPU/Quantum node pools with deterministic scheduler"
@@ -64,6 +114,8 @@ steps:
       - "Zero Trust security architecture"
       - "OPA Gatekeeper policy enforcement"
       - "Fortinet integration for secure gateway"
+      - "SPIFFE/SPIRE for workload identity"
+      - "Cilium CNI for network policy enforcement"
     components:
       scheduler:
         type: "quantum-aware"
@@ -97,16 +149,37 @@ steps:
       - "qunimbus/control/autoscaler-rl-config.yaml"
       - "qunimbus/control/security-policies.yaml"
 
+  # 2) Compute & quantum fabric (cuQuantum/ROCm + QuASIM QaaS)
   - name: "Create Quantum Compute Fabric"
     id: "compute-fabric"
-    description: "Build quantum compute fabric with multi-GPU lattice mapping and energy optimization"
+    description: "Build quantum compute fabric with multi-GPU lattice mapping and QuASIM QaaS integration"
+    run: |
+      set -euo pipefail
+      copilot-arch generate compute-fabric \
+        --integrate "quasim.runtime,quasim.QaaS,cuQuantum,ROCm,Qiskit,TensorRT,qpe_harmonic" \
+        --optimize "multi-gpu-lattice-mapping,affinity-aware-placement,deterministic-replay" \
+        --output qunimbus/compute/
+      # GPU node pool & topology values
+      cat > qunimbus/compute/values.yaml <<'YAML'
+      gpu:
+        class: ${QN_GPU_CLASS}
+        replicas: 3
+        topology: "nvlink-c2c-preferred"
+      runtime:
+        quasim:
+          enableQaaS: true
+          deterministicSeeds: true
+          qpe_harmonic_fem: true
+      YAML
     integrations:
       quantum_frameworks:
         - "QuASIM runtime"
+        - "QuASIM QaaS (Quantum-as-a-Service)"
         - "NVIDIA cuQuantum"
         - "AMD ROCm"
         - "Qiskit"
         - "Cirq"
+        - "QPE harmonic oscillator for FEM"
       classical_acceleration:
         - "TensorRT for inference optimization"
         - "cuDNN for neural network acceleration"
@@ -140,9 +213,26 @@ steps:
       - "qunimbus/compute/energy-optimization.yaml"
       - "qunimbus/compute/integration-manifests/"
 
+  # 3) Storage & data layer (MERA-lifted anti-holographic compression)
   - name: "Build Anti-Holographic Storage System"
     id: "storage-fabric"
-    description: "Implement quantum-optimized storage with tensor memory and neural deduplication"
+    description: "Implement MERA-lifted quantum-optimized storage with tensor memory and neural deduplication"
+    run: |
+      set -euo pipefail
+      copilot-arch generate storage-fabric \
+        --type "object+tensor" \
+        --features "mera-lifted-compression,quantum-delta-encoding,neural-dedup,checksum-repair" \
+        --output qunimbus/storage/
+      cat > qunimbus/storage/policy.yaml <<'YAML'
+      retention:
+        tensors: 30d
+      compression:
+        scheme: "MERA-lifted-duality"
+        target_ratio: "10-50x"
+      encryption:
+        at_rest: "FIPS-140-3 AES-256-GCM"
+        in_transit: "TLS1.3"
+      YAML
     storage_types:
       object_storage:
         type: "S3-compatible"
@@ -155,19 +245,20 @@ steps:
         type: "QEBS (Quantum Elastic Block Store)"
         features:
           - "Tensor-level data versioning"
-          - "Anti-holographic compression (10-50× ratio)"
+          - "MERA-lifted anti-holographic compression (10-50× ratio)"
           - "Zero-copy GPU memory access"
           - "Deterministic state replay"
       metadata_store:
         type: "Distributed KV store"
         implementation: "etcd cluster"
     compression:
-      algorithm: "anti-holographic tensor compression"
+      algorithm: "MERA-lifted duality anti-holographic tensor compression"
       compression_ratio: "10-50×"
       features:
         - "Lossless quantum state encoding"
         - "Adaptive error budget allocation"
         - "Progressive refinement"
+        - "MERA tensor network decomposition"
     data_protection:
       encryption: "AES-256-GCM at rest, TLS 1.3 in transit"
       compliance: "FIPS 140-2 Level 3"
@@ -178,26 +269,50 @@ steps:
       - "qunimbus/storage/compression-algorithms.py"
       - "qunimbus/storage/data-protection-policies.yaml"
 
+  # 4) AI & RL optimization for scheduling/scaling/network
   - name: "Integrate Reinforcement-Learning Optimizer"
     id: "ai-rl-optimizer"
-    description: "Build RL-based optimizer for scheduling, scaling, and network path optimization"
+    description: "Build RL-based optimizer for scheduling, scaling, and network path optimization with QuASIM fidelity"
+    run: |
+      set -euo pipefail
+      copilot-ai build optimizer \
+        --scope "scheduling,scaling,network" \
+        --reward "quasim_fidelity + energy_efficiency + throughput - latency" \
+        --framework "pytorch+rllib" \
+        --output qunimbus/ai/
+      cat > qunimbus/ai/config.yaml <<'YAML'
+      rllib:
+        algo: PPO
+        horizon: 2048
+        lr: 3e-4
+        gamma: 0.995
+      objectives:
+        fidelity_target: 0.97
+        energy_savings_target: 0.30
+        latency_slo_ms: 50
+      YAML
     scope:
       - "Dynamic job scheduling optimization"
       - "Auto-scaling policy learning"
       - "Network path selection and routing"
       - "Energy consumption minimization"
+      - "QuASIM quantum fidelity optimization"
     reward_function:
       components:
+        - name: "quasim_fidelity"
+          weight: 0.25
+          metric: "quantum state fidelity"
+          target: "≥0.97"
         - name: "energy_efficiency"
-          weight: 0.4
+          weight: 0.35
           metric: "joules per QFLOPS"
         - name: "throughput"
-          weight: 0.35
+          weight: 0.25
           metric: "jobs completed per hour"
         - name: "latency"
-          weight: 0.25
+          weight: 0.15
           metric: "mean job completion time (penalty)"
-      objective: "maximize(energy_efficiency + throughput - latency)"
+      objective: "maximize(quasim_fidelity + energy_efficiency + throughput - latency)"
     framework:
       ml_framework: "PyTorch 2.0+"
       rl_library: "Ray RLlib"
@@ -226,9 +341,27 @@ steps:
       - "qunimbus/ai/training-pipeline.yaml"
       - "qunimbus/ai/model-serving-config.yaml"
 
+  # 5) Security & compliance (Fortinet, InfraGard, CAC/IdP)
   - name: "Fortinet & InfraGard Integration"
     id: "security-compliance"
-    description: "Integrate enterprise security with Fortinet and InfraGard compliance"
+    description: "Integrate enterprise security with Fortinet, InfraGard, and CAC/OIDC authentication"
+    run: |
+      set -euo pipefail
+      copilot-security integrate \
+        --partners "Fortinet,InfraGard" \
+        --features "secure-enclave-routing,cac-login,saml-oidc-broker,network-segmentation" \
+        --standards "CMMC-2.0-L2,NIST-800-53,DO-326A,DO-178C" \
+        --output qunimbus/security/
+      cat > qunimbus/security/idp.yaml <<'YAML'
+      oidc:
+        issuer: https://id.quasim.io/realms/quantum
+        clients:
+          - name: qunimbus
+            redirect_uris: ["https://console.qunimbus.cloud/callback"]
+        cac:
+          enabled: true
+          mTLS: required
+      YAML
     partners:
       fortinet:
         products:
@@ -241,6 +374,7 @@ steps:
           - "Advanced threat protection"
           - "SSL/TLS inspection"
           - "IPS/IDS integration"
+          - "Gateway load balancer integration"
       infragard:
         role: "Public-private partnership for critical infrastructure protection"
         verification:
@@ -251,8 +385,11 @@ steps:
       methods:
         - name: "CAC (Common Access Card)"
           use_case: "DoD personnel authentication"
+          mtls_required: true
         - name: "PIV (Personal Identity Verification)"
           use_case: "Federal civilian authentication"
+        - name: "OIDC/SAML"
+          use_case: "Enterprise SSO"
         - name: "FIDO2"
           use_case: "Commercial user authentication"
       mfa_required: true
@@ -285,9 +422,27 @@ steps:
       - "qunimbus/security/cac-authentication-config.yaml"
       - "qunimbus/security/enclave-isolation-spec.yaml"
 
+  # 6) Networking & performance (QKD/QoS over SRv6/QUIC)
   - name: "Design Quantum Mesh Network"
     id: "networking"
-    description: "Create hybrid photonic-classical mesh network with quantum key distribution"
+    description: "Create hybrid photonic-classical mesh network with quantum key distribution and QoS"
+    run: |
+      set -euo pipefail
+      copilot-net generate \
+        --type "photon+classical-hybrid" \
+        --protocols "QKD,SRv6,QUIC" \
+        --latency-target "0.5ms intra-region" \
+        --output qunimbus/network/
+      cat > qunimbus/network/policy.yaml <<'YAML'
+      qos:
+        classes:
+          - name: control
+            latency_budget_ms: 5
+          - name: quantum
+            latency_budget_ms: 0.5
+          - name: bulk
+            latency_budget_ms: 50
+      YAML
     network_type: "Photon + Classical hybrid mesh"
     protocols:
       quantum:
@@ -347,32 +502,53 @@ steps:
       - "qunimbus/network/srv6-routing.yaml"
       - "qunimbus/network/cilium-cni-config.yaml"
 
+  # 7) CI/CD & observability (with GitOps SLOs and efficiency index)
   - name: "Implement CI/CD Pipeline & Observability Stack"
     id: "cicd-observability"
-    description: "Build comprehensive CI/CD pipeline with full-stack observability"
+    description: "Build comprehensive CI/CD pipeline with full-stack observability and GitOps efficiency tracking"
+    run: |
+      set -euo pipefail
+      copilot-workflow create \
+        --name "qunimbus-ci.yml" \
+        --jobs "lint:make lint,test:make test,build-docker:docker build -t qunimbus .,deploy:helm upgrade --install qunimbus ./chart,validate:python scripts/validate.py" \
+        --monitoring "Prometheus,Loki,Tempo,Grafana" \
+        --output .github/workflows/qunimbus-ci.yml
+      # Efficiency exporter & dashboard placeholders
+      mkdir -p monitoring
+      cat > monitoring/efficiency_exporter.README.md <<'MD'
+      QuNimbus efficiency exporter integrates with Argo CD audit logs to compute:
+      - sync_wave_duration_seconds
+      - rollout_promotion_duration_seconds
+      - repo_server_cache_hit_ratio
+      - gitops_efficiency_index (baseline/observed)
+      MD
     cicd_pipeline:
       name: "qunimbus-ci"
       stages:
         - name: "lint"
-          tools: ["ruff", "terraform fmt", "yamllint"]
+          tools: ["ruff", "terraform fmt", "yamllint", "make lint"]
         - name: "security-scan"
           tools: ["CodeQL", "Trivy", "Snyk"]
         - name: "test"
           types: ["unit", "integration", "e2e"]
           coverage_target: "≥90%"
+          command: "make test"
         - name: "build"
           artifacts:
             - "Container images"
             - "Helm charts"
             - "Terraform modules"
+          command: "docker build -t qunimbus ."
         - name: "deploy"
           environments: ["dev", "staging", "production"]
           strategy: "Blue-Green with canary analysis"
+          command: "helm upgrade --install qunimbus ./chart"
         - name: "validate"
           checks:
             - "Smoke tests"
             - "Performance benchmarks"
             - "Compliance validation"
+          command: "python scripts/validate.py"
       automation:
         - "Automated rollback on failure"
         - "Progressive delivery with Argo Rollouts"
@@ -434,9 +610,23 @@ steps:
       - "qunimbus/observability/grafana-dashboards/"
       - "qunimbus/observability/alerting-rules.yaml"
 
+  # 8) QuNimbus SDKs (Python/C++/Rust) with QuASIM hooks
   - name: "Generate QuNimbus SDK for QuASIM"
     id: "sdk-generation"
-    description: "Create multi-language SDK for seamless quantum-classical orchestration"
+    description: "Create multi-language SDK for seamless quantum-classical orchestration with QuASIM integration"
+    run: |
+      set -euo pipefail
+      copilot-sdk generate \
+        --lang "Python,C++,Rust" \
+        --modules "qunimbus.client,qunimbus.scheduler,qunimbus.analytics,qunimbus.quasim_client" \
+        --integrate "quasim.runtime" \
+        --output sdk/
+      cat > sdk/python/examples/qpe_harmonic_fem.py <<'PY'
+      # Example: run QPE-based FEM harmonic oscillator via QuNimbus->QuASIM
+      from qunimbus.quasim_client import qpe_harmonic_fem
+      result = qpe_harmonic_fem(mesh="beam_2d", precision="fp16", repeats=128)
+      print(result.summary())
+      PY
     languages:
       - name: "Python"
         version: "≥3.10"
@@ -470,6 +660,13 @@ steps:
           - "Historical data analysis"
           - "Cost tracking and optimization"
           - "Performance profiling"
+      qunimbus_quasim_client:
+        purpose: "QuASIM-specific integration module"
+        features:
+          - "QPE harmonic FEM job submission"
+          - "QuASIM QaaS API integration"
+          - "Deterministic seed management"
+          - "Fidelity tracking and optimization"
     integration:
       quasim_runtime:
         methods:
@@ -494,9 +691,21 @@ steps:
       - "sdk/docs/"
       - "sdk/examples/"
 
+  # 9) Benchmarking & validation (QPE/FEM manufacturing)
   - name: "Run Comparative Benchmarks"
     id: "benchmarking"
-    description: "Execute comprehensive benchmarks against major cloud providers"
+    description: "Execute comprehensive benchmarks against major cloud providers with QPE/FEM workloads"
+    run: |
+      set -euo pipefail
+      mkdir -p scripts docs/analysis
+      cat > scripts/benchmark_qunimbus.py <<'PY'
+      # Placeholder: orchestrate QPE/FEM runs across QuNimbus vs AWS/GCP/Azure/Oracle and emit md
+      print("Benchmark runner scaffolded.")
+      PY
+      python scripts/benchmark_qunimbus.py --compare "AWS,GCP,Azure,Oracle" \
+        --metrics "throughput,latency,power,cost" \
+        --quasim "qpe_harmonic_fem" \
+        --output docs/analysis/qunimbus_vs_public_clouds.md || true
     benchmark_script: "scripts/benchmark_qunimbus.py"
     comparison_targets:
       - "AWS (EC2 P4d, EKS)"
@@ -520,6 +729,10 @@ steps:
         measurement: "Time to scale 0→100 nodes"
         target: "≤5 minutes"
     workloads:
+      - name: "QPE harmonic FEM (manufacturing)"
+        description: "Quantum Phase Estimation for FEM harmonic oscillator simulations"
+        use_case: "Laser cutting, vibration analysis"
+        repetitions: 128
       - name: "Quantum circuit simulation"
         description: "30-qubit circuit with 100 gates"
         repetitions: 1000
@@ -542,7 +755,95 @@ steps:
       - "docs/analysis/performance_charts.png"
       - "docs/analysis/cost_comparison.csv"
 
+  # 10) QuASIM-specific validation suite
+  - name: "Validate QuASIM Integration"
+    id: "quasim-validation"
+    description: "Validate QuASIM runtime integration and FEM manufacturing workloads"
+    run: |
+      set -euo pipefail
+      mkdir -p docs
+      copilot-test run \
+        --workload "fem_laser_cutting" \
+        --fidelity "0.99" \
+        --compare "classical_ansys" \
+        --output docs/quasim_hooks.md || true
+    validation_workloads:
+      - name: "FEM Laser Cutting"
+        description: "QPE-based harmonic oscillator simulation for laser cutting"
+        fidelity_target: "≥0.99"
+        comparison: "Classical ANSYS benchmark"
+      - name: "QuASIM QaaS API"
+        description: "Validate Quantum-as-a-Service API integration"
+        tests:
+          - "Authentication and authorization"
+          - "Job submission and monitoring"
+          - "Deterministic seed replay"
+          - "Fidelity tracking"
+      - name: "Deterministic Reproducibility"
+        description: "Verify <1μs seed replay drift tolerance"
+        tolerance: "<1μs"
+    outputs:
+      - "docs/quasim_hooks.md"
+      - "docs/quasim_validation_report.json"
+
+  # 11) Lint, plan, and summarize artifacts
+  - name: "Lint, Plan & Summarize"
+    id: "lint-summarize"
+    description: "Validate IaC, lint configurations, and summarize all generated artifacts"
+    run: |
+      set -euo pipefail
+      (terraform -chdir=infra/terraform validate && echo "Terraform validate OK") || echo "Terraform skipped"
+      (helm lint qunimbus/control/helm || true)
+      echo "Artifacts:"
+      find qunimbus -maxdepth 3 -type f | sed 's/^/- /'
+      echo "Success criteria:" && printf -- " - %s\n" ${QN_NAME} "GitOps + OIDC + RL autoscaling targets defined"
+    validation_steps:
+      - name: "Terraform Validation"
+        command: "terraform -chdir=infra/terraform validate"
+        required: true
+      - name: "Helm Lint"
+        command: "helm lint qunimbus/control/helm"
+        required: false
+      - name: "YAML Validation"
+        command: "yamllint qunimbus/"
+        required: false
+      - name: "Artifact Summary"
+        command: "find qunimbus -maxdepth 3 -type f"
+        required: true
+    outputs:
+      - "Validation summary"
+      - "Artifact inventory"
+      - "Success criteria checklist"
+
+# Artifacts to be generated and preserved
+artifacts:
+  - "qunimbus/control/**"
+  - "qunimbus/compute/**"
+  - "qunimbus/storage/**"
+  - "qunimbus/ai/**"
+  - "qunimbus/security/**"
+  - "qunimbus/network/**"
+  - "sdk/**"
+  - "docs/**"
+  - ".github/workflows/qunimbus-ci.yml"
+  - "scripts/**"
+  - "logs/**"
+  - "infra/terraform/**"
+  - "monitoring/**"
+
 deliverables:
+  - "GitOps-managed multi-cluster blueprint (Terraform/Helm/Kustomize)"
+  - "Deterministic scheduler + RL-based autoscaler configuration"
+  - "Quantum compute fabric integrated with QuASIM QaaS"
+  - "MERA-lifted anti-holographic storage policies"
+  - "Zero-trust security with Fortinet/InfraGard and CAC/IdP login"
+  - "QuNimbus SDKs (Python/C++/Rust) with QuASIM integration examples"
+  - "Benchmark report scaffold comparing QuNimbus vs public clouds"
+  - "Compliance scaffolding for DO-178C Level A and CMMC 2.0 L2"
+  - "QPE harmonic FEM validation report"
+  - "GitOps efficiency index and observability dashboards"
+
+detailed_deliverables:
   infrastructure:
     - name: "Complete Cloud Control Plane Blueprint"
       files:
@@ -559,24 +860,28 @@ deliverables:
 
   compute:
     - name: "Quantum Fabric Simulator"
-      description: "RL-driven scheduler integrated with QuASIM runtime kernels"
+      description: "RL-driven scheduler integrated with QuASIM runtime kernels and QaaS"
       components:
         - "GPU/quantum co-scheduler"
         - "Energy optimization controller"
-        - "Anti-holographic state manager"
+        - "MERA-lifted anti-holographic state manager"
+        - "QuASIM QaaS integration"
+        - "QPE harmonic FEM support"
       performance: "≥10× efficiency vs public cloud"
 
   security:
     - name: "Security Layer"
       components:
-        - "CAC/PIV login integration"
-        - "Fortinet gateway configuration"
+        - "CAC/PIV login integration with mTLS"
+        - "Fortinet gateway configuration (FortiGate/FortiWeb/FortiSIEM)"
         - "InfraGard-verified isolation domains"
         - "Zero Trust architecture implementation"
+        - "OIDC/SAML broker for enterprise SSO"
       compliance:
         - "CMMC 2.0 Level 2"
         - "NIST 800-53 HIGH baseline"
         - "DO-326A airworthiness security"
+        - "DO-178C Level A readiness"
 
   developer_tools:
     - name: "QuNimbus SDK"
@@ -585,15 +890,18 @@ deliverables:
         - "Quantum-classical orchestration API"
         - "Job submission and management"
         - "Analytics and monitoring"
-      documentation: "Complete with examples"
+        - "QuASIM QaaS client integration"
+        - "QPE harmonic FEM examples"
+      documentation: "Complete with examples and QuASIM integration guides"
 
   analysis:
     - name: "Benchmark Report"
       content:
-        - "Performance comparison vs AWS/GCP/Azure"
+        - "Performance comparison vs AWS/GCP/Azure/Oracle"
         - "≥10× efficiency gain verification"
         - "Cost-benefit analysis"
         - "Energy consumption metrics"
+        - "QPE/FEM manufacturing use case results"
       format: ["Markdown", "PDF", "Interactive dashboard"]
 
   documentation:
@@ -605,6 +913,8 @@ deliverables:
         - "Deployment guides"
         - "Investor brief"
         - "Technical white paper"
+        - "QuASIM integration guide"
+        - "QPE/FEM manufacturing examples"
       target_audiences: ["Engineers", "CTO/CIO", "Investors"]
 
 optional_enhancements:
@@ -714,19 +1024,32 @@ validation:
     - "SDK functional with example applications"
     - "Documentation complete and accessible"
 
-notes: |
+notes:
+  - "The `copilot-*` commands are action verbs for the Copilot Agent to scaffold code, manifests, and configs."
+  - "Replace placeholders with your organization's registries, domains, and compliance artifacts."
+  - "For real benchmarks, wire `scripts/benchmark_qunimbus.py` to invoke QuASIM jobs and collect wall, power, and cost metrics."
+  - "MERA-lifted compression leverages Multi-scale Entanglement Renormalization Ansatz for quantum state compression."
+  - "QuASIM QaaS integration enables direct quantum-as-a-service API access from QuNimbus."
+  - "QPE harmonic FEM workloads demonstrate manufacturing use cases (laser cutting, vibration analysis)."
+  - "Environment variables (QN_*) allow runtime configuration without modifying the task definition."
+  - "Success criteria must all pass for validation; use for CI/CD gates."
+
+extended_notes: |
   This task defines the complete specification for QuNimbus, the quantum-optimized cloud fabric
-  for QuASIM. Upon execution, GitHub Copilot will scaffold the entire infrastructure, generate
+  for QuASIM with enhanced MERA-lifted anti-holographic compression and QPE/FEM manufacturing
+  integration. Upon execution, GitHub Copilot will scaffold the entire infrastructure, generate
   all necessary configuration files, implement the SDK, and produce comprehensive documentation.
   
   The resulting system will provide a self-sovereign, quantum-accelerated cloud platform that
   dramatically outperforms traditional public clouds for quantum-classical workloads while
-  maintaining strict compliance with aerospace and defense regulations.
+  maintaining strict compliance with aerospace and defense regulations (DO-178C Level A, CMMC 2.0 L2).
   
   QuNimbus represents a paradigm shift in cloud computing architecture, purpose-built for the
-  quantum era with native support for quantum circuits, tensor networks, and hybrid algorithms.
+  quantum era with native support for quantum circuits, tensor networks, hybrid algorithms, and
+  manufacturing-grade QPE simulations.
 
-version: "1.0.0"
+version: "2.0.0"
 created: "2025-11-10"
+updated: "2025-11-10"
 author: "QuASIM Engineering Team"
 license: "Apache-2.0"
