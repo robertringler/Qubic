@@ -1,6 +1,18 @@
-.PHONY: test validate fmt lint build bench pack deploy video
+.PHONY: test validate fmt lint build bench pack deploy video spacex-demo starship-demo demo-all
 
 ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+# SpaceX/NASA Pilot Track Demo Targets
+spacex-demo:
+	@echo "Running SpaceX Falcon 9 Stage 1 demo..."
+	python3 quasim_spacex_demo.py --profile configs/meco_profiles/spacex_f9_stage1.json
+
+starship-demo:
+	@echo "Running Starship hot-staging demo..."
+	python3 quasim_spacex_demo.py --profile configs/meco_profiles/starship_hotstaging.json
+
+demo-all: spacex-demo starship-demo
+	@echo "All pilot track demos complete!"
 
 # Format code (Python, Terraform)
 fmt:
