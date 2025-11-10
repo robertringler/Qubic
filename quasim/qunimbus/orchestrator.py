@@ -107,8 +107,7 @@ class QuNimbusOrchestrator:
         )
         logger.info("[10:02:15] RL Policy: 98.3% → 99.1% convergence | MERA: 100×")
         logger.info(
-            "[10:02:17] Pilot Factory: Gen 1–1,000 ACTIVE | "
-            "10,000+ qubits (PsiQuantum + QuEra)"
+            "[10:02:17] Pilot Factory: Gen 1–1,000 ACTIVE | " "10,000+ qubits (PsiQuantum + QuEra)"
         )
         logger.info("[10:02:19] Veto Rate: 0.8% | Auto-corrected in <0.1s")
 
@@ -178,10 +177,10 @@ class QuNimbusOrchestrator:
         Returns:
             Combined execution results
         """
+        logger.info("QuNimbus v2.0 — DUAL EXECUTION: Wave 3 Launch + China Photonic Factory Scale")
         logger.info(
-            f"QuNimbus v2.0 — DUAL EXECUTION: Wave 3 Launch + China Photonic Factory Scale"
+            f"Location: Akron, Ohio, US | Time: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
         )
-        logger.info(f"Location: Akron, Ohio, US | Time: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
         logger.info("Targets:")
         logger.info("  1. Wave 3: 1,000 pilots/day (10,000+ qubits, 100× MERA)")
         logger.info("  2. China Photonic Factory: Global competition integration")
@@ -193,9 +192,7 @@ class QuNimbusOrchestrator:
         wave3_result, china_result = await asyncio.gather(wave3_task, china_task)
 
         # Update combined metrics
-        self.metrics.pilots_generated = (
-            self.metrics.akron_pilots + self.metrics.china_pilots
-        )
+        self.metrics.pilots_generated = self.metrics.akron_pilots + self.metrics.china_pilots
         self.metrics.timestamp = datetime.now()
 
         # Display global impact
@@ -223,18 +220,14 @@ class QuNimbusOrchestrator:
             f"| **Pilots/Day**   | {self.metrics.akron_pilots:,}    | "
             f"{self.metrics.china_pilots}      | **{self.metrics.pilots_generated:,}** |"
         )
-        logger.info(
-            f"| **Qubits**       | 10,000+  | 1M+/yr   | **1.01M+**  |"
-        )
+        logger.info("| **Qubits**       | 10,000+  | 1M+/yr   | **1.01M+**  |")
         logger.info(
             f"| **Efficiency**   | {self.metrics.efficiency_multiplier}×      | 22.1×    | **22.1×**   |"
         )
         logger.info(
             f"| **MERA**         | {self.metrics.mera_compression}×     | 100×     | **100×**    |"
         )
-        logger.info(
-            "| **Value Unlocked** | $12B/yr | $8B/yr   | **$20B/yr** |"
-        )
+        logger.info("| **Value Unlocked** | $12B/yr | $8B/yr   | **$20B/yr** |")
 
     def _display_compliance_status(self):
         """Display compliance and security status."""
@@ -267,9 +260,7 @@ class QuNimbusOrchestrator:
 
             logger.info("\n### Next: Global Quantum Dominance")
             logger.info("# Auto-draft Wave 4: 10,000 pilots/day")
-            logger.info(
-                'qunimbus prep wave4 \\'
-            )
+            logger.info("qunimbus prep wave4 \\")
             logger.info('  --target "10000_pilots_per_day" \\')
             logger.info('  --integrate "india_qpi_ai,japan_quantum_optics"')
 

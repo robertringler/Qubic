@@ -298,9 +298,7 @@ class PilotFactory:
             )
 
         logger.info("| ... | ... | ... | ... | ... | ... |")
-        logger.info(
-            "| 1000 | Retail | QAOA Inventory Opt | 0.298s | 0.998 | -42% Overstock |"
-        )
+        logger.info("| 1000 | Retail | QAOA Inventory Opt | 0.298s | 0.998 | -42% Overstock |")
         logger.info("\n> **Wave 3 LIVE — 1,000 pilots/day achieved.**")
 
     def get_stats(self) -> Dict:

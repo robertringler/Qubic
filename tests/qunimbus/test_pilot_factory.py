@@ -1,7 +1,5 @@
 """Tests for QuNimbus Pilot Factory."""
 
-import pytest
-
 from quasim.qunimbus.pilot_factory import PilotFactory, PilotSpec
 
 

@@ -61,8 +61,7 @@ class ChinaPhotonicFactory:
         self._connected = False
 
         logger.info(
-            f"China Photonic Factory integration initialized - "
-            f"Partner: {self.config.partner}"
+            f"China Photonic Factory integration initialized - " f"Partner: {self.config.partner}"
         )
         logger.info(
             f"Capacity: {self.config.capacity_qubits_per_year:,} qubits/yr | "
@@ -83,10 +82,7 @@ class ChinaPhotonicFactory:
         self.metrics.timestamp = datetime.now()
 
         logger.info("✓ Connection established via QKD (BB84)")
-        logger.info(
-            f"✓ Latency: {self.metrics.qkd_latency_ms} ms "
-            f"(Akron ↔ Shenzhen)"
-        )
+        logger.info(f"✓ Latency: {self.metrics.qkd_latency_ms} ms " f"(Akron ↔ Shenzhen)")
         logger.info(f"✓ Bandwidth: {self.config.qkd_bandwidth_gbps} Gbps")
         logger.info(f"✓ Compliance: {self.config.compliance_level} + CMMC L2 bridge")
 

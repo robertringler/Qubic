@@ -8,9 +8,9 @@ and cross-border quantum networking.
 __version__ = "2.0.0"
 __wave__ = "3"
 
+from quasim.qunimbus.china_integration import ChinaPhotonicFactory
 from quasim.qunimbus.orchestrator import QuNimbusOrchestrator
 from quasim.qunimbus.pilot_factory import PilotFactory
-from quasim.qunimbus.china_integration import ChinaPhotonicFactory
 
 __all__ = [
     "QuNimbusOrchestrator",

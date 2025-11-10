@@ -1,7 +1,5 @@
 """Tests for China Photonic Factory integration."""
 
-import pytest
-
 from quasim.qunimbus.china_integration import (
     ChinaFactoryConfig,
     ChinaFactoryMetrics,

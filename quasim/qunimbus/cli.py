@@ -14,7 +14,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
-from typing import List, Optional
+from typing import Optional
 
 import click
 
