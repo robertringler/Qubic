@@ -63,3 +63,7 @@ artifacts/agritech/
 # SpaceX/NASA Pilot demo outputs (runtime-generated)
 *_demo_report.json
 
+# Enhancement orchestrator logs
+logs/copilot-enhancement/
+docs/artifacts/
+

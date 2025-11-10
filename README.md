@@ -1,3 +1,19 @@
+<div align="center">
+  <img src="docs/assets/quasim_logo_light.svg" alt="QuASIM Logo" width="300"/>
+  
+  # QuASIM
+  ### Quantum-Inspired Autonomous Simulation
+  
+  [![Build Status](https://github.com/robertringler/QuASIM/workflows/CI/badge.svg)](https://github.com/robertringler/QuASIM/actions)
+  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+  [![Compliance](https://img.shields.io/badge/CMMC-2.0%20L2-green.svg)](docs/compliance/)
+  [![DO-178C](https://img.shields.io/badge/DO--178C-Level%20A-green.svg)](docs/certification/)
+  
+  **Enterprise-Grade Quantum Simulation Platform for Aerospace & Defense**
+</div>
+
+---
+
 # QuASIM — Quantum-Inspired Autonomous Simulation
 
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
