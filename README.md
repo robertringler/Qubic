@@ -125,7 +125,7 @@ Interactive valuation analytics and visualizations for the Q1 2026 pre-revenue u
 - Φ_QEVF verifier archives RMSE, MAE, variance, KS statistics, and breach counts with Ed25519 manifests under `data/ord/archive`.
 - Grafana dashboards deliver expected-vs-actual variance, geographic heatmaps, operations health, and a sanitized public board refreshed hourly.
 - Synthetic stress injector drives 1.5× load with ΔT < 0.1 K while chaos orchestration validates recovery automation.
-- Compliance snapshot workflow (`.github/workflows/compliance_snapshot.yml`) signs DO-178C/CMMC matrices, SBOM, Trivy, and Grype artefacts on every merge.
+- Compliance snapshot workflow (`.github/workflows/compliance_snapshot.yml`) signs DO-178C/CMMC matrices, SBOM, Trivy, and Grype artifacts on every merge.
 - Quantum Market Protocol sandbox links verifier outputs to calibrated pricing projections via `qmp/qex-sandbox`.
 
 ## Summary of Implications — Phase VI.1
