@@ -121,7 +121,7 @@ Interactive valuation analytics and visualizations for the Q1 2026 pre-revenue u
 ## Phase VI.1 Closed-Loop Verification
 
 - Specification: [`docs/specifications/quasim_qnimbus_phaseVI.1_validation_enhanced.yaml`](docs/specifications/quasim_qnimbus_phaseVI.1_validation_enhanced.yaml) captures the authoritative scope, success criteria, and rollout sequencing for Phase VI.1.
-- Status dossier: [`docs/status/phase_vi.md`](docs/status/phase_vi.md) summarizes the 72 h validation window, including verification metrics, stress outcomes, and Phase VII readiness indicators.
+- Status dossier: [docs/status/phase_vi.md](docs/status/phase_vi.md) summarizes the 72 h validation window, including verification metrics, stress outcomes, and Phase VII readiness indicators.
 - Φ_QEVF verifier archives RMSE, MAE, variance, KS statistics, and breach counts with Ed25519 manifests under `data/ord/archive`.
 - Grafana dashboards deliver expected-vs-actual variance, geographic heatmaps, operations health, and a sanitized public board refreshed hourly.
 - Synthetic stress injector drives 1.5× load with ΔT < 0.1 K while chaos orchestration validates recovery automation.
