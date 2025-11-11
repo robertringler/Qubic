@@ -123,6 +123,74 @@ Interactive valuation analytics and visualizations for the Q1 2026 pre-revenue u
 
 ---
 
+## 🏭 Vertical Market Demonstrations
+
+QuASIM provides **industry-specific demonstration packages** showcasing quantum-classical optimization across 8+ market verticals. Each demo is deterministic (<60s runtime, CPU-only) and includes domain-specific compliance tags.
+
+### Quick Start
+
+```bash
+# Install demo dependencies
+pip install -r requirements-demo.txt
+
+# Run individual vertical demos
+make demo-aerospace      # Falcon 9 trajectory optimization
+make demo-telecom        # LEO constellation network optimization
+make demo-finance        # Portfolio VaR risk modeling
+make demo-healthcare     # Genomic pipeline throughput optimization
+make demo-energy         # Smart grid load balancing
+make demo-transportation # Multi-modal logistics optimization
+make demo-manufacturing  # IIoT production line optimization
+make demo-agritech       # Precision agriculture optimization
+
+# Run all vertical demos
+make demo-all-verticals
+```
+
+### Vertical Coverage
+
+| Vertical | Use Case | Key Metrics | Compliance Tags |
+|----------|----------|-------------|-----------------|
+| **Aerospace & Defense** | Launch vehicle trajectory optimization | Altitude, velocity, MECO time | DO-178C Level A, ITAR, NASA-STD-8739.8 |
+| **Telecom & Satellite** | LEO constellation network capacity | Throughput, latency, coverage | FCC Part 25, ITU Radio, 3GPP TS 38.821 |
+| **Financial Services** | Portfolio risk (VaR) optimization | VaR, Sharpe ratio, return | PCI DSS, SOX, Basel III, MiFID II |
+| **Healthcare** | Genomic sequencing pipeline | Throughput, accuracy, cost | HIPAA, CLIA, CAP, FDA 21 CFR Part 11 |
+| **Energy & Utilities** | Smart grid load balancing | Load balance, renewable %, frequency | NERC CIP, IEEE 1547, FERC, IEC 61850 |
+| **Transportation** | Multi-modal freight optimization | Cost, delivery time, utilization | DOT FMCSA, CARB, EPA SmartWay, ISO 28000 |
+| **Manufacturing** | IIoT production line optimization | OEE, throughput, defect rate | ISO 9001, ISA-95, IEC 62443, OSHA |
+| **Agritech** | Precision agriculture optimization | Yield, water efficiency, margin | EPA FIFRA, FDA FSMA, USDA Organic, GAP |
+
+### Demo Architecture
+
+All vertical demos follow a consistent pattern:
+
+1. **Configuration**: JSON profile defines targets, tolerances, weights, alpha bounds, and compliance tags
+2. **Simulation**: Domain-specific surrogate model (simplified physics/Monte Carlo)
+3. **Optimization**: Evolutionary algorithm with 50 generations, population of 20
+4. **Validation**: Deterministic reproducibility with fixed seed (42)
+5. **Output**: JSON report with metrics, optimization history, base64 PNG visualization
+
+Example command:
+
+```bash
+python demos/quasim_finance_demo.py \
+  --profile configs/vertical_profiles/finance_var.json \
+  --generations 50 --pop 20 --seed 42
+```
+
+Output: `finance_var_demo_report.json` with VaR, Sharpe ratio, fidelity metrics, and compliance tags.
+
+### CI/CD Integration
+
+The `.github/workflows/vertical-demo.yml` workflow validates all 8 vertical demos on every push:
+
+- Runtime: <60s per demo (8 demos in <10 minutes total)
+- Determinism: Fixed seed ensures reproducible outputs
+- Schema validation: JSON reports checked for required fields
+- Artifact upload: All reports uploaded for 90-day retention
+
+---
+
 ## 🛰️ QuASIM × SpaceX/NASA Pilot Track — Status
 
 | Workflow | Status | Description |
