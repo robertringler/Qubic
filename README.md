@@ -950,3 +950,13 @@ and certifiable quantum simulation for next-generation aerospace systems._
 ---
 
 **© 2025 QuASIM. All rights reserved.**
+
+## 🚀 Phase VI — QuASIM × QuNimbus Expansion
+
+| Stream | Status | Notes |
+| --- | --- | --- |
+| ORD Canary | ![ORD Canary](https://github.com/robertringler/QuASIM/actions/workflows/ord.yml/badge.svg) | 6-hour operational readiness burn-in with Φ_QEVF, energy, fidelity, and throughput telemetry. |
+| Compliance Automation | _Coming Soon_ | DO-178C DAL-S, CMMC L5+, and FIPS 140-4 CI gates in progress. |
+| QEX Sandbox | _Coming Soon_ | QMP integration delivering EPH spot/futures reference feeds. |
+
+The Phase VI track focuses on operationalizing Φ_QEVF telemetry, compliance automation, and monetization protocols across all demo regions. Refer to `docs/ord/ORD_runbook.md` for orchestration details and `dashboards/grafana/qevf_telemetry.json` for Grafana import.
