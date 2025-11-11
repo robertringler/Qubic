@@ -213,13 +213,13 @@ deliverables:
 
   qmp_scaffold:
     - path: qmp/qex-sandbox/pricing/model.py
-      formula: R = k × N² × η_ent × P_EPH × σ_market
+      formula: R = k × N² × η_ent × P_EPH × eph_volatility_pct
       parameters:
         - k: market_constant (calibrated)
         - N: logical_qubit_count
         - η_ent: entanglement_efficiency
         - P_EPH: eph_spot_price
-        - σ_market: volatility_adjustment
+        - eph_volatility_pct: volatility_adjustment
 
     - path: qmp/qex-sandbox/api/mock_ticker.py
       endpoints:
