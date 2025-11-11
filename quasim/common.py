@@ -141,7 +141,7 @@ def create_visualization_generic(
 
     x_data = np.array(metrics[x_key])
 
-    for _i, (ax, y_key, label, title) in enumerate(zip(axes, y_keys, labels, titles)):
+    for ax, y_key, label, title in zip(axes, y_keys, labels, titles):
         y_data = np.array(metrics[y_key])
         ax.plot(x_data, y_data, "b-", linewidth=2, label=label)
 
