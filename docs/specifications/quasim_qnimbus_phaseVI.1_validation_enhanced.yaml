@@ -612,7 +612,7 @@ tasks:
 
       **Phase VII Launch Criteria Met:**
       - ✅ Verification pipeline operational with <${inputs.verification.verifier_tolerance_pct}% variance
-      - ✅ Observability stack deployed across ${inputs.infrastructure.regions.length} regions
+      - ✅ Observability stack deployed across 3 regions
       - ✅ Compliance automation achieving daily attestation cadence
       - ✅ Stress validation confirming ${inputs.stress_testing.stress_load_factor}× load capacity
       - ✅ QMP sandbox integrated with live telemetry feeds
