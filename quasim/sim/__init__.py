@@ -1,15 +1,8 @@
-"""QCMG (Quantacosmorphysigenetic) Field Simulation Module.
-
-This module provides simulation capabilities for quantum field dynamics
-with tracking of coherence, entropy, and energy evolution.
-"""QuASIM Simulation Module.
-
-This module provides field simulation capabilities including the
-Quantacosmorphysigenetic (QCMG) field evolution system.
 """QCMG - Quantacosmomorphysigenetic Field Simulation Module.
 
 This module provides simulation capabilities for coupled quantum-classical
-field dynamics based on the Quantacosmomorphysigenetic (QCMG) model.
+field dynamics based on the Quantacosmomorphysigenetic (QCMG) model with
+tracking of coherence, entropy, and energy evolution.
 """
 
 from __future__ import annotations
@@ -83,7 +76,9 @@ class QuantacosmorphysigeneticField:
         if params.random_seed is not None:
             np.random.seed(params.random_seed)
 
-    def initialize(self, mode: Literal["gaussian", "uniform", "zero"] = "gaussian") -> None:
+    def initialize(
+        self, mode: Literal["gaussian", "uniform", "zero", "soliton", "random"] = "gaussian"
+    ) -> None:
         """Initialize the field with a specific configuration.
 
         Args:
@@ -91,6 +86,8 @@ class QuantacosmorphysigeneticField:
                 - "gaussian": Gaussian distribution centered in the field
                 - "uniform": Uniform random distribution
                 - "zero": All zeros
+                - "soliton": Soliton-like localized state
+                - "random": Random field configuration
         """
         size = self.params.grid_size
 
@@ -108,6 +105,17 @@ class QuantacosmorphysigeneticField:
         elif mode == "zero":
             # Zero field
             self._field = np.zeros((size, size))
+
+        elif mode == "soliton":
+            # Soliton-like localized state (narrower than gaussian)
+            x = np.linspace(-3, 3, size)
+            y = np.linspace(-3, 3, size)
+            x_grid, y_grid = np.meshgrid(x, y)
+            self._field = np.exp(-(x_grid**2 + y_grid**2) / 0.5)
+
+        elif mode == "random":
+            # Random field configuration (alias for uniform for backward compatibility)
+            self._field = np.random.uniform(0, 1, (size, size))
 
         else:
             raise ValueError(f"Unknown initialization mode: {mode}")
@@ -253,6 +261,10 @@ class QuantacosmorphysigeneticField:
         self._history.append(state)
 
 
+__version__ = "0.1.0"
+
+# Backward compatibility alias
+QCMGState = FieldState
 __all__ = ["QCMGParameters", "FieldState", "QuantacosmorphysigeneticField"]
 from quasim.sim.qcmg_field import FieldState, QCMGParameters, QuantacosmomorphysigeneticField
 
@@ -266,7 +278,9 @@ __all__ = [
 from quasim.sim.qcmg import QCMGParameters, QCMGState, QuantacosmorphysigeneticField
 
 __all__ = [
+    "__version__",
     "QCMGParameters",
-    "QCMGState",
+    "FieldState",
+    "QCMGState",  # backward compatibility
     "QuantacosmorphysigeneticField",
 ]

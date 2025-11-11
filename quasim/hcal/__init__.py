@@ -1,3 +1,6 @@
+"""Hardware Control & Calibration Layer (HCAL) for QuASIM.
+
+HCAL provides a unified API for hardware control and calibration with:
 """HCAL - Hardware Control Abstraction Layer.
 
 HCAL provides a unified interface for hardware control and calibration with:
@@ -52,6 +55,11 @@ class HCAL:
         # Initialize policy engine
         self.policy_engine = PolicyEngine(policy_path)
 
+        # Override dry_run if policy requires it (check if method exists)
+        if (
+            hasattr(self.policy_engine, "is_dry_run_default")
+            and self.policy_engine.is_dry_run_default()
+        ):
         # Override dry_run if policy requires it
         if self.policy_engine.is_dry_run_default():
             dry_run = True
@@ -61,6 +69,11 @@ class HCAL:
         # Initialize components
         self.topology = TopologyDiscovery()
         self.sensor_manager = SensorManager()
+        self.actuator = Actuator(
+            policy_engine=self.policy_engine,
+            audit_log_path=audit_log_path,
+            dry_run=dry_run,
+        )
         self.actuator = Actuator(enable_actuation=not dry_run)
 
         # Initialize backends
@@ -88,12 +101,17 @@ class HCAL:
 
         Args:
             policy_path: Path to policy YAML file
+            enable_actuation: Whether to enable hardware changes (overrides dry_run)
             enable_actuation: Whether to enable hardware changes
             audit_log_dir: Directory for audit logs
 
         Returns:
             HCAL instance
         """
+        # enable_actuation=True means dry_run=False
+        dry_run = not enable_actuation
+        audit_log_path = audit_log_dir / "audit.log" if audit_log_dir else None
+        return cls(policy_path=policy_path, dry_run=dry_run, audit_log_path=audit_log_path)
         audit_log_path = None
         if audit_log_dir:
             audit_log_dir.mkdir(parents=True, exist_ok=True)
@@ -453,6 +471,15 @@ class HCAL:
 
 
 __all__ = [
+    "__version__",
+    "HCAL",
+    "DeviceLimits",
+    "Environment",
+    "PolicyEngine",
+    "PolicyViolation",
+    "Policy",
+    "CalibrationResult",
+    "TelemetryReading",
     "HCAL",
     "Policy",
     "PolicyEngine",
