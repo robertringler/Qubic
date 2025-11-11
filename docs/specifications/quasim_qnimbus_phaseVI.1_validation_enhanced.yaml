@@ -73,6 +73,12 @@ inputs:
     health_check_interval_seconds: 15
     alert_escalation_minutes: 5
 
+  compliance:
+    schedule: "0 0 * * *"
+    snapshot_retention_days: 90
+    attestation_algorithm: "Ed25519"
+    automated_reporting: true
+
 deliverables:
   core_services:
     - path: services/telemetry/verifier.py
