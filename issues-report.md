@@ -2,9 +2,9 @@
 ### Ruff Linting
 196	UP006 	non-pep585-annotation
 194	N806  	non-lowercase-variable-in-function
+ 69	W291  	trailing-whitespace
  62	UP045 	non-pep604-annotation-optional
- 52	W291  	trailing-whitespace
- 48	F841  	unused-variable
+ 49	F841  	unused-variable
  36	N803  	invalid-argument-name
  35	E402  	module-import-not-at-top-of-file
  35	W293  	blank-line-with-whitespace
@@ -27,8 +27,8 @@
   1	F404  	late-future-import
   1	SIM110	reimplemented-builtin
   1	SIM118	in-dict-keys
-Found 790 errors.
-No fixes available (450 hidden fixes can be enabled with the `--unsafe-fixes` option).
+Found 808 errors.
+No fixes available (468 hidden fixes can be enabled with the `--unsafe-fixes` option).
 ### Type Checking (mypy)
 quasim-api is not a valid Python package name
 Type checking completed
