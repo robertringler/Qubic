@@ -296,7 +296,7 @@ def test_bridge_ascend_with_query_id():
     fake_http = FakeHttp()
     bridge = QNimbusBridge(QNimbusConfig(), fake_http)
 
-    resp = bridge.ascend("test query", seed=42, query_id="custom-qid-123")
+    bridge.ascend("test query", seed=42, query_id="custom-qid-123")
 
     # Verify query_id was included in request payload
     assert len(fake_http.posts) == 1
@@ -344,7 +344,7 @@ def test_refresh_token_not_implemented():
 
     try:
         refresh_token("current-token")
-        assert False, "Should have raised NotImplementedError"
+        raise AssertionError("Should have raised NotImplementedError")
     except NotImplementedError as e:
         assert "Q1 2026" in str(e)
 
