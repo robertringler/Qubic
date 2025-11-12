@@ -201,18 +201,31 @@ docker compose up --build
 
 ## Architecture
 
-```mermaid
-%%{init: {'theme':'neutral','themeVariables':{'primaryColor':'#e1f5ff','lineColor':'#007acc'}}}%%
-graph TB
-A[Client SDKs (Python/C++)] --> B[Circuit Compiler]
-B --> C[Tensor Planner]
-C --> D[GPU Scheduler]
-D --> E[Grace CPU ↔ Blackwell GPU (NVLink-C2C)]
-E --> F[Kubernetes Services / GitOps / Security]
-F --> G[Observability Stack (Grafana/Prometheus)]
-```
+![QuASIM Architecture](docs/assets/quasim_architecture.png)
 
 📚 **Architecture Docs:** [docs/technical/architecture.md](docs/technical/architecture.md)
+
+### Closed-Loop Verification (Φ_QEVF) + Safety Control
+
+![Closed-Loop Φ_QEVF](docs/assets/quasim_closed_loop.png)
+
+### Phase VII Global Deployment Topology
+
+![Phase VII Topology](docs/assets/quasim_phase_vii_topology.png)
+
+### Runbook & SLO + EPH Liquidity
+
+![Runbook & Liquidity](docs/assets/quasim_runbook_liquidity.png)
+
+### Predictive Control Map
+
+![Predictive Control](docs/assets/quasim_predictive_control.png)
+
+### Equations Overlay
+
+![Equations Overlay](docs/assets/quasim_equations_overlay.png)
+
+> SVGs are available in `docs/assets/*.svg` for crisp scaling in docs and slides.
 
 ---
 
