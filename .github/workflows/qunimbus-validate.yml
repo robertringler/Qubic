@@ -221,3 +221,124 @@ jobs:
         assert not np.allclose(result1, result3), 'Different seeds should produce different results'
         print('✓ Seed variation verified')
         "
+
+  strict-validation-tests:
+    name: Test Strict Validation Mode
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Test strict mode with missing observables
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_strict_mode_fails_on_missing_observable
+    
+    - name: Test strict mode with complete observables
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_strict_mode_passes_with_all_observables
+
+  dry-run-tests:
+    name: Test Dry-Run Mode
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Test dry-run mode (no network calls)
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_dry_run_mode_no_network_calls
+    
+    - name: Test dry-run policy validation
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_dry_run_validates_policy
+    
+    - name: Test CLI with query_id/qid
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_cli_with_query_id_and_qid
+
+  auth-module-tests:
+    name: Test Auth Module (JWT/HMAC)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Test HMAC signing
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_hmac_sign
+    
+    - name: Test JWT verification (graceful degradation)
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_verify_jwt_without_pyjwt
+    
+    - name: Test token refresh stub
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_refresh_token_not_implemented
+
+  audit-chain-tests:
+    name: Test Audit Chain with Query ID
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Test query_id in audit events
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_audit_event_with_query_id
+    
+    - name: Test qid alias
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_audit_event_with_qid_alias
+    
+    - name: Test audit chain verification
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_verify_audit_chain_with_query_ids
+    
+    - name: Test corruption detection
+      run: |
+        pytest -v tests/qunimbus/test_qunimbus_enhancements.py::test_verify_audit_chain_detects_corruption
+

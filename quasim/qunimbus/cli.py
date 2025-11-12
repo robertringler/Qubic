@@ -177,7 +177,7 @@ def generate_pilots(count: int, display_snapshot: bool):
     pilots = factory.generate_batch(count)
 
     logger.info(f"\n✓ Generated {len(pilots)} pilots")
-    logger.info(f"Veto rate: {factory.get_stats()['veto_rate']*100:.1f}%")
+    logger.info(f"Veto rate: {factory.get_stats()['veto_rate'] * 100:.1f}%")
 
     if display_snapshot:
         factory.display_wave3_snapshot()
@@ -295,7 +295,11 @@ def metrics():
 @click.option(
     "--dry-run", is_flag=True, help="Validate config, seed, and policy without network calls"
 )
-def ascend_cmd(query: str, mode: str, seed: int, out: str, dry_run: bool):
+@click.option("--query-id", default=None, help="Primary query identifier for audit tracking")
+@click.option("--qid", default=None, help="Alias for --query-id")
+def ascend_cmd(
+    query: str, mode: str, seed: int, out: str, dry_run: bool, query_id: str | None, qid: str | None
+):
     """Execute QuNimbus v6 ascend operation.
 
     This command queries QuNimbus v6 for world-model generation with
@@ -315,6 +319,9 @@ def ascend_cmd(query: str, mode: str, seed: int, out: str, dry_run: bool):
     # Set deterministic seed
     set_seed(seed)
 
+    # Resolve query_id (prefer --query-id over --qid)
+    resolved_qid = query_id or qid
+
     # Dry-run mode: validate without network calls
     if dry_run:
         logger.info("🔍 DRY RUN MODE - Validation Only")
@@ -323,6 +330,8 @@ def ascend_cmd(query: str, mode: str, seed: int, out: str, dry_run: bool):
         logger.info(f"✓ Mode: {mode}")
         logger.info(f"✓ Seed: {seed}")
         logger.info(f"✓ Output directory: {out}")
+        if resolved_qid:
+            logger.info(f"✓ Query ID: {resolved_qid}")
         logger.info("✓ Configuration valid")
 
         result = {
@@ -332,6 +341,7 @@ def ascend_cmd(query: str, mode: str, seed: int, out: str, dry_run: bool):
             "mode": mode,
             "seed": seed,
             "out": out,
+            "query_id": resolved_qid,
         }
         click.echo(json.dumps(result, indent=2))
         return
@@ -343,8 +353,10 @@ def ascend_cmd(query: str, mode: str, seed: int, out: str, dry_run: bool):
     # Execute ascend
     logger.info(f"Ascending with query: {query}")
     logger.info(f"Mode: {mode}, Seed: {seed}")
+    if resolved_qid:
+        logger.info(f"Query ID: {resolved_qid}")
 
-    resp = bridge.ascend(query=query, mode=mode, seed=seed)
+    resp = bridge.ascend(query=query, mode=mode, seed=seed, query_id=resolved_qid)
 
     # Audit event
     audit_event(
@@ -353,7 +365,7 @@ def ascend_cmd(query: str, mode: str, seed: int, out: str, dry_run: bool):
             "query": query,
             "mode": mode,
             "seed": seed,
-            "qid": resp.get("query_id"),
+            "query_id": resolved_qid or resp.get("query_id"),
         },
     )
 

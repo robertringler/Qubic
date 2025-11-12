@@ -289,3 +289,112 @@ def test_query_id_in_response():
 
     assert "query_id" in resp
     assert resp["query_id"].startswith("qid-")
+
+
+def test_bridge_ascend_with_query_id():
+    """Test that bridge.ascend accepts and includes query_id in payload."""
+    fake_http = FakeHttp()
+    bridge = QNimbusBridge(QNimbusConfig(), fake_http)
+
+    resp = bridge.ascend("test query", seed=42, query_id="custom-qid-123")
+
+    # Verify query_id was included in request payload
+    assert len(fake_http.posts) == 1
+    url, payload, timeout = fake_http.posts[0]
+    assert payload.get("query_id") == "custom-qid-123"
+
+
+def test_hmac_sign():
+    """Test HMAC-SHA256 signing function."""
+    from quasim.qunimbus.auth import sign_hmac
+
+    # Test with explicit key
+    sig = sign_hmac("test message", "secret-key")
+    assert len(sig) > 0
+    assert isinstance(sig, str)
+
+    # Signature should be deterministic
+    sig2 = sign_hmac("test message", "secret-key")
+    assert sig == sig2
+
+    # Different messages should produce different signatures
+    sig3 = sign_hmac("different message", "secret-key")
+    assert sig != sig3
+
+
+def test_verify_jwt_without_pyjwt():
+    """Test JWT verification graceful degradation without PyJWT."""
+    from quasim.qunimbus.auth import verify_jwt
+
+    # Valid JWT structure (3 parts)
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+
+    ok, data = verify_jwt(token)
+    assert isinstance(data, dict)
+
+    # Should handle malformed tokens
+    ok, data = verify_jwt("invalid.token")
+    assert not ok
+    assert "error" in data
+
+
+def test_refresh_token_not_implemented():
+    """Test that refresh_token raises NotImplementedError (stub)."""
+    from quasim.qunimbus.auth import refresh_token
+
+    try:
+        refresh_token("current-token")
+        assert False, "Should have raised NotImplementedError"
+    except NotImplementedError as e:
+        assert "Q1 2026" in str(e)
+
+
+def test_cli_with_query_id_and_qid():
+    """Test that CLI accepts both --query-id and --qid."""
+    from click.testing import CliRunner
+
+    from quasim.qunimbus.cli import cli
+
+    runner = CliRunner()
+
+    # Test with --query-id
+    result = runner.invoke(
+        cli,
+        [
+            "ascend",
+            "--query",
+            "test query",
+            "--query-id",
+            "qid-test-123",
+            "--dry-run",
+        ],
+    )
+
+    assert result.exit_code == 0
+    # Extract JSON from output (it's indented, so join all lines starting with '{' or containing json)
+    # The JSON starts after the log messages
+    json_start = result.output.find("{")
+    assert json_start >= 0, f"No JSON in output: {result.output}"
+    json_str = result.output[json_start:]
+    output = json.loads(json_str)
+    assert output.get("query_id") == "qid-test-123"
+
+    # Test with --qid alias
+    result = runner.invoke(
+        cli,
+        [
+            "ascend",
+            "--query",
+            "test query",
+            "--qid",
+            "qid-test-456",
+            "--dry-run",
+        ],
+    )
+
+    assert result.exit_code == 0
+    json_start = result.output.find("{")
+    assert json_start >= 0, f"No JSON in output: {result.output}"
+    json_str = result.output[json_start:]
+    output = json.loads(json_str)
+    assert output.get("query_id") == "qid-test-456"

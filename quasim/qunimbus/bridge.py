@@ -46,7 +46,9 @@ class QNimbusBridge:
         self.cfg = cfg
         self.http = http_client
 
-    def ascend(self, query: str, mode: str = "singularity", seed: int = 42) -> Dict[str, Any]:
+    def ascend(
+        self, query: str, mode: str = "singularity", seed: int = 42, query_id: str | None = None
+    ) -> Dict[str, Any]:
         """Execute QuNimbus ascend operation.
 
         This operation generates world-model artifacts based on the query.
@@ -67,6 +69,9 @@ class QNimbusBridge:
         seed : int
             Random seed for deterministic generation (default: 42)
             Must be in range [0, 2^31-1] for cross-platform reproducibility
+        query_id : str | None
+            Optional query identifier for audit tracking (default: None)
+            If provided, included in request payload and audit logs
 
         Returns
         -------
@@ -163,6 +168,8 @@ class QNimbusBridge:
         - Query responses are cached for 24h on server side
         """
         payload = {"query": query, "mode": mode, "seed": seed}
+        if query_id:
+            payload["query_id"] = query_id
 
         response = self.http.post_json(
             f"{self.cfg.base_url}/ascend", payload, timeout=self.cfg.timeout_s

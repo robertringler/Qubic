@@ -266,6 +266,38 @@ F --> G[Observability Stack (Grafana/Prometheus)]
 
 QuASIM now interfaces with QuNimbus v6 for multi-scale world modeling. Deterministic seeds, audit logs, and HDF5/Zarr state enable replayable validation.
 
+### v6 Safety-Critical Enhancements
+
+**Dry-Run Validation**
+```bash
+# Validate config/seed/policy without network calls (~0ms overhead)
+qunimbus ascend --query "climate model" --dry-run
+```
+
+**Query ID Audit Tracking**
+```bash
+# Add query_id to SHA256-chained audit logs
+qunimbus ascend --query "simulation" --query-id "qid-a1b2c3"
+# Or use alias --qid
+qunimbus ascend --query "simulation" --qid "qid-a1b2c3"
+```
+
+**Strict Validation Mode**
+```bash
+# Fail (exit 3) if any observable is missing
+qunimbus validate \
+  --snapshot artifacts/snapshot.hdf5 \
+  --observables configs/observables/earth_2025.yml \
+  --tolerance 0.03 \
+  --strict
+```
+
+**Audit Chain Verification**
+```python
+from quasim.audit.log import verify_audit_chain
+assert verify_audit_chain("artifacts/audit.jsonl")
+```
+
 ### Quickstart
 
 ```bash
@@ -285,17 +317,19 @@ python -m quasim.qunimbus.cli validate \
 
 - **Bridge Layer**: `quasim/qunimbus/bridge.py` mediates all external calls
 - **Determinism**: `quasim/runtime/determinism.py` ensures reproducible seeds
-- **Audit Log**: `quasim/audit/log.py` provides SHA256 chain-of-trust
-- **Validation**: `quasim/validation/compare.py` compares observables
+- **Audit Log**: `quasim/audit/log.py` provides SHA256 chain-of-trust with query_id tracking
+- **Validation**: `quasim/validation/compare.py` compares observables (strict mode available)
 - **Policy Guard**: `quasim/policy/qnimbus_guard.py` enforces safety rules
+- **Auth Module**: `quasim/qunimbus/auth.py` JWT verify, HMAC signing (Q1-2026 production)
 
 ### Key Features
 
 - **Deterministic Replay**: All QuNimbus interactions use seeded randomness
-- **Audit Trail**: Append-only log with cryptographic integrity
-- **Observable Validation**: Compare snapshots against expected metrics
+- **Audit Trail**: Append-only log with cryptographic integrity + query_id indexing
+- **Observable Validation**: Compare snapshots against expected metrics with strict mode
 - **Safety Gates**: Policy guard prevents dangerous query patterns
-- **Compliance Ready**: Mapped to DO-178C, NIST 800-53, CMMC 2.0
+- **Dry-Run Mode**: Pre-flight validation without network I/O
+- **Compliance Ready**: Mapped to DO-178C Level A, NIST 800-53 (AC-2, AU-3, SC-28), CMMC 2.0 L2
 
 ### Data Schema
 
@@ -311,7 +345,7 @@ See `configs/observables/earth_2025.yml` for validation schema.
 
 ### Compliance
 
-Compliance documentation: `docs/compliance/qunimbus_integration.md`
+Compliance documentation: `docs/QUNIMBUS_NIST_800_53_COMPLIANCE.md`
 
 ## Phase VI.1 Operationalization (Automated)
 - Φ_QEVF verifier harness added (RMSE/MAE/variance, KS confidence with scipy)
