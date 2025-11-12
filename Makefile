@@ -2,6 +2,7 @@
 .PHONY: demo-aerospace demo-telecom demo-finance demo-healthcare demo-energy
 .PHONY: demo-transportation demo-manufacturing demo-agritech demo-all-verticals
 .PHONY: test validate fmt lint build bench pack deploy video spacex-demo starship-demo demo-all demos
+.PHONY: audit autonomy-test
 
 ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -150,3 +151,13 @@ stop-full-stack:
 		echo "Docker not installed."; \
 		exit 1; \
 	fi
+
+# Run full repository audit
+audit:
+	@echo "Running QuASIM full repository audit..."
+	@python3 -m quasim.audit.run --full --export-json audit/audit_summary.json
+
+# Run Phase VIII autonomy tests
+autonomy-test:
+	@echo "Running Phase VIII autonomy tests..."
+	@pytest tests/phaseVIII/ -v --tb=short

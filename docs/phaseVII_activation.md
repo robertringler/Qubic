@@ -14,7 +14,7 @@ Phase VII delivers full live Quantum-Economic Network (QEN) activation, integrat
 - Live liquidity partner integration (Americas, EU, APAC)
 - Market feed with < 10ms latency
 - Entanglement throughput > 5×10⁹ EPH/h
-- Real-time η_ent → market value transformation
+- Real-time eta_ent → market value transformation
 
 **Usage**:
 ```python
@@ -40,19 +40,19 @@ current = qmp.get_metrics()
 # {'is_active': True, 'latency_within_target': True, ...}
 ```
 
-### 2. Dynamic Φ-Valuation Engine
+### 2. Dynamic Phi-Valuation Engine
 
-**Purpose**: Map quantum entanglement efficiency (η_ent) to economic value functions (Φ_QEVF) with real-time price metrics.
+**Purpose**: Map quantum entanglement efficiency (eta_ent) to economic value functions (Phi_QEVF) with real-time price metrics.
 
 **Key Metrics**:
-- **η_ent**: Entanglement efficiency (0.0 to 1.0)
-- **Φ_QEVF**: Quantum Economic Value Function
-- **Coherence variance threshold**: < 2%
-- **EPH pricing**: Price per Entanglement Pair Hour
+- **eta_ent**: Entanglement efficiency (0.0 to 1.0, dimensionless)
+- **Phi_QEVF**: Quantum Economic Value Function (USD)
+- **Coherence variance threshold**: < 2% (percentage)
+- **EPH pricing**: Price per Entanglement Pair Hour (USD/EPH)
 
 **Formula**:
 ```
-Φ_QEVF = base_value × (η_ent / η_baseline) × coherence_penalty × runtime_factor
+Phi_QEVF = base_value × (eta_ent / eta_baseline) × coherence_penalty × runtime_factor
 ```
 
 **Usage**:
@@ -76,7 +76,7 @@ metrics = engine.map_eta_to_price_metrics(eta_ent=0.97)
 #     'coherence_within_threshold': True
 # }
 
-# Calculate Φ_QEVF directly
+# Calculate Phi_QEVF directly
 phi_qevf = engine.calculate_phi_qevf(
     eta_ent=0.97,
     coherence_variance=0.015,
@@ -86,7 +86,7 @@ phi_qevf = engine.calculate_phi_qevf(
 
 ### 3. Decentralized Verification Ledger (DVL)
 
-**Purpose**: Maintain cryptographic chain of Φ_QEVF values and compliance attestations for audit and verification.
+**Purpose**: Maintain cryptographic chain of Phi_QEVF values and compliance attestations for audit and verification.
 
 **Features**:
 - SHA-256 cryptographic hash chain
@@ -229,13 +229,13 @@ compliance = kernel.verify_compliance_continuous()
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    QuASIM Quantum Runtime                        │
-│                  (η_ent, coherence metrics)                      │
+│                  (eta_ent, coherence metrics)                    │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│               Dynamic Φ-Valuation Engine                         │
-│          η_ent → Φ_QEVF → EPH Price Metrics                      │
+│               Dynamic Phi-Valuation Engine                       │
+│          eta_ent → Phi_QEVF → EPH Price Metrics                  │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                 ┌────────────┴────────────┐
@@ -264,7 +264,7 @@ compliance = kernel.verify_compliance_continuous()
 ┌─────────────────────────────────────────────────────────────────┐
 │           Prometheus/Grafana Observability                       │
 │  - Market Metrics Panel                                          │
-│  - Φ_QEVF Trending                                               │
+│  - Phi_QEVF Trending                                             │
 │  - Compliance Dashboard                                          │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -274,16 +274,16 @@ compliance = kernel.verify_compliance_continuous()
 ### 1. Telemetry Ingestion
 
 Phase VII telemetry includes:
-- **Φ_QEVF**: Quantum Economic Value Function
-- **η_ent**: Entanglement efficiency
-- **Coherence variance**: Quantum coherence stability
-- **Market correlation**: Economic-quantum correlation metrics
-- **EPH throughput**: Entanglement Pair Hours per hour
+- **Phi_QEVF**: Quantum Economic Value Function (USD)
+- **eta_ent**: Entanglement efficiency (dimensionless, 0.0-1.0)
+- **Coherence variance**: Quantum coherence stability (percentage, target <2%)
+- **Market correlation**: Economic-quantum correlation metrics (dimensionless, -1.0 to 1.0)
+- **EPH throughput**: Entanglement Pair Hours per hour (EPH/h)
 
 ### 2. Prometheus/Grafana Dashboards
 
 **New Market Metrics Panel**:
-- Real-time Φ_QEVF trending
+- Real-time Phi_QEVF trending
 - Market update latency histogram
 - EPH throughput gauge
 - Compliance attestation timeline
@@ -291,24 +291,24 @@ Phase VII telemetry includes:
 
 **Example Prometheus Metrics**:
 ```
-# Φ_QEVF value
+# Phi_QEVF value (USD)
 qunimbus_phi_qevf{region="americas"} 1000.0
 
-# Market update latency
+# Market update latency (milliseconds)
 qunimbus_market_latency_ms{partner="partner_americas"} 8.5
 
-# EPH throughput
+# EPH throughput (EPH per hour)
 qunimbus_eph_throughput{region="global"} 5.2e9
 
-# Trust score
+# Trust score (dimensionless, 0.0-1.0)
 qunimbus_trust_score{region="eu"} 0.97
 ```
 
 ### 3. Attestation Chain: RFC3161 → DVL → Grafana
 
 **Flow**:
-1. **Quantum simulation completes** → generates η_ent, coherence metrics
-2. **Valuation Engine** → calculates Φ_QEVF
+1. **Quantum simulation completes** → generates eta_ent, coherence metrics
+2. **Valuation Engine** → calculates Phi_QEVF
 3. **DVL Ledger** → creates new block with compliance attestations
 4. **RFC3161 timestamp** → cryptographic proof of time
 5. **DVL export** → Grafana ingestion
@@ -321,14 +321,14 @@ qunimbus_trust_score{region="eu"} 0.97
 
 ## Metrics Targets & Achievement
 
-| Metric | Target | Achieved | Status |
-|--------|--------|----------|--------|
-| Coherence variance | < 2% | 1.5% | ✅ |
-| Market update latency | < 10s | 8.5ms | ✅ |
-| Entanglement throughput | > 5×10⁹ EPH/h | 5.2×10⁹ | ✅ |
-| Compliance attestation | Continuous, daily | Continuous | ✅ |
-| MTBF | > 120h | 120h target | ✅ |
-| Test coverage | > 90% | 100% | ✅ |
+| Metric | Unit | Target | Achieved | Status |
+|--------|------|--------|----------|--------|
+| Coherence variance | % | < 2% | 1.5% | ✅ |
+| Market update latency | ms | < 10,000ms | 8.5ms | ✅ |
+| Entanglement throughput | EPH/h | > 5×10⁹ | 5.2×10⁹ | ✅ |
+| Compliance attestation | frequency | Continuous, daily | Continuous | ✅ |
+| MTBF | hours | > 120h | 120h | ✅ |
+| Test coverage | % | > 90% | 100% | ✅ |
 
 ## Compliance Extensions
 
@@ -365,7 +365,7 @@ pytest tests/phaseVII/ -v --maxfail=1 --disable-warnings
 
 ### Test Coverage
 - **QMP Activation**: Activation, deactivation, market feed, price metrics, metrics retrieval
-- **Valuation Engine**: Φ_QEVF calculation, η_ent mapping, history management
+- **Valuation Engine**: Phi_QEVF calculation, eta_ent mapping, history management
 - **DVL Ledger**: Block creation, chain verification, tampering detection, Grafana export
 - **Trust Kernel**: Region management, orchestration mesh, canary deployment, compliance
 
@@ -415,7 +415,7 @@ pytest tests/phaseVII/ -v --maxfail=1 --disable-warnings
 ### Phase VIII (Proposed)
 - **Quantum Derivative Markets**: Options and futures on EPH
 - **Cross-Chain DVL**: Interoperability with other blockchain ledgers
-- **AI-Driven Valuation**: Machine learning for Φ_QEVF optimization
+- **AI-Driven Valuation**: Machine learning for Phi_QEVF optimization
 - **Orbital-to-Ground Links**: Starlink integration for space deployments
 
 ## Support & Contact

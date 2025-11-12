@@ -73,8 +73,12 @@ Each verified simulation propagates to the Quantum Market Protocol (QMP), quanti
 | GPU Acceleration | cuQuantum + Grace-Blackwell Fabric | 10–100 × faster vs CPU |
 | RL Kernel Evolution | Energy-adaptive autotuning | 30 % + efficiency gain |
 | Economic Telemetry | QuNimbus Wave 2 activation | Live Φ_QEVF → valuation link |
+| **Phase VIII Autonomy** | **Meta-Controller + Policy Reasoner + Ethical Governor** | **Self-governing compliance engine** |
+| **Repository Audit** | **Automated quality, security, compliance validation** | **Continuous audit CI/CD** |
 
-📚 **Read More:** [docs/technical/architecture.md](docs/technical/architecture.md)
+📚 **Read More:** [docs/technical/architecture.md](docs/technical/architecture.md)  
+🤖 **Phase VIII:** [docs/phaseVIII/README.md](docs/phaseVIII/README.md)  
+🔍 **Audit System:** [docs/audit/README.md](docs/audit/README.md)
 
 ---
 
@@ -85,6 +89,9 @@ Each verified simulation propagates to the Quantum Market Protocol (QMP), quanti
 - Tool-qualification automation hooks for DO-178C/DO-330.
 - Autonomous self-evolving kernel architecture with RL optimization.
 - Anti-holographic tensor compression achieving 10-50× compression ratios.
+- **Phase VIII: Meta-Controller Kernel with Q-learning parameter optimization.**
+- **Phase VIII: Policy Reasoner with multi-framework compliance rules.**
+- **Phase VIII: Quantum Ethical Governor for energy-equity monitoring.**
 
 Full list and triage: [Patentables](docs/ip/patentables.md).
 
