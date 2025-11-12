@@ -121,20 +121,20 @@ Full live Quantum-Economic Network (QEN) activation integrating quantum simulati
 
 1. **Quantum Market Protocol (QMP) Activation** - `quasim/qunimbus/phaseVII/qmp_activation.py`
    - Live liquidity partner integration (Americas, EU, APAC)
-   - Market update latency: 8.5ms (target: <10s achieved ✓)
+   - Market update latency: 8.5ms (target: <10,000ms achieved ✓)
    - Entanglement throughput: 5.2×10⁹ EPH/h (target: >5×10⁹ achieved ✓)
-   - Real-time η_ent → market value transformation
+   - Real-time eta_ent → market value transformation
    - Market feed management with partner status tracking
 
-2. **Dynamic Φ-Valuation Engine** - `quasim/qunimbus/phaseVII/valuation_engine.py`
-   - Maps quantum entanglement efficiency (η_ent) to Φ_QEVF
-   - Formula: `Φ_QEVF = base × (η_ent/baseline) × coherence_penalty × runtime_factor`
+2. **Dynamic Phi-Valuation Engine** - `quasim/qunimbus/phaseVII/valuation_engine.py`
+   - Maps quantum entanglement efficiency (eta_ent) to Phi_QEVF
+   - Formula: `Phi_QEVF = base × (eta_ent/baseline) × coherence_penalty × runtime_factor`
    - Coherence variance threshold: <2% (achieved 1.5% ✓)
    - EPH price per Entanglement Pair Hour calculation
    - Valuation history tracking (1000 record limit)
 
 3. **Decentralized Verification Ledger (DVL)** - `quasim/qunimbus/phaseVII/dvl_ledger.py`
-   - SHA-256 cryptographic hash chain for Φ_QEVF values
+   - SHA-256 cryptographic hash chain for Phi_QEVF values
    - Compliance attestations: DO-178C, NIST-800-53, CMMC-2.0, ISO-27001, ITAR, GDPR
    - Tamper detection and chain verification
    - RFC3161 timestamping support
@@ -165,14 +165,14 @@ Full live Quantum-Economic Network (QEN) activation integrating quantum simulati
 - API usage examples and code samples
 
 **Metrics Achievement:**
-| Metric | Target | Achieved | Status |
-|--------|--------|----------|--------|
-| Coherence variance | <2% | 1.5% | ✓ |
-| Market update latency | <10s | 8.5ms | ✓ |
-| Entanglement throughput | >5×10⁹ EPH/h | 5.2×10⁹ | ✓ |
-| Compliance attestation | Continuous | Continuous | ✓ |
-| MTBF | >120h | 120h | ✓ |
-| Test coverage | >90% | 100% | ✓ |
+| Metric | Unit | Target | Achieved | Status |
+|--------|------|--------|----------|--------|
+| Coherence variance | % | <2% | 1.5% | ✓ |
+| Market update latency | ms | <10,000ms | 8.5ms | ✓ |
+| Entanglement throughput | EPH/h | >5×10⁹ | 5.2×10⁹ | ✓ |
+| Compliance attestation | frequency | Continuous | Continuous | ✓ |
+| MTBF | hours | >120h | 120h | ✓ |
+| Test coverage | % | >90% | 100% | ✓ |
 
 **Compliance Extensions:**
 - ISO 27001: A.12.1.2, A.14.2.2, A.18.1.4 controls
