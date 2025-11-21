@@ -1,0 +1,9 @@
+"""Canonical serialization for snapshots."""
+from __future__ import annotations
+
+import json
+from typing import Any, Dict
+
+
+def canonical_serialize(obj: Dict[str, Any]) -> str:
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"))
