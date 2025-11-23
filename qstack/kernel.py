@@ -1,9 +1,12 @@
-"""System kernel orchestrating Q-Stack subsystems deterministically."""
+"""System kernel orchestrating Q-Stack subsystems deterministically with alignment."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Dict, List, Mapping
 
+from qstack.alignment.constitution import DEFAULT_CONSTITUTION
+from qstack.alignment.evaluator import AlignmentEvaluator
+from qstack.alignment.violations import AlignmentViolation
 from qstack.config import QStackConfig
 from qstack.events import EventBus, EventType
 from qstack.system import QStackSystem
@@ -21,12 +24,48 @@ def _safe_repr(value: Any) -> str:
 
 @dataclass
 class QStackKernel:
-    """Deterministic kernel responsible for subsystem lifecycle."""
+    """Deterministic kernel responsible for subsystem lifecycle with alignment checks."""
 
     config: QStackConfig
     system: QStackSystem
     event_bus: EventBus
     telemetry: Telemetry
+    alignment_evaluator: AlignmentEvaluator | None = None
+
+    def _resolve_alignment(self) -> AlignmentEvaluator:
+        if self.alignment_evaluator is None:
+            self.alignment_evaluator = AlignmentEvaluator(self.config, DEFAULT_CONSTITUTION)
+        return self.alignment_evaluator
+
+    def _record_alignment_event(
+        self, event_type: EventType, violations: List[AlignmentViolation], phase: str, operation: str
+    ) -> None:
+        payload = {
+            "operation": operation,
+            "phase": phase,
+            "violations": [violation.as_dict() for violation in violations],
+        }
+        event = self.event_bus.publish(event_type, payload)
+        self.telemetry.record(
+            "alignment",
+            {"event_id": event.event_id, "phase": phase, "violation_count": len(violations)},
+            payload,
+        )
+
+    def _precheck_or_raise(self, operation: str, context: Mapping[str, Any]) -> None:
+        evaluator = self._resolve_alignment()
+        violations = evaluator.pre_operation_check(operation, dict(context))
+        if violations:
+            self._record_alignment_event(EventType.ALIGNMENT_PRE_CHECK_FAILED, violations, "pre", operation)
+        if evaluator.has_fatal(violations):
+            raise ValueError(f"Alignment pre-check failed for {operation}")
+
+    def _postcheck(self, operation: str, context: Mapping[str, Any]) -> List[AlignmentViolation]:
+        evaluator = self._resolve_alignment()
+        violations = evaluator.post_operation_check(operation, dict(context))
+        if violations:
+            self._record_alignment_event(EventType.ALIGNMENT_POST_CHECK_VIOLATION, violations, "post", operation)
+        return violations
 
     def boot(self) -> Dict[str, Any]:
         config_snapshot = self.config.to_dict()
@@ -38,6 +77,7 @@ class QStackKernel:
 
     def run_qnx_cycles(self, steps: int) -> List[Dict[str, Any]]:
         results: List[Dict[str, Any]] = []
+        self._precheck_or_raise("qnx.simulation", {"requested_steps": steps})
         for step in range(max(0, steps)):
             start_event = self.event_bus.publish(EventType.QNX_CYCLE_STARTED, {"step": step})
             self.telemetry.record("qnx", {"phase": "start", "step": step, "event_id": start_event.event_id}, {})
@@ -54,20 +94,24 @@ class QStackKernel:
                 {"result": serialized_result},
             )
             results.append({"step": step, "event_id": complete_event.event_id, "result": serialized_result})
+        self._postcheck("qnx.simulation", {"steps": steps, "results": _safe_repr(results)})
         return results
 
     def run_quasim(self, circuit: List[List[complex]]) -> List[complex]:
+        self._precheck_or_raise("quasim.simulation", {"circuit": _safe_repr(circuit)})
         simulation_result = self.system.simulate_circuit(circuit)
         event = self.event_bus.publish(
             EventType.QUASIM_SIMULATION_RUN,
             {"circuit": _safe_repr(circuit), "result": _safe_repr(simulation_result)},
         )
         self.telemetry.record(
-            "quasim", {"event_id": event.event_id, "result_length": len(simulation_result)}, {}
+            "quasim", {"event_id": event.event_id, "result_length": len(simulation_result)}, {},
         )
+        self._postcheck("quasim.simulation", {"circuit": _safe_repr(circuit), "result": _safe_repr(simulation_result)})
         return simulation_result
 
     def run_qunimbus(self, agents: Any, shocks: Any, steps: int) -> Dict[str, Any]:
+        self._precheck_or_raise("qunimbus.synthetic_market", {"agents": _safe_repr(agents), "steps": steps})
         market_result = self.system.run_synthetic_market(agents, shocks, steps)
         event = self.event_bus.publish(
             EventType.QUNIMBUS_EVAL_COMPLETED,
@@ -76,6 +120,7 @@ class QStackKernel:
         self.telemetry.record(
             "qunimbus", {"event_id": event.event_id, "steps": steps}, {"result": market_result}
         )
+        self._postcheck("qunimbus.synthetic_market", {"steps": steps, "result": _safe_repr(market_result)})
         return market_result
 
     def run_scenario(
@@ -106,6 +151,10 @@ class QStackKernel:
             "scenario",
             {"name": name, "event_id": end_event.event_id},
             {"qnx_results": qnx_results, "quasim_result": quasim_result, "node_score": node_score},
+        )
+
+        self._postcheck(
+            "qnx.simulation", {"steps": scenario_steps, "results": _safe_repr(qnx_results), "scenario": name}
         )
 
         return {

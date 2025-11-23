@@ -91,6 +91,12 @@ def cmd_run_qunimbus(args: argparse.Namespace) -> None:
     _dump_output({"qunimbus_result": result, "events": [event.event_id for event in session.event_bus.events]})
 
 
+def cmd_alignment_summary(args: argparse.Namespace) -> None:
+    session = build_session(args)
+    summary = session.alignment_summary()
+    _dump_output({"alignment": summary})
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Q-Stack deterministic CLI")
     parser.add_argument("--scenario", default="default", help="Scenario name for session context")
@@ -113,6 +119,9 @@ def build_parser() -> argparse.ArgumentParser:
     qunimbus_parser = subparsers.add_parser("run-qunimbus", help="Run a QuNimbus economic scenario")
     qunimbus_parser.add_argument("--scenario", required=True, help="Path to JSON scenario file")
     qunimbus_parser.set_defaults(func=cmd_run_qunimbus)
+
+    alignment_parser = subparsers.add_parser("alignment-summary", help="Show constitutional and policy alignment details")
+    alignment_parser.set_defaults(func=cmd_alignment_summary)
 
     return parser
 
