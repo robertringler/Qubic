@@ -265,17 +265,7 @@ __version__ = "0.1.0"
 
 # Backward compatibility alias
 QCMGState = FieldState
-__all__ = ["QCMGParameters", "FieldState", "QuantacosmorphysigeneticField"]
-from quasim.sim.qcmg_field import FieldState, QCMGParameters, QuantacosmomorphysigeneticField
-
-__version__ = "0.1.0"
-
-__all__ = [
-    "QCMGParameters",
-    "FieldState",
-    "QuantacosmomorphysigeneticField",
-    "__version__",
-from quasim.sim.qcmg import QCMGParameters, QCMGState, QuantacosmorphysigeneticField
+QuantacosmomorphysigeneticField = QuantacosmorphysigeneticField
 
 __all__ = [
     "__version__",
@@ -283,4 +273,5 @@ __all__ = [
     "FieldState",
     "QCMGState",  # backward compatibility
     "QuantacosmorphysigeneticField",
+    "QuantacosmomorphysigeneticField",
 ]
