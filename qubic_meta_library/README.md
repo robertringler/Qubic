@@ -173,6 +173,12 @@ qubic_meta_library/
 │   ├── patent_analyzer.py     # Analyze patents
 │   ├── execution_engine.py    # Execute pipelines
 │   └── dashboard.py           # Generate KPIs
+├── integrations/               # Platform connectors
+│   ├── __init__.py            # Exports all connectors
+│   ├── quasim_connector.py    # QuASIM quantum simulation
+│   ├── qstack_connector.py    # QStack AI/ML platform
+│   ├── qnimbus_connector.py   # QNimbus cloud orchestration
+│   └── orchestrator.py        # Unified execution orchestrator
 ├── cli/                        # Command-line interface
 │   ├── __init__.py
 │   └── main.py                # CLI entry point
@@ -180,7 +186,8 @@ qubic_meta_library/
     ├── __init__.py
     ├── test_models.py
     ├── test_synergy_mapper.py
-    └── test_execution_engine.py
+    ├── test_execution_engine.py
+    └── test_integrations.py   # Platform connector tests
 ```
 
 ## Data Models
@@ -312,6 +319,101 @@ Pipeline(
 - Secure data handling for SBOM generation
 - Compliance validation in execution pipelines
 - Audit trail for all operations
+
+## Platform Integrations
+
+The Qubic Meta Library provides unified connectors for all Q-Stack platforms with automatic routing.
+
+### Unified Orchestrator
+
+```python
+from qubic_meta_library.integrations import (
+    QuASIMConnector,
+    QStackConnector,
+    QNimbusConnector,
+    UnifiedOrchestrator
+)
+
+# Initialize orchestrator (combines all platforms)
+orchestrator = UnifiedOrchestrator()
+
+# Auto-route prompts to optimal platform
+for prompt in prompts:
+    platform = orchestrator.route_prompt(prompt)
+    result = orchestrator.execute(prompt)
+    print(f"{prompt.id} routed to {platform}: {result['status']}")
+
+# Batch execution with automatic routing
+results = orchestrator.execute_batch(prompts, dry_run=False)
+print(f"Executed {len(results)} prompts")
+
+# Get routing statistics
+summary = orchestrator.get_routing_summary(prompts)
+# Returns: {'QuASIM': 1733, 'QStack': 1713, 'QNimbus': 3704}
+```
+
+### QuASIM Connector (Quantum Simulation)
+
+```python
+from qubic_meta_library.integrations import QuASIMConnector
+
+connector = QuASIMConnector()
+
+# Supported domains: D1, D4, D6, D7, D9, D13-D16 (quantum-heavy)
+if connector.can_execute(prompt):
+    result = connector.execute(prompt, seed=42, shots=1000)
+    print(f"State vector: {result['state_vector']}")
+    print(f"Energy: {result['energy']}")
+```
+
+### QStack Connector (AI/ML)
+
+```python
+from qubic_meta_library.integrations import QStackConnector
+
+connector = QStackConnector()
+
+# Supported domains: D3, D8, D11, D19 (AI-heavy)
+if connector.can_execute(prompt):
+    result = connector.execute(prompt, batch_size=32)
+    print(f"Predictions: {result['predictions']}")
+    print(f"Confidence: {result['confidence']}")
+```
+
+### QNimbus Connector (Cloud Orchestration)
+
+```python
+from qubic_meta_library.integrations import QNimbusConnector
+
+connector = QNimbusConnector(provider="aws")  # aws, gcp, azure
+
+# Supported domains: D5, D10, D12, D17, D18, D20 (cloud-intensive)
+if connector.can_execute(prompt):
+    result = connector.execute(prompt, region="us-east-1")
+    print(f"Job ID: {result['job_id']}")
+    print(f"Cluster: {result['cluster']}")
+```
+
+### Platform Routing Table
+
+| Domain | Platform | Reason |
+|--------|----------|--------|
+| D1 (Advanced Materials) | QuASIM | Quantum material simulation |
+| D2 (Energy & Thermal) | QNimbus | Distributed compute |
+| D3 (Multi-Agent AI) | QStack | AI/ML workloads |
+| D4 (Quantum Chemistry) | QuASIM | Quantum chemistry |
+| D5 (Environmental) | QNimbus | Climate modeling |
+| D6 (Aerospace) | QuASIM | CFD + quantum optimization |
+| D7 (Nanotech) | QuASIM | Quantum-scale simulation |
+| D8 (Autonomous Systems) | QStack | RL/ML heavy |
+| D9 (Biomedical) | QuASIM | Molecular simulation |
+| D10 (Climate Science) | QNimbus | Large-scale compute |
+| D11 (Robotics) | QStack | AI control systems |
+| D12 (IoT) | QNimbus | Edge orchestration |
+| D13-D16 (Energy/Sim/Quantum) | QuASIM | Quantum-accelerated |
+| D17-D18 (Space/Ocean) | QNimbus | Cloud-scale |
+| D19 (Agriculture) | QStack | ML optimization |
+| D20 (Smart Cities) | QNimbus | Infrastructure |
 
 ## Integration with QuASIM
 
