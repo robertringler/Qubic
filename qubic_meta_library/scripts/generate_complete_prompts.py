@@ -284,7 +284,7 @@ def generate_prompts_for_domain(domain_id: str, output_dir: Path):
     # Determine keystone prompt IDs (7 per domain, evenly distributed)
     total_prompts = end_id - start_id + 1
     keystone_interval = total_prompts // 7
-    keystone_ids = set(start_id + i * keystone_interval for i in range(7))
+    keystone_ids = {start_id + i * keystone_interval for i in range(7)}
 
     filename = f"d{domain_id[1:].zfill(2)}_{domain['name'].lower().replace(' ', '_').replace('&', 'and')}.csv"
     filepath = output_dir / filename
