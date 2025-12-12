@@ -1,4 +1,5 @@
 """High-level deterministic system calls."""
+
 from __future__ import annotations
 
 from typing import Callable
@@ -13,7 +14,9 @@ class SyscallError(Exception):
 
 
 class SyscallRouter:
-    def __init__(self, config: NodeConfig, policies: list[NodePolicy], incident_log: IncidentLog) -> None:
+    def __init__(
+        self, config: NodeConfig, policies: list[NodePolicy], incident_log: IncidentLog
+    ) -> None:
         self.config = config
         self.policies = policies
         self.incidents = incident_log

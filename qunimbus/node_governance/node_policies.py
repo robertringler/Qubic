@@ -1,4 +1,5 @@
 """Per-node policy definitions and evaluation."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -11,7 +12,9 @@ class NodePolicyResult:
     reason: str
 
 
-def evaluate_node_policies(metrics: dict[str, int], expectations: dict[str, int]) -> NodePolicyResult:
+def evaluate_node_policies(
+    metrics: dict[str, int], expectations: dict[str, int]
+) -> NodePolicyResult:
     penalty = 0
     for key, expected in sorted(expectations.items()):
         value = metrics.get(key, 0)

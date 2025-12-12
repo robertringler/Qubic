@@ -1,4 +1,5 @@
 """Simple critic scoring logic."""
+
 from __future__ import annotations
 
 from ..utils.provenance import hash_payload

@@ -1,4 +1,5 @@
 """Base classes for deterministic reality adapters."""
+
 from __future__ import annotations
 
 import json
@@ -48,10 +49,14 @@ class BaseAdapter:
         return AdapterOutput(normalized=normalized, percept=percept, provenance=provenance)
 
     # Subclass hooks -----------------------------------------------------------------
-    def _normalize(self, raw: object, tick: int) -> dict[str, object]:  # pragma: no cover - abstract
+    def _normalize(
+        self, raw: object, tick: int
+    ) -> dict[str, object]:  # pragma: no cover - abstract
         raise NotImplementedError
 
-    def _to_percept(self, normalized: dict[str, object]) -> dict[str, object]:  # pragma: no cover - abstract
+    def _to_percept(
+        self, normalized: dict[str, object]
+    ) -> dict[str, object]:  # pragma: no cover - abstract
         raise NotImplementedError
 
     # Helpers ------------------------------------------------------------------------

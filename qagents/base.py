@@ -1,4 +1,5 @@
 """Deterministic agent primitives for Q-Stack multi-agent simulations."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -41,8 +42,7 @@ class AgentState:
 class AgentPolicy(Protocol):
     """Policy interface producing deterministic actions."""
 
-    def decide(self, observation: AgentObservation, state: AgentState) -> dict[str, Any]:
-        ...
+    def decide(self, observation: AgentObservation, state: AgentState) -> dict[str, Any]: ...
 
 
 @dataclass

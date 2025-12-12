@@ -1,4 +1,5 @@
 """Synthetic economy and market microstructure layer."""
+
 from qunimbus.synthetic.agents import EconomicAgent
 from qunimbus.synthetic.credit_network import CreditNetwork, Exposure
 from qunimbus.synthetic.market_venue import MarketVenue

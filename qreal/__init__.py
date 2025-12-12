@@ -1,4 +1,5 @@
 """Reality adapters bringing external data into Q-Stack deterministically."""
+
 from qreal.base_adapter import AdapterOutput, BaseAdapter
 from qreal.grid_adapter import GridAdapter
 from qreal.market_adapter import MarketAdapter

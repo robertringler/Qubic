@@ -5,6 +5,7 @@ from qstack.qnx_agi.planning import ConstrainedAStarPlanner
 def test_constrained_a_star_respects_envelope():
     def heuristic(goal, state):
         return float(sum(goal[k] != state.get(k) for k in goal))
+
     envelope = SafetyEnvelope({"x": (0, 2)})
     planner = ConstrainedAStarPlanner(heuristic=heuristic, envelope=envelope)
     goal = {"x": 2}

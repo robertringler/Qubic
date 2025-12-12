@@ -1,4 +1,5 @@
 """Deterministic global ledger primitives."""
+
 from qledger.chain import LedgerChain
 from qledger.index import LedgerIndex
 from qledger.query import LedgerQuery

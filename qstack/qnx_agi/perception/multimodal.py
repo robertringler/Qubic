@@ -1,4 +1,5 @@
 """Multimodal perception fusion."""
+
 from __future__ import annotations
 
 from .base import Percept

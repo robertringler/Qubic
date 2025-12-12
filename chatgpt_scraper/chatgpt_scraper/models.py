@@ -16,7 +16,9 @@ class RawMessage(BaseModel):
     id: str | None = None
     author: dict[str, Any] | None = None
     role: str | None = None
-    create_time: Any | None = Field(default=None, description="Raw timestamp as stored in the export")
+    create_time: Any | None = Field(
+        default=None, description="Raw timestamp as stored in the export"
+    )
     metadata: dict[str, Any] = Field(default_factory=dict)
     content: Any = None
     weight: float | None = None

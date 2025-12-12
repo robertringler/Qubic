@@ -1,4 +1,5 @@
 """Deterministic replay of cluster events."""
+
 from __future__ import annotations
 
 from qsk.distributed.event_log import EventLog

@@ -1,4 +1,5 @@
 """Scenario drivers connecting to subsystems."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -12,7 +13,9 @@ if TYPE_CHECKING:  # pragma: no cover
 
 @dataclass
 class ScenarioDrivers:
-    simulators: dict[str, Callable[[Event, ScenarioState], dict[str, object]]] = field(default_factory=dict)
+    simulators: dict[str, Callable[[Event, ScenarioState], dict[str, object]]] = field(
+        default_factory=dict
+    )
     governance_hook: Callable[[Event, ScenarioState], dict[str, object]] | None = None
     node_hook: Callable[[Event, ScenarioState], dict[str, object]] | None = None
 

@@ -1,4 +1,5 @@
 """Telemetry for HAL components."""
+
 from __future__ import annotations
 
 from .cpu import CPU

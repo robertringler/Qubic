@@ -1,4 +1,5 @@
 """Minimal deterministic trust graph for Q identities."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -35,6 +36,8 @@ class TrustGraph:
             stack.extend(sorted(self.edges.get(current, set())))
         return False
 
-    def attest_edge(self, attestor: Attestor, source: QIdentity, target: QIdentity) -> dict[str, str]:
+    def attest_edge(
+        self, attestor: Attestor, source: QIdentity, target: QIdentity
+    ) -> dict[str, str]:
         payload = {"source": source.to_dict(), "target": target.to_dict()}
         return attestor.attest(payload)

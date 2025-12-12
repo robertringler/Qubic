@@ -1,4 +1,5 @@
 """Pharma scenario templates."""
+
 from __future__ import annotations
 
 from qscenario.drivers import ScenarioDrivers

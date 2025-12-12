@@ -1,4 +1,3 @@
-
 from qstack.q import Attestor, IdentityRegistry, KeyManager, Ledger, QIdentity, Signer, TrustGraph
 
 

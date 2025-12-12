@@ -1,4 +1,5 @@
 """Ledger record definitions with deterministic hashing."""
+
 from __future__ import annotations
 
 import hashlib
@@ -53,6 +54,10 @@ class LedgerRecord:
         )
 
     @staticmethod
-    def genesis(record_type: str = "genesis", payload: dict[str, Any] | None = None) -> LedgerRecord:
+    def genesis(
+        record_type: str = "genesis", payload: dict[str, Any] | None = None
+    ) -> LedgerRecord:
         payload = payload or {"message": "ledger genesis"}
-        return LedgerRecord(tick=0, record_type=record_type, payload=payload, node_id="system", prev_hash=_DEF_PREV)
+        return LedgerRecord(
+            tick=0, record_type=record_type, payload=payload, node_id="system", prev_hash=_DEF_PREV
+        )

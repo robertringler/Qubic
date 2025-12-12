@@ -1,4 +1,5 @@
 """Aerospace domain evaluator."""
+
 from __future__ import annotations
 
 from ..core.tensor_ops import tensor_contract

@@ -1,4 +1,5 @@
 """Deterministic in-memory virtual filesystem."""
+
 from __future__ import annotations
 
 import builtins
@@ -30,7 +31,9 @@ class VirtualFileSystem:
             if part not in node.children:
                 if not create:
                     raise FileNotFoundError(path)
-                node.children[part] = VFSNode(name=part, is_dir=is_dir if part == parts[-1] else True)
+                node.children[part] = VFSNode(
+                    name=part, is_dir=is_dir if part == parts[-1] else True
+                )
             node = node.children[part]
         if is_dir and not node.is_dir:
             raise IsADirectoryError(path)

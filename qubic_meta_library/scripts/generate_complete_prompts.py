@@ -9,7 +9,6 @@ import csv
 import random
 from pathlib import Path
 
-
 # Domain definitions with their characteristics
 DOMAINS = {
     "D3": {
@@ -213,7 +212,7 @@ DOMAINS = {
 def generate_prompt_description(domain_id: str, category: str, prompt_num: int) -> str:
     """Generate a realistic prompt description."""
     domain_name = DOMAINS[domain_id]["name"]
-    
+
     descriptions = {
         "Swarm Intelligence": f"Swarm-based optimization for {['resource allocation', 'task scheduling', 'path planning'][prompt_num % 3]}",
         "Multi-Agent Systems": f"Multi-agent coordination for {['distributed sensing', 'collaborative planning', 'emergent behavior'][prompt_num % 3]}",
@@ -232,7 +231,7 @@ def generate_prompt_description(domain_id: str, category: str, prompt_num: int) 
         "Precision Agriculture": f"Precision farming for {['irrigation', 'fertilization', 'pest management'][prompt_num % 3]} optimization",
         "Urban Planning": f"Smart city planning for {['traffic flow', 'energy distribution', 'waste management'][prompt_num % 3]}",
     }
-    
+
     base_desc = descriptions.get(category, f"{category} simulation and optimization")
     return f"{base_desc} using {domain_name.lower()} approaches"
 
@@ -255,7 +254,7 @@ def generate_keystone_nodes(domain_id: str, is_keystone: bool = False) -> str:
     """Generate keystone technology nodes."""
     if not is_keystone:
         return ""
-    
+
     nodes = {
         "D3": ["Swarm algorithms", "Multi-agent coordination"],
         "D5": ["Climate modeling", "Ecosystem simulation"],
@@ -273,7 +272,7 @@ def generate_keystone_nodes(domain_id: str, is_keystone: bool = False) -> str:
         "D19": ["Crop optimization", "Precision farming"],
         "D20": ["Smart infrastructure", "Urban analytics"],
     }
-    
+
     return ";".join(nodes.get(domain_id, ["Technology node 1", "Technology node 2"]))
 
 
@@ -281,15 +280,15 @@ def generate_prompts_for_domain(domain_id: str, output_dir: Path):
     """Generate all prompts for a domain."""
     domain = DOMAINS[domain_id]
     start_id, end_id = domain["id_range"]
-    
+
     # Determine keystone prompt IDs (7 per domain, evenly distributed)
     total_prompts = end_id - start_id + 1
     keystone_interval = total_prompts // 7
     keystone_ids = set(start_id + i * keystone_interval for i in range(7))
-    
+
     filename = f"d{domain_id[1:].zfill(2)}_{domain['name'].lower().replace(' ', '_').replace('&', 'and')}.csv"
     filepath = output_dir / filename
-    
+
     with open(filepath, "w", newline="") as f:
         writer = csv.DictWriter(
             f,
@@ -308,15 +307,15 @@ def generate_prompts_for_domain(domain_id: str, output_dir: Path):
             ],
         )
         writer.writeheader()
-        
+
         for prompt_id in range(start_id, end_id + 1):
             is_keystone = prompt_id in keystone_ids
             category = domain["categories"][(prompt_id - start_id) % len(domain["categories"])]
-            
+
             # Select synergy connections (1-2 domains)
             num_connections = 1 if random.random() < 0.6 else 2
             synergy_conns = random.sample(domain["connected_domains"], num_connections)
-            
+
             # Determine phase based on ID (earlier IDs in earlier phases)
             if prompt_id < start_id + total_prompts * 0.3:
                 phase = 1
@@ -326,25 +325,36 @@ def generate_prompts_for_domain(domain_id: str, output_dir: Path):
                 phase = 3
             else:
                 phase = 4
-            
+
             # Output types
-            output_types = ["simulation", "model", "analysis", "optimization", "design", "prediction"]
+            output_types = [
+                "simulation",
+                "model",
+                "analysis",
+                "optimization",
+                "design",
+                "prediction",
+            ]
             output_type = output_types[(prompt_id - start_id) % len(output_types)]
-            
-            writer.writerow({
-                "id": prompt_id,
-                "category": category,
-                "description": generate_prompt_description(domain_id, category, prompt_id - start_id),
-                "domain": domain_id,
-                "patentability_score": generate_patentability_score(is_keystone),
-                "commercial_potential": generate_commercial_potential(is_keystone),
-                "keystone_nodes": generate_keystone_nodes(domain_id, is_keystone),
-                "synergy_connections": ";".join(synergy_conns),
-                "execution_layers": domain["platform"],
-                "phase_deployment": phase,
-                "output_type": output_type,
-            })
-    
+
+            writer.writerow(
+                {
+                    "id": prompt_id,
+                    "category": category,
+                    "description": generate_prompt_description(
+                        domain_id, category, prompt_id - start_id
+                    ),
+                    "domain": domain_id,
+                    "patentability_score": generate_patentability_score(is_keystone),
+                    "commercial_potential": generate_commercial_potential(is_keystone),
+                    "keystone_nodes": generate_keystone_nodes(domain_id, is_keystone),
+                    "synergy_connections": ";".join(synergy_conns),
+                    "execution_layers": domain["platform"],
+                    "phase_deployment": phase,
+                    "output_type": output_type,
+                }
+            )
+
     print(f"✓ Generated {total_prompts} prompts for {domain_id} ({domain['name']})")
 
 
@@ -352,17 +362,19 @@ def main():
     """Generate all missing domain prompt files."""
     output_dir = Path(__file__).parent.parent / "data" / "prompts"
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     print("Generating complete prompt library for missing domains...")
     print(f"Output directory: {output_dir}")
     print()
-    
+
     for domain_id in sorted(DOMAINS.keys()):
         generate_prompts_for_domain(domain_id, output_dir)
-    
+
     print()
     print("✓ All domain prompts generated successfully!")
-    print(f"Total new prompts generated: {sum(d['id_range'][1] - d['id_range'][0] + 1 for d in DOMAINS.values())}")
+    print(
+        f"Total new prompts generated: {sum(d['id_range'][1] - d['id_range'][0] + 1 for d in DOMAINS.values())}"
+    )
 
 
 if __name__ == "__main__":

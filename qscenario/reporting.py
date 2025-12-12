@@ -1,4 +1,5 @@
 """Structured scenario reporting."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -38,7 +39,9 @@ class ScenarioReport:
 
     def narrative(self) -> list[str]:
         lines: list[str] = []
-        lines.append(f"Scenario {self.config.name} executed over {len(self.timeline.describe())} ticks.")
+        lines.append(
+            f"Scenario {self.config.name} executed over {len(self.timeline.describe())} ticks."
+        )
         if self.outcome.incidents:
             lines.append(f"Incidents observed: {len(self.outcome.incidents)}")
         if self.outcome.metrics:

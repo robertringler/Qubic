@@ -1,4 +1,5 @@
 """Q-Stack constitutional engine."""
+
 from qconstitution.articles import ArticleSet, ConstitutionalArticle
 from qconstitution.charter import Charter, ConstitutionalVersion, default_charter
 from qconstitution.interpreter import ConstitutionalInterpreter

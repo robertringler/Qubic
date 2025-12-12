@@ -1,4 +1,5 @@
 """Deterministic message passing primitives."""
+
 from __future__ import annotations
 
 from collections import deque

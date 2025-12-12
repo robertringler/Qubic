@@ -1,4 +1,5 @@
 """Adapter layer wrapping the QNX substrate for deterministic orchestration."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

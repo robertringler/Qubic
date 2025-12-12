@@ -1,4 +1,5 @@
 """Deterministic meta-cognitive loop integrating planning and governance signals."""
+
 from __future__ import annotations
 
 import hashlib
@@ -41,7 +42,9 @@ class MetaCognitionEngine:
     tick_counter: TickCounter = field(default_factory=TickCounter)
     audit: AuditLog = field(default_factory=AuditLog)
 
-    def select_plan(self, candidates: list[list[dict[str, Any]]], governance_signals: dict[str, float]) -> list[dict[str, Any]]:
+    def select_plan(
+        self, candidates: list[list[dict[str, Any]]], governance_signals: dict[str, float]
+    ) -> list[dict[str, Any]]:
         best: list[dict[str, Any]] = []
         best_score = float("-inf")
         for plan in candidates:
@@ -51,5 +54,7 @@ class MetaCognitionEngine:
             if combined > best_score:
                 best = plan
                 best_score = combined
-            self.audit.record("meta_plan", {"tick": self.tick_counter.next(), "score": combined, "digest": digest})
+            self.audit.record(
+                "meta_plan", {"tick": self.tick_counter.next(), "score": combined, "digest": digest}
+            )
         return best

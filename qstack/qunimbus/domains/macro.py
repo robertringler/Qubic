@@ -1,4 +1,5 @@
 """Macro domain mapping."""
+
 from __future__ import annotations
 
 from ..core.pricing import price_stream

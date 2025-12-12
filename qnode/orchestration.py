@@ -1,4 +1,5 @@
 """Node-level orchestration across subsystems."""
+
 from __future__ import annotations
 
 from typing import Callable
@@ -13,7 +14,12 @@ from qscenario.scenario import Scenario
 
 
 class NodeOrchestrator:
-    def __init__(self, config: NodeConfig, policies: dict[str, NodePolicy], dispatcher: dict[str, Callable[[dict[str, object]], object]]) -> None:
+    def __init__(
+        self,
+        config: NodeConfig,
+        policies: dict[str, NodePolicy],
+        dispatcher: dict[str, Callable[[dict[str, object]], object]],
+    ) -> None:
         self.incidents = IncidentLog()
         policy_list = list(policies.values())
         self.syscalls = SyscallRouter(config, policy_list, self.incidents)
@@ -29,12 +35,16 @@ class NodeOrchestrator:
     def attach_scenario(self, scenario: Scenario) -> None:
         scenario.state.context.setdefault("node_config", self.syscalls.config.__dict__)
 
-    def run_scenario(self, scenario: Scenario, required_metrics: list[str] | None = None) -> ScenarioReport:
+    def run_scenario(
+        self, scenario: Scenario, required_metrics: list[str] | None = None
+    ) -> ScenarioReport:
         required = required_metrics or []
         self.attach_scenario(scenario)
         state = scenario.run()
         outcome = evaluate_outcomes(state, required)
-        report = ScenarioReport(scenario.config, scenario.timeline, outcome, state, scenario.results)
+        report = ScenarioReport(
+            scenario.config, scenario.timeline, outcome, state, scenario.results
+        )
         for incident in state.incidents:
             self.incidents.record("scenario", incident)
         return report

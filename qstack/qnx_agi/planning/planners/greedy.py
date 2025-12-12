@@ -1,4 +1,5 @@
 """Greedy planner using deterministic scoring."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -21,5 +22,7 @@ class GreedyPlanner(Planner):
     def plan(self, goal: dict[str, Any], state: dict[str, Any]) -> list[dict[str, Any]]:
         steps: list[dict[str, Any]] = []
         for key, value in goal.items():
-            steps.append({"action": "set", "key": key, "value": value, "score": _score({key: value}, state)})
+            steps.append(
+                {"action": "set", "key": key, "value": value, "score": _score({key: value}, state)}
+            )
         return steps

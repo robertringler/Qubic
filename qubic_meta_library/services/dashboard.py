@@ -71,9 +71,15 @@ class Dashboard:
         return {
             "total_prompts": total_prompts,
             "high_value_prompts": high_value_count,
-            "high_value_percentage": (high_value_count / total_prompts * 100) if total_prompts else 0.0,
-            "average_patentability": (total_patentability / total_prompts) if total_prompts else 0.0,
-            "average_commercial_potential": (total_commercial / total_prompts) if total_prompts else 0.0,
+            "high_value_percentage": (
+                (high_value_count / total_prompts * 100) if total_prompts else 0.0
+            ),
+            "average_patentability": (
+                (total_patentability / total_prompts) if total_prompts else 0.0
+            ),
+            "average_commercial_potential": (
+                (total_commercial / total_prompts) if total_prompts else 0.0
+            ),
             "by_phase": self._group_prompts_by_phase(prompts),
             "by_output_type": self._group_prompts_by_output_type(prompts),
         }

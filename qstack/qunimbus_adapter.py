@@ -1,4 +1,5 @@
 """Adapter layer for the QuNimbus synthetic economy and governance modules."""
+
 from __future__ import annotations
 
 import sys

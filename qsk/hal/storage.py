@@ -1,4 +1,5 @@
 """Logical block device simulation."""
+
 from __future__ import annotations
 
 

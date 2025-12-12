@@ -1,4 +1,5 @@
 """Domain scenario templates."""
+
 from qscenario.domains.aerospace import aerospace_launch_anomaly
 from qscenario.domains.energy import energy_grid_instability
 from qscenario.domains.finance import finance_liquidity_crunch

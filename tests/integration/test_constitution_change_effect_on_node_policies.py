@@ -17,7 +17,9 @@ def test_constitution_change_enforces_new_constraints():
             )
         ]
     )
-    charter = Charter(active=ConstitutionalVersion(version_id="v0", enacted_tick=0, articles=base_articles))
+    charter = Charter(
+        active=ConstitutionalVersion(version_id="v0", enacted_tick=0, articles=base_articles)
+    )
     config = NodeConfig(node_id="n1", identity_ref="id", allowed_syscalls=["read"])
     validate_node_config(config, charter=charter, ledger_enabled=False)
 

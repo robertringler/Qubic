@@ -1,4 +1,5 @@
 """Campaign simulator for multi-agent exercises."""
+
 from qcampaign.campaign import Campaign
 from qcampaign.reporting import CampaignReport
 from qcampaign.scenarios import build_campaign_scenario

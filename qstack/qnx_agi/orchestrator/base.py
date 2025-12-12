@@ -34,7 +34,9 @@ class Orchestrator:
             self._memory.record(percept.modality, percept.value)
         plan = self._planning.evaluate(goal, state.facts)
         run_id = deterministic_id("cycle", {"goal": goal, "state": state.facts})
-        self._audit.record("cycle", {"id": run_id, "goal": goal, "state": state.facts, "plan": plan})
+        self._audit.record(
+            "cycle", {"id": run_id, "goal": goal, "state": state.facts, "plan": plan}
+        )
         return {
             "id": run_id,
             "percepts": percepts,

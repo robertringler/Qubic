@@ -1,4 +1,5 @@
 """Abstract interpretation utilities using interval domains."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

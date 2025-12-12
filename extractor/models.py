@@ -39,4 +39,3 @@ class SentenceRecord:
     classification: ClassificationLabel
     domains: list[str]
     source_path: Path
-

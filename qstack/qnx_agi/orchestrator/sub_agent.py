@@ -1,4 +1,5 @@
 """SubAgent orchestrating partial goals."""
+
 from __future__ import annotations
 
 from typing import Any

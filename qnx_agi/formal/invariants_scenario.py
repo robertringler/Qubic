@@ -1,4 +1,5 @@
 """Scenario-level invariants."""
+
 from __future__ import annotations
 
 from qscenario.scenario import ScenarioState

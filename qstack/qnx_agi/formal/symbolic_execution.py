@@ -1,4 +1,5 @@
 """Deterministic symbolic execution stubs built atop interval domains."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

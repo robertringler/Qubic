@@ -1,4 +1,5 @@
 """Deterministic Merkle tree implementation."""
+
 from __future__ import annotations
 
 import hashlib
@@ -30,7 +31,7 @@ class DeterministicMerkleTree:
     def root(self) -> str:
         if not self.leaves:
             return _hash(b"empty")
-        level = [ _hash(v.encode("utf-8")) for v in self.leaves ]
+        level = [_hash(v.encode("utf-8")) for v in self.leaves]
         while len(level) > 1:
             level = self._pairwise(level)
         return level[0]
@@ -38,7 +39,7 @@ class DeterministicMerkleTree:
     def prove(self, index: int) -> tuple[str, list[tuple[str, str]]]:
         if index < 0 or index >= len(self.leaves):
             raise IndexError("leaf index out of range")
-        hashes = [ _hash(v.encode("utf-8")) for v in self.leaves ]
+        hashes = [_hash(v.encode("utf-8")) for v in self.leaves]
         path: list[tuple[str, str]] = []
         idx = index
         while len(hashes) > 1:

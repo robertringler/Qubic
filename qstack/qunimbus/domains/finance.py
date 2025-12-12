@@ -1,4 +1,5 @@
 """Finance domain hooks."""
+
 from __future__ import annotations
 
 from ..core.risk import risk_score

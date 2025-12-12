@@ -1,6 +1,5 @@
 """Integration tests for Qubic Meta Library."""
 
-
 from qubic_meta_library.services import (
     Dashboard,
     ExecutionEngine,

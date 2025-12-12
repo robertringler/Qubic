@@ -1,4 +1,5 @@
 """Deterministic ledger with Merkle anchoring and attestation verification."""
+
 from __future__ import annotations
 
 import hashlib
@@ -34,7 +35,11 @@ class DeterministicLedger:
         digest = _hash_payload(payload, prev_digest)
         attestation = self.attestor.attest(payload) if self.attestor else None
         entry = DeterministicLedgerEntry(
-            index=len(self.entries), payload=payload, prev_digest=prev_digest, digest=digest, attestation=attestation
+            index=len(self.entries),
+            payload=payload,
+            prev_digest=prev_digest,
+            digest=digest,
+            attestation=attestation,
         )
         self.entries.append(entry)
         return entry

@@ -1,4 +1,5 @@
 """Graph-based deterministic execution for operator DAGs with replay and checkpoints."""
+
 from __future__ import annotations
 
 from collections import deque

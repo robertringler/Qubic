@@ -138,9 +138,7 @@ def run_evolution_cycle(
             control = energy_monitor.apply_feedback_control(telemetry)
 
             # Update precision management
-            precision_mgr.update_accumulated_error(
-                kernel_id, result["accumulated_error"]
-            )
+            precision_mgr.update_accumulated_error(kernel_id, result["accumulated_error"])
 
             # Evaluate fitness (penalize if throttled)
             throttle_penalty = (1.0 - control["throttle_factor"]) * 50.0

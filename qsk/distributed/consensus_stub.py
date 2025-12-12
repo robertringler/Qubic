@@ -1,4 +1,5 @@
 """Deterministic pseudo-consensus protocol."""
+
 from __future__ import annotations
 
 

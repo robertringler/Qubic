@@ -7,7 +7,9 @@ def test_campaign_runs_and_logs():
     policy = LambdaPolicy(lambda obs, state: {"action": "noop", "tick": obs.tick})
     red = RedTeam(name="red", agents=[Agent("r1", policy)])
     blue = BlueTeam(name="blue", agents=[Agent("b1", policy)])
-    campaign = Campaign(name="cmp", scenario_config={"risk": 1}, teams=[red, blue], timeline_ticks=2)
+    campaign = Campaign(
+        name="cmp", scenario_config={"risk": 1}, teams=[red, blue], timeline_ticks=2
+    )
 
     scorecard = campaign.run()
 

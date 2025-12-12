@@ -1,4 +1,5 @@
 """Deterministic market data adapter."""
+
 from __future__ import annotations
 
 from qreal.base_adapter import BaseAdapter

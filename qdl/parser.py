@@ -1,4 +1,5 @@
 """Recursive descent parser for QDL."""
+
 from __future__ import annotations
 
 from .ast import (

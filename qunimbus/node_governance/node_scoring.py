@@ -1,4 +1,5 @@
 """Node scoring based on scenario outcomes."""
+
 from __future__ import annotations
 
 from qscenario.reporting import ScenarioReport

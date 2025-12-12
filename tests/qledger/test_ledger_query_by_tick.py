@@ -8,11 +8,15 @@ def test_query_by_tick_and_constitution():
     store.append("main", LedgerRecord.genesis())
     store.append(
         "main",
-        LedgerRecord(tick=5, record_type="constitution_version", payload={"version": "v1"}, node_id="sys"),
+        LedgerRecord(
+            tick=5, record_type="constitution_version", payload={"version": "v1"}, node_id="sys"
+        ),
     )
     store.append(
         "main",
-        LedgerRecord(tick=7, record_type="constitution_version", payload={"version": "v2"}, node_id="sys"),
+        LedgerRecord(
+            tick=7, record_type="constitution_version", payload={"version": "v2"}, node_id="sys"
+        ),
     )
 
     query = LedgerQuery(store)

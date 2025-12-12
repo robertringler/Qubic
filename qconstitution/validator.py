@@ -1,4 +1,5 @@
 """Validation utilities for Q-Stack constitutional compliance."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -27,6 +28,8 @@ class Validator:
             )
 
 
-def validate_node_config(config: NodeConfig, charter: Charter | None = None, ledger_enabled: bool = True) -> None:
+def validate_node_config(
+    config: NodeConfig, charter: Charter | None = None, ledger_enabled: bool = True
+) -> None:
     validator = Validator(charter or default_charter())
     validator.validate_node(config, ledger_enabled=ledger_enabled)

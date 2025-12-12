@@ -1,4 +1,5 @@
 """Upgrade process for constitutional versions."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -32,7 +33,9 @@ class UpgradePath:
     def evaluate(self, proposal: ConstitutionalUpgradeProposal, votes: list[str]) -> bool:
         return len(votes) >= self.threshold
 
-    def apply(self, charter: Charter, proposal: ConstitutionalUpgradeProposal, votes: list[str]) -> Charter:
+    def apply(
+        self, charter: Charter, proposal: ConstitutionalUpgradeProposal, votes: list[str]
+    ) -> Charter:
         if not self.evaluate(proposal, votes):
             raise ValueError("upgrade did not meet threshold")
         merged_articles = ArticleSet(charter.active.articles.articles + proposal.added_articles)

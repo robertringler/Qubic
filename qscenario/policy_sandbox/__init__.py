@@ -1,4 +1,5 @@
 """Policy sandbox for running scenarios under multiple policy variants."""
+
 from qscenario.policy_sandbox.comparison import ComparisonReport
 from qscenario.policy_sandbox.constraints import enforce_core_constraints
 from qscenario.policy_sandbox.policy_variant import PolicyVariant

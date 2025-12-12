@@ -1,4 +1,5 @@
 """Aerospace governance weights."""
+
 from __future__ import annotations
 
 from ..core.incentives import incentive_budget

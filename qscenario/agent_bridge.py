@@ -1,4 +1,5 @@
 """Bridge between scenarios, grounded world state, and agents."""
+
 from __future__ import annotations
 
 from qagents.base import AgentObservation
@@ -14,7 +15,9 @@ def observation_from_state(state: ScenarioState, grounded: GroundedState) -> Age
     return AgentObservation(tick=state.tick, view=view, provenance=provenance)
 
 
-def apply_actions(state: ScenarioState, actions: list[InterventionAction]) -> list[dict[str, object]]:
+def apply_actions(
+    state: ScenarioState, actions: list[InterventionAction]
+) -> list[dict[str, object]]:
     applied: list[dict[str, object]] = []
     for action in actions:
         state.record_metric("agent_actions", 1)

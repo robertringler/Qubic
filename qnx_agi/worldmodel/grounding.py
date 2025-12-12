@@ -1,4 +1,5 @@
 """Ground simulated state with external observations."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -31,7 +32,12 @@ class GroundedState:
     anchors: dict[str, ObservationAnchor] = field(default_factory=dict)
 
     @staticmethod
-    def reconcile(simulated: dict[str, float], observed: dict[str, float], anchor: ObservationAnchor, weights: ConfidenceWeights) -> GroundedState:
+    def reconcile(
+        simulated: dict[str, float],
+        observed: dict[str, float],
+        anchor: ObservationAnchor,
+        weights: ConfidenceWeights,
+    ) -> GroundedState:
         weights = weights.normalize()
         blended: dict[str, float] = {}
         for key in sorted(set(simulated.keys()) | set(observed.keys())):
@@ -42,4 +48,7 @@ class GroundedState:
         return GroundedState(blended=blended, anchors=anchors)
 
     def divergence(self, simulated: dict[str, float]) -> dict[str, float]:
-        return {key: self.blended.get(key, 0.0) - simulated.get(key, 0.0) for key in sorted(self.blended.keys())}
+        return {
+            key: self.blended.get(key, 0.0) - simulated.get(key, 0.0)
+            for key in sorted(self.blended.keys())
+        }

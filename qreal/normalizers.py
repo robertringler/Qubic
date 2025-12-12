@@ -1,4 +1,5 @@
 """Deterministic normalization transforms for external feeds."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -23,11 +24,14 @@ class NormalizationChain:
 
 # Built-in normalizers ----------------------------------------------------------------
 
+
 def sort_keys(payload: dict[str, object]) -> dict[str, object]:
     return {k: payload[k] for k in sorted(payload.keys())}
 
 
-def clamp_numbers(min_value: float, max_value: float) -> Callable[[dict[str, object]], dict[str, object]]:
+def clamp_numbers(
+    min_value: float, max_value: float
+) -> Callable[[dict[str, object]], dict[str, object]]:
     def _clamp(payload: dict[str, object]) -> dict[str, object]:
         new_payload: dict[str, object] = {}
         for key, value in payload.items():

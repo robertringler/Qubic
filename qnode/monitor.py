@@ -1,4 +1,5 @@
 """Health and integrity monitor."""
+
 from __future__ import annotations
 
 from infra.alerts import AlertEngine

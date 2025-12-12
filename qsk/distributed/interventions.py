@@ -1,4 +1,5 @@
 """Cluster-level intervention coordination."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -25,7 +26,9 @@ class ClusterInterventionPlan:
         return [self.assignments[k] for k in sorted(self.assignments)]
 
 
-def deterministic_allocation(nodes: list[str], actions: list[ScheduledAction]) -> ClusterInterventionPlan:
+def deterministic_allocation(
+    nodes: list[str], actions: list[ScheduledAction]
+) -> ClusterInterventionPlan:
     plan = ClusterInterventionPlan()
     sorted_actions = sorted(actions, key=lambda a: a.key())
     for idx, action in enumerate(sorted_actions):

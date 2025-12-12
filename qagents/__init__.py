@@ -1,4 +1,5 @@
 """Q-Stack deterministic multi-agent layer."""
+
 from qagents.base import Agent, AgentLog, AgentObservation, AgentPolicy, AgentState, LambdaPolicy
 from qagents.interaction import InteractionBus, Message
 from qagents.observation import filtered_observation, merge_observations

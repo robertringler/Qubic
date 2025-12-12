@@ -198,9 +198,7 @@ class TensorNetworkEngine:
 
         self.profile_data["execution_time_s"] += time.time() - start_time
 
-    def _get_gate_tensor(
-        self, gate_name: str, params: dict[str, float] | None = None
-    ) -> NDArray:
+    def _get_gate_tensor(self, gate_name: str, params: dict[str, float] | None = None) -> NDArray:
         """Get gate tensor from name."""
         params = params or {}
 

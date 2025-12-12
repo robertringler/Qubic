@@ -1,4 +1,5 @@
 """Typed events for scenarios."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,7 +13,12 @@ class Event:
     payload: dict[str, object]
 
     def describe(self) -> dict[str, object]:
-        return {"tick": self.tick, "domain": self.domain, "kind": self.kind, "payload": self.payload}
+        return {
+            "tick": self.tick,
+            "domain": self.domain,
+            "kind": self.kind,
+            "payload": self.payload,
+        }
 
 
 @dataclass(frozen=True)

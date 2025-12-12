@@ -1,4 +1,5 @@
 """Intervention planning layer."""
+
 from qintervention.actions import InterventionAction, ScheduledAction
 from qintervention.constraints import Constraint, ConstraintSet, domain_whitelist
 from qintervention.evaluation import InterventionEvaluation, InterventionOutcome

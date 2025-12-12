@@ -1,4 +1,3 @@
-
 from qstack.qnx_agi.formal import (
     AbstractLattice,
     AbstractState,

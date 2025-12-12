@@ -12,5 +12,10 @@ def test_lifecycle_transitions():
     lifecycle.resume()
     lifecycle.shutdown()
     assert lifecycle.state == "shutdown"
-    assert lifecycle.trace() == ["init->running", "running->paused", "paused->running", "running->shutdown"]
+    assert lifecycle.trace() == [
+        "init->running",
+        "running->paused",
+        "paused->running",
+        "running->shutdown",
+    ]
     assert monitor.metrics.snapshot()["start"] == 1

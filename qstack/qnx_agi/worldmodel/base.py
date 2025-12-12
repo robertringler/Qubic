@@ -65,7 +65,9 @@ class WorldStateGraph:
 class WorldModel:
     """Deterministic world model with domain dynamics and simulation hooks."""
 
-    def __init__(self, dynamics: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] | None = None):
+    def __init__(
+        self, dynamics: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] | None = None
+    ):
         genesis = WorldState(facts={}, digest=hash_payload({}), parent=None)
         self._history: list[WorldState] = [genesis]
         self._graph = WorldStateGraph(genesis)
@@ -76,7 +78,9 @@ class WorldModel:
     def current(self) -> WorldState:
         return self._history[-1]
 
-    def register_dynamics(self, domain: str, fn: Callable[[dict[str, Any]], dict[str, Any]]) -> None:
+    def register_dynamics(
+        self, domain: str, fn: Callable[[dict[str, Any]], dict[str, Any]]
+    ) -> None:
         self._dynamics[domain] = fn
 
     def record_event(self, label: str, payload: dict[str, Any]) -> WorldEvent:
@@ -93,7 +97,9 @@ class WorldModel:
         self._graph.add_transition(self.current, next_state)
         return next_state
 
-    def simulate_step(self, domain: str, state_override: dict[str, Any] | None = None) -> WorldState:
+    def simulate_step(
+        self, domain: str, state_override: dict[str, Any] | None = None
+    ) -> WorldState:
         if domain not in self._dynamics:
             raise ValueError(f"No dynamics registered for domain {domain}")
         base_state = state_override or self.current.facts
@@ -122,7 +128,7 @@ class WorldModel:
     def rewind(self, steps: int = 1) -> WorldState:
         if steps >= len(self._history):
             raise ValueError("cannot rewind beyond initial state")
-        self._history = self._history[: -steps]
+        self._history = self._history[:-steps]
         return self.current
 
     def history(self) -> list[WorldState]:

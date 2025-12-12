@@ -1,4 +1,5 @@
 """Semantic memory implemented as a simple knowledge graph."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

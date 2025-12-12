@@ -27,6 +27,7 @@ from runtime.python.quasim.runtime import runtime as runtime_context
 # Dataclass for internal standardized return payload
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ScenarioResult:
     scenario_id: str

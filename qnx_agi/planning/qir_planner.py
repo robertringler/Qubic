@@ -1,4 +1,5 @@
 """QIR-driven planner."""
+
 from __future__ import annotations
 
 from qdl.qir.ir_nodes import Graph

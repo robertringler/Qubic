@@ -1,4 +1,5 @@
 """Decode OHLCV rows into deterministic dictionaries."""
+
 from __future__ import annotations
 
 from typing import Sequence

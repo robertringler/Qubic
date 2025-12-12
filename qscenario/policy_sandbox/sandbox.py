@@ -1,4 +1,5 @@
 """Run scenarios under multiple policy variants."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -24,6 +25,8 @@ class PolicySandbox:
             scenario.config.policies = policies
             state = scenario.run()
             outcome = evaluate_outcomes(state, list(policies.keys()))
-            report = ScenarioReport(scenario.config, scenario.timeline, outcome, state, scenario.results)
+            report = ScenarioReport(
+                scenario.config, scenario.timeline, outcome, state, scenario.results
+            )
             reports.append(report)
         return ComparisonReport(reports)

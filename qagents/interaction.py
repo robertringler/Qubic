@@ -1,4 +1,5 @@
 """Deterministic interaction utilities between agents."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

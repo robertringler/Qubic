@@ -1,4 +1,5 @@
 """Deterministic CLI entrypoint for Q-Stack operations."""
+
 from __future__ import annotations
 
 import argparse
@@ -71,7 +72,9 @@ def cmd_run_qnx(args: argparse.Namespace) -> None:
     session = build_session(args)
     session.kernel.boot()
     results = session.kernel.run_qnx_cycles(args.steps)
-    _dump_output({"qnx_results": results, "events": [event.event_id for event in session.event_bus.events]})
+    _dump_output(
+        {"qnx_results": results, "events": [event.event_id for event in session.event_bus.events]}
+    )
 
 
 def cmd_run_quasim(args: argparse.Namespace) -> None:
@@ -79,7 +82,9 @@ def cmd_run_quasim(args: argparse.Namespace) -> None:
     session.kernel.boot()
     circuit = _load_circuit(args.circuit)
     amplitudes = session.kernel.run_quasim(circuit)
-    _dump_output({"amplitudes": amplitudes, "events": [event.event_id for event in session.event_bus.events]})
+    _dump_output(
+        {"amplitudes": amplitudes, "events": [event.event_id for event in session.event_bus.events]}
+    )
 
 
 def cmd_run_qunimbus(args: argparse.Namespace) -> None:
@@ -87,7 +92,12 @@ def cmd_run_qunimbus(args: argparse.Namespace) -> None:
     session.kernel.boot()
     scenario = _load_qunimbus_scenario(args.scenario)
     result = session.kernel.run_qunimbus(scenario["agents"], scenario["shocks"], scenario["steps"])
-    _dump_output({"qunimbus_result": result, "events": [event.event_id for event in session.event_bus.events]})
+    _dump_output(
+        {
+            "qunimbus_result": result,
+            "events": [event.event_id for event in session.event_bus.events],
+        }
+    )
 
 
 def cmd_alignment_summary(args: argparse.Namespace) -> None:
@@ -119,7 +129,9 @@ def build_parser() -> argparse.ArgumentParser:
     qunimbus_parser.add_argument("--scenario", required=True, help="Path to JSON scenario file")
     qunimbus_parser.set_defaults(func=cmd_run_qunimbus)
 
-    alignment_parser = subparsers.add_parser("alignment-summary", help="Show constitutional and policy alignment details")
+    alignment_parser = subparsers.add_parser(
+        "alignment-summary", help="Show constitutional and policy alignment details"
+    )
     alignment_parser.set_defaults(func=cmd_alignment_summary)
 
     return parser

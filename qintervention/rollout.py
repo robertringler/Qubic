@@ -1,4 +1,5 @@
 """Deterministic rollout of intervention plans."""
+
 from __future__ import annotations
 
 from qintervention.actions import ScheduledAction

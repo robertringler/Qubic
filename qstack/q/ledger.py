@@ -1,4 +1,5 @@
 """Deterministic append-only ledger with chained digests."""
+
 from __future__ import annotations
 
 import hashlib
@@ -24,7 +25,9 @@ class Ledger:
     def append(self, payload: dict[str, str]) -> LedgerEntry:
         prev_digest = self.entries[-1].digest if self.entries else "genesis"
         digest = self._compute_digest(payload, prev_digest)
-        entry = LedgerEntry(index=len(self.entries), payload=payload, prev_digest=prev_digest, digest=digest)
+        entry = LedgerEntry(
+            index=len(self.entries), payload=payload, prev_digest=prev_digest, digest=digest
+        )
         self.entries.append(entry)
         return entry
 

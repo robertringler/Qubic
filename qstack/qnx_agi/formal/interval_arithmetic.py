@@ -5,6 +5,7 @@ operations, enclosure checks, and affine propagation utilities used by
 planners and formal analyzers. All operations avoid nondeterminism and favor
 explicit bounds to align with safety-critical review.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -74,7 +75,9 @@ class Interval:
         return (self.low, self.high)
 
 
-def propagate_affine(intervals: dict[str, Interval], weights: dict[str, float], bias: float = 0.0) -> Interval:
+def propagate_affine(
+    intervals: dict[str, Interval], weights: dict[str, float], bias: float = 0.0
+) -> Interval:
     r"""Propagate an affine transform \sum w_i * x_i + bias over intervals."""
     low = bias
     high = bias

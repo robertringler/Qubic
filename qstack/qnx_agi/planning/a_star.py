@@ -1,4 +1,5 @@
 """Advanced deterministic A* planner with safety constraints."""
+
 from __future__ import annotations
 
 from typing import Any, Callable
@@ -16,7 +17,9 @@ class ConstrainedAStarPlanner(Planner):
         super().__init__(heuristic)
         self._envelope = envelope
 
-    def _neighbors(self, state: dict[str, Any], goal: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
+    def _neighbors(
+        self, state: dict[str, Any], goal: dict[str, Any]
+    ) -> list[tuple[str, dict[str, Any]]]:
         neighbors: list[tuple[str, dict[str, Any]]] = []
         for key, value in goal.items():
             if state.get(key) != value:
@@ -30,7 +33,11 @@ class ConstrainedAStarPlanner(Planner):
         return neighbors
 
     def plan(self, goal: dict[str, Any], state: dict[str, Any]) -> list[PlanStep]:
-        open_set: list[PlanStep] = [PlanStep(action="start", parameters=state, cost=0.0, heuristic=self._heuristic(goal, state))]
+        open_set: list[PlanStep] = [
+            PlanStep(
+                action="start", parameters=state, cost=0.0, heuristic=self._heuristic(goal, state)
+            )
+        ]
         explored: dict[str, float] = {}
         while open_set:
             open_set.sort(key=lambda s: (s.total(), s.action))
@@ -50,7 +57,13 @@ class ConstrainedAStarPlanner(Planner):
                 step_cost = current.cost + 1.0
                 heuristic = self._heuristic(goal, neighbor)
                 open_set.append(
-                    PlanStep(action=action, parameters=neighbor, cost=step_cost, heuristic=heuristic, parent=current)
+                    PlanStep(
+                        action=action,
+                        parameters=neighbor,
+                        cost=step_cost,
+                        heuristic=heuristic,
+                        parent=current,
+                    )
                 )
         return []
 

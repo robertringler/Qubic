@@ -15,7 +15,10 @@ def _safe_init(backend_cls: type[SimulationBackend]) -> SimulationBackend | None
     try:
         return backend_cls()
     except Exception as exc:  # pragma: no cover - defensive
-        logger.info("Skipping backend during initialisation", extra={"backend": backend_cls.__name__, "error": str(exc)})
+        logger.info(
+            "Skipping backend during initialisation",
+            extra={"backend": backend_cls.__name__, "error": str(exc)},
+        )
         return None
 
 
@@ -28,5 +31,6 @@ def get_backend_registry() -> dict[str, SimulationBackend]:
         if backend is not None:
             registry[backend.name] = backend
     return registry
+
 
 __all__ = ["get_backend_registry"]
