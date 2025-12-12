@@ -9,7 +9,7 @@ This module tests the QuASIM Python SDK including:
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 

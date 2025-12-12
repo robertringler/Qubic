@@ -9,8 +9,6 @@ This module tests QuASIM validation functions including:
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestInputValidation:
     """Test input validation functions."""
@@ -217,7 +215,9 @@ class TestConstraintValidation:
     def test_validate_equality_constraint(self):
         """Test equality constraint validation."""
 
-        def validate_equality(solution: list[float], target: float, tolerance: float = 1e-6) -> bool:
+        def validate_equality(
+            solution: list[float], target: float, tolerance: float = 1e-6
+        ) -> bool:
             return abs(sum(solution) - target) < tolerance
 
         assert validate_equality([0.5, 0.5], 1.0)
@@ -227,9 +227,7 @@ class TestConstraintValidation:
     def test_validate_bounds(self):
         """Test bound constraint validation."""
 
-        def validate_bounds(
-            solution: list[float], bounds: list[tuple[float, float]]
-        ) -> bool:
+        def validate_bounds(solution: list[float], bounds: list[tuple[float, float]]) -> bool:
             if len(solution) != len(bounds):
                 return False
             return all(lower <= val <= upper for val, (lower, upper) in zip(solution, bounds))
@@ -304,7 +302,9 @@ class TestDataValidation:
     def test_validate_matrix_dimensions(self):
         """Test matrix dimension validation."""
 
-        def validate_matrix_dims(matrix: list[list], expected_rows: int, expected_cols: int) -> bool:
+        def validate_matrix_dims(
+            matrix: list[list], expected_rows: int, expected_cols: int
+        ) -> bool:
             if len(matrix) != expected_rows:
                 return False
             return all(len(row) == expected_cols for row in matrix)
