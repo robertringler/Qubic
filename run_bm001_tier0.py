@@ -205,8 +205,8 @@ def main() -> int:
     
     try:
         # Load acceptance criteria
-        import yaml
         with open(args.yaml) as f:
+            import yaml
             yaml_data = yaml.safe_load(f)
         acceptance_criteria = yaml_data.get("acceptance_criteria", {})
         

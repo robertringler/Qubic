@@ -177,9 +177,9 @@ class AnsysBaselineExecutor:
         self.working_dir = working_dir
         self.working_dir.mkdir(parents=True, exist_ok=True)
         
-        # Set random seed from execution protocol
+        # Create dedicated RandomState instance for isolated random number generation
         random_seed = benchmark.execution_protocol.get("reproducibility", {}).get("random_seed", 42)
-        np.random.seed(random_seed)
+        self.rng = np.random.RandomState(random_seed)
         
         logger.info(f"Initialized AnsysBaselineExecutor for {benchmark.id}")
     
@@ -206,7 +206,7 @@ class AnsysBaselineExecutor:
         # Simulate solve time (based on benchmark targets)
         target_time = self.benchmark.performance_targets.get("ansys_baseline_time", 180.0)
         # Add some variance (±5%)
-        variance = np.random.uniform(0.95, 1.05)
+        variance = self.rng.uniform(0.95, 1.05)
         solve_time = target_time * variance
         
         # Simulate convergence history
@@ -248,7 +248,7 @@ class AnsysBaselineExecutor:
         residual = 1.0
         for i in range(max_iterations):
             residual *= 0.5  # Halve each iteration (idealized)
-            residual *= np.random.uniform(0.9, 1.1)  # Add noise
+            residual *= self.rng.uniform(0.9, 1.1)  # Add noise
             history.append(residual)
             if residual < 0.005:  # Converged
                 break
@@ -283,8 +283,8 @@ class QuasimExecutor:
         self.random_seed = random_seed
         self.working_dir.mkdir(parents=True, exist_ok=True)
         
-        # Set random seed for deterministic execution
-        np.random.seed(random_seed)
+        # Create dedicated RandomState instance for isolated random number generation
+        self.rng = np.random.RandomState(random_seed)
         
         logger.info(f"Initialized QuasimExecutor for {benchmark.id} (device={device})")
     
@@ -311,7 +311,7 @@ class QuasimExecutor:
         # Simulate solve time (speedup based on benchmark targets)
         target_time = self.benchmark.performance_targets.get("quasim_target_time", 45.0)
         # Add some variance (±5%)
-        variance = np.random.uniform(0.95, 1.05)
+        variance = self.rng.uniform(0.95, 1.05)
         solve_time = target_time * variance
         
         # Simulate convergence history (QuASIM may use more iterations but faster)
@@ -352,7 +352,7 @@ class QuasimExecutor:
         residual = 1.0
         for i in range(max_iterations):
             residual *= 0.45  # Slightly faster convergence (tensor acceleration)
-            residual *= np.random.uniform(0.9, 1.1)
+            residual *= self.rng.uniform(0.9, 1.1)
             history.append(residual)
             if residual < 0.003:  # Converged (QuASIM uses tighter tolerance)
                 break
