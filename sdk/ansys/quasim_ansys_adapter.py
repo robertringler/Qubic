@@ -453,15 +453,22 @@ class QuasimAnsysAdapter:
         start_time = time.time()
         
         mapdl = mapdl or self.mapdl_session
-        if mapdl is None:
-            raise MeshImportError("No MAPDL session provided")
         
-        logger.info("Importing mesh from MAPDL session...")
+        # Allow standalone mode without MAPDL for testing
+        if mapdl is None and self.mode == SolverMode.STANDALONE:
+            logger.info("Standalone mode: generating test mesh...")
+        elif mapdl is None:
+            raise MeshImportError("No MAPDL session provided")
+        else:
+            logger.info("Importing mesh from MAPDL session...")
         
         try:
             # TODO: C++/CUDA integration - actual PyMAPDL mesh extraction
             # For now, create a simple test mesh
-            logger.warning("Using test mesh (PyMAPDL integration not yet implemented)")
+            if mapdl is None:
+                logger.warning("Standalone mode: using test mesh")
+            else:
+                logger.warning("Using test mesh (PyMAPDL integration not yet implemented)")
             
             # Create simple 8-node hex mesh (2x2x2 elements)
             nodes = np.array([
