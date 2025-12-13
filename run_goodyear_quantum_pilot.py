@@ -169,16 +169,14 @@ def main() -> None:
         print("  5. Deploy to production environments")
         print()
 
-        return 0
-
     except Exception as e:
         print()
         print(f"✗ Error during simulation campaign: {e}")
         print()
         import traceback
         traceback.print_exc()
-        return 1
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

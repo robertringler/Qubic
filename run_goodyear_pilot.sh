@@ -37,9 +37,10 @@ fi
 
 # Check for required modules
 echo "Checking dependencies..."
-python3 -c "import numpy, yaml" 2>/dev/null || {
+python3 -c "import numpy, yaml, click" 2>/dev/null || {
     echo "Installing required dependencies..."
     pip install -q numpy pyyaml click
+    echo "✓ Dependencies installed"
 }
 echo "✓ Dependencies OK"
 echo ""
