@@ -603,11 +603,11 @@ Establish QRATUM as the de facto standard for quantum-enhanced computational inf
 
 ### Appendix F: Contact
 
-**Technical:** support@quasim.dev  
-**Sales:** sales@quasim.dev  
-**Partnerships:** partnerships@quasim.dev  
-**Security:** security@quasim.dev  
-**Compliance:** compliance@quasim.dev  
+**Technical:** support@qratum.io  
+**Sales:** sales@qratum.io  
+**Partnerships:** partnerships@qratum.io  
+**Security:** security@qratum.io  
+**Compliance:** compliance@qratum.io  
 
 **Website:** https://qratum.io  
 **Documentation:** https://docs.qratum.io  
