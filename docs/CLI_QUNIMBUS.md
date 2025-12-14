@@ -432,4 +432,4 @@ For issues or questions, refer to:
 - Main README: [../README.md](../README.md)
 - QuNimbus Documentation: [QUNIMBUS_WAVE3.md](QUNIMBUS_WAVE3.md)
 - Wave 3 Quick Start: [QUNIMBUS_WAVE3_QUICKSTART.md](QUNIMBUS_WAVE3_QUICKSTART.md)
-- QuASIM Documentation: [../docs/README.md](../docs/README.md)
+- QuASIM Documentation: [README.md](README.md)

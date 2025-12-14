@@ -231,4 +231,4 @@ $env:JAX_PLATFORM_NAME="cpu"  # Windows PowerShell
 For issues or questions, refer to:
 - Main README: [../README.md](../README.md)
 - OwnAI Documentation: [ownai/ownai_overview.md](ownai/ownai_overview.md)
-- QuASIM Documentation: [../docs/README.md](../docs/README.md)
+- QuASIM Documentation: [README.md](README.md)

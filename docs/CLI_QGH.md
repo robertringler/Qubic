@@ -325,4 +325,4 @@ MemoryError: Unable to allocate array
 For issues or questions, refer to:
 - Main README: [../README.md](../README.md)
 - QGH Algorithm Documentation: [algorithms/qgh.md](algorithms/qgh.md)
-- QuASIM Documentation: [../docs/README.md](../docs/README.md)
+- QuASIM Documentation: [README.md](README.md)
