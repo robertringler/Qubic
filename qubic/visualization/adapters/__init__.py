@@ -5,6 +5,7 @@ from qubic.visualization.adapters.mesh import MeshAdapter
 from qubic.visualization.adapters.quantum import QuantumSimulationAdapter
 from qubic.visualization.adapters.timeseries import TimeSeriesAdapter
 from qubic.visualization.adapters.tire import TireSimulationAdapter
+from qubic.visualization.adapters.xenon_adapter import XenonSimulationAdapter
 
 __all__ = [
     "SimulationAdapter",
@@ -12,4 +13,5 @@ __all__ = [
     "QuantumSimulationAdapter",
     "MeshAdapter",
     "TimeSeriesAdapter",
+    "XenonSimulationAdapter",
 ]
