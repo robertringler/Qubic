@@ -486,6 +486,7 @@ class QuasimAnsysAdapter:
         # Log solver parameters
         if self.enable_logging:
             self._log_initialization_parameters()
+        logger.info(f"Initialized QuasimAnsysAdapter (mode={mode.value}, device={device})")
 
         # Initialize GPU context
         if self.device in (DeviceType.GPU, DeviceType.MULTI_GPU):
@@ -538,31 +539,49 @@ class QuasimAnsysAdapter:
 
         Args:
             mapdl: Active PyMAPDL session (optional if provided in constructor).
+                   In STANDALONE mode, None is acceptable and generates a test mesh.
+                   In other modes, a valid MAPDL session is required.
 
         Returns:
             Imported mesh data.
 
         Raises:
             MeshImportError: If mesh import fails.
+            MeshImportError: If mesh import fails or no MAPDL session provided
+                           (except in STANDALONE mode).
 
         Example:
             >>> from ansys.mapdl.core import launch_mapdl
             >>> mapdl = launch_mapdl()
             >>> # ... setup geometry, mesh in Ansys ...
             >>> adapter.import_mesh_from_mapdl(mapdl)
+
+            >>> # Standalone mode with test mesh
+            >>> adapter = QuasimAnsysAdapter(mode=SolverMode.STANDALONE)
+            >>> adapter.import_mesh_from_mapdl()  # Generates test mesh
         """
         start_time = time.time()
 
         mapdl = mapdl or self.mapdl_session
-        if mapdl is None:
+
+        # Allow standalone mode without MAPDL for testing
+        if mapdl is None and self.mode == SolverMode.STANDALONE:
+            logger.info("Standalone mode: generating test mesh...")
+        elif mapdl is None:
             raise MeshImportError("No MAPDL session provided")
 
         logger.info("Importing mesh from MAPDL session...")
+        else:
+            logger.info("Importing mesh from MAPDL session...")
 
         try:
             # TODO: C++/CUDA integration - actual PyMAPDL mesh extraction
             # For now, create a simple test mesh
             logger.warning("Using test mesh (PyMAPDL integration not yet implemented)")
+            if mapdl is None:
+                logger.warning("Standalone mode: using test mesh")
+            else:
+                logger.warning("Using test mesh (PyMAPDL integration not yet implemented)")
 
             # Create simple 8-node hex mesh (2x2x2 elements)
             nodes = np.array(
@@ -682,6 +701,7 @@ class QuasimAnsysAdapter:
         """
         if isinstance(model, str):
             model = MaterialModel(model.lower())
+            model = MaterialModel(model)
 
         mat = MaterialParameters(
             material_id=material_id,
@@ -743,6 +763,7 @@ class QuasimAnsysAdapter:
         setup_start = time.time()
         self._track_hardware_utilization_start()
         solve_start = time.time()
+        start_time = time.time()
 
         try:
             # TODO: C++/CUDA integration - actual solver call
@@ -771,6 +792,7 @@ class QuasimAnsysAdapter:
 
             # Track hardware utilization
             self._track_hardware_utilization_end()
+            solve_time = time.time() - start_time
 
             self.metrics = PerformanceMetrics(
                 solve_time=solve_time,
@@ -876,6 +898,7 @@ class QuasimAnsysAdapter:
             data = np.column_stack(
                 [np.arange(1, self.state.num_nodes + 1), self.state.displacements]
             )
+            data = np.column_stack([np.arange(self.state.num_nodes), self.state.displacements])
             np.savetxt(filepath, data, delimiter=",", header=header, comments="")
             logger.info(f"Displacements exported to {filepath}")
 
@@ -1066,6 +1089,7 @@ def test_installation() -> bool:
     # Test adapter creation
     try:
         _adapter = QuasimAnsysAdapter(device="cpu")
+        QuasimAnsysAdapter(device="cpu")
         logger.info("✓ Adapter creation successful")
     except Exception as e:
         logger.error(f"✗ Adapter creation failed: {e}")
