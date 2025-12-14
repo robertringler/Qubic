@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 import logging
 from pathlib import Path
 
@@ -99,8 +100,6 @@ class VideoExporter:
                 )
 
                 # Save frame to buffer
-                import io
-
                 buf = io.BytesIO()
                 self.backend.fig.savefig(buf, format="png", bbox_inches="tight")
                 buf.seek(0)
@@ -175,8 +174,6 @@ class VideoExporter:
             )
 
             # Save frame to buffer
-            import io
-
             buf = io.BytesIO()
             self.backend.fig.savefig(buf, format="png", bbox_inches="tight")
             buf.seek(0)

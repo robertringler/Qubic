@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import tempfile
 from pathlib import Path
 
 from qubic.visualization.adapters.timeseries import TimeSeriesAdapter
@@ -72,8 +73,6 @@ class TimeSeriesPipeline:
         logger.info(f"Rendering animation with {n_timesteps} frames at {fps} FPS")
 
         # Render frames to temporary directory
-        import tempfile
-
         temp_dir = Path(tempfile.mkdtemp(prefix="qubic_viz_"))
         frame_paths = []
 
