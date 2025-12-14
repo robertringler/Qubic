@@ -71,7 +71,7 @@ def simulate_mechanism(
         t_max: Maximum simulation time
         initial_state: Initial concentrations
         method: Simulation method ("gillespie" or "langevin")
-        **kwargs: Additional simulator arguments
+        **kwargs: Additional simulator arguments (volume, seed, dt, etc.)
     
     Returns:
         Tuple of (times, trajectories)
@@ -82,12 +82,18 @@ def simulate_mechanism(
         ... )
     """
     if method == "gillespie":
+        # Extract run() parameters
+        seed = kwargs.pop("seed", None)
+        record_interval = kwargs.pop("record_interval", None)
+        # Remaining kwargs go to simulator init
         simulator = GillespieSimulator(mechanism, **kwargs)
-        return simulator.run(t_max, initial_state)
+        return simulator.run(t_max, initial_state, seed=seed, record_interval=record_interval)
     elif method == "langevin":
         dt = kwargs.pop("dt", 0.01)
+        seed = kwargs.pop("seed", None)
+        # Remaining kwargs go to simulator init
         simulator = LangevinSimulator(mechanism, **kwargs)
-        return simulator.run(t_max, dt, initial_state)
+        return simulator.run(t_max, dt, initial_state, seed=seed)
     else:
         raise ValueError(f"Unknown simulation method: {method}")
 
