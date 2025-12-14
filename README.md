@@ -167,6 +167,61 @@ Structured logs, metrics, and dashboards.
 - Multi-physics coupling  
 - Uncertainty quantification  
 
+### **Tire Simulation & Materials Engineering**
+- Goodyear Quantum Tire Pilot integration  
+- 1,000+ pre-characterized tire materials database  
+- Quantum-enhanced compound optimization  
+- Multi-scale physics modeling (molecular → macroscopic)  
+- Comprehensive performance analysis (grip, wear, thermal, efficiency)  
+
+---
+
+## Goodyear Quantum Tire Pilot
+
+QuASIM includes a comprehensive tire simulation platform integrated with Goodyear's Quantum Pilot materials database, enabling large-scale tire performance analysis with quantum-enhanced optimization.
+
+### Quick Start
+
+Run the full Goodyear Quantum Tire Pilot to generate 10,000+ tire simulation scenarios:
+
+```bash
+python3 run_goodyear_quantum_pilot.py
+```
+
+This generates:
+- **10,000 unique tire simulation scenarios**
+- **1,000+ Goodyear materials** (8 families: natural rubber, synthetic rubber, biopolymer, nano-enhanced, graphene-reinforced, quantum-optimized, silica-enhanced, carbon black)
+- **Comprehensive performance metrics** (16 KPIs per scenario)
+- **Quantum-enhanced optimization** (QAOA, VQE, hybrid algorithms)
+- **DO-178C Level A compliance posture**
+
+### Features
+
+- **Materials Database**: 1,000+ pre-characterized compounds with test data and certification status
+- **Tire Types**: Passenger, truck, off-road, racing, EV-specific, winter, all-season, performance
+- **Environmental Coverage**: Temperature range -40°C to +80°C, 12 surface types, 8 weather conditions
+- **Performance Domains**: Traction, wear, thermal response, rolling resistance, hydroplaning, noise, durability
+- **Integration Ready**: CAD systems, FEA tools, AI/ML workflows, digital twin platforms
+
+### CLI Usage
+
+```bash
+# Use all 1,000+ Goodyear materials
+quasim-tire goodyear --use-all --scenarios-per-material 10
+
+# Use only quantum-validated materials
+quasim-tire goodyear --quantum-only --scenarios-per-material 20
+
+# Use only certified materials
+quasim-tire goodyear --use-certified --scenarios-per-material 5
+```
+
+### Documentation
+
+- **Usage Guide**: [GOODYEAR_PILOT_USAGE.md](GOODYEAR_PILOT_USAGE.md)
+- **Implementation Summary**: [TIRE_SIMULATION_SUMMARY.md](TIRE_SIMULATION_SUMMARY.md)
+- **Demo Script**: [demos/tire_simulation_demo.py](demos/tire_simulation_demo.py)
+
 ---
 
 ## Installation & Quickstart
