@@ -423,4 +423,3 @@ For issues or questions, refer to:
 - Main README: [../README.md](../README.md)
 - QNX Documentation: [qnx_integration/01_qnx_architecture.md](qnx_integration/01_qnx_architecture.md)
 - QNX Scenarios: [qnx_integration/02_qnx_scenarios.md](qnx_integration/02_qnx_scenarios.md)
-- QuASIM Documentation: [README.md](README.md)

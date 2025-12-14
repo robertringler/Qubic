@@ -334,4 +334,3 @@ REVULTRA algorithms are used in:
 For issues or questions, refer to:
 - Main README: [../README.md](../README.md)
 - REVULTRA Algorithm Documentation: [algorithms/revultra.md](algorithms/revultra.md)
-- QuASIM Documentation: [README.md](README.md)

@@ -379,4 +379,3 @@ Available: ['beta_metrics', 'ioc_periods', 'emergent_complexity']
 For issues or questions, refer to:
 - Main README: [../README.md](../README.md)
 - TERC Bridge Documentation: [terc_bridge.md](terc_bridge.md)
-- QuASIM Documentation: [README.md](README.md)
