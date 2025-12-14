@@ -17,8 +17,9 @@ logger = get_logger(__name__)
 def _default_serializer(obj: Any) -> str:
     """Provide a stable string representation for non-JSON-native types.
 
-    Returns str(obj) as a deterministic fallback for objects that don't have a native
-    string representation (deterministic for builtins)
+    Returns str(obj) as a fallback for objects that don't have a native JSON representation.
+    Note: This is deterministic for builtins but may not be deterministic for custom objects
+    that don't implement __str__ consistently.
     """
     return str(obj)
 
@@ -29,8 +30,8 @@ def _canonical_serialize(obj: Any) -> str:
     - sort_keys=True to ensure dictionary order is stable
     - separators removes irrelevant whitespace
     - uses _default_serializer for non-JSON-native types
-    If serialization still fails for some reason, fall back to JSON of str(obj) to avoid raising
-    from hashing path while logging the event.
+    If serialization fails, falls back to JSON of str(obj), then to JSON of repr(obj) as
+    ultimate fallback, to avoid raising from hashing path while logging the event.
     """
     try:
         return json.dumps(
