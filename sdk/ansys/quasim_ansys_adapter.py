@@ -459,7 +459,12 @@ class QuasimAnsysAdapter:
     ) -> None:
         """Initialize QuASIM Ansys adapter."""
         self.mode = mode
-        self.device = DeviceType(device) if isinstance(device, str) else device
+        if isinstance(device, str):
+            self.device = DeviceType(device.lower())
+        elif isinstance(device, DeviceType):
+            self.device = device
+        else:
+            raise ValueError(f"Invalid device type: {device}")
         self.mapdl_session = mapdl_session
         self.random_seed = random_seed
         self.enable_logging = enable_logging
@@ -477,8 +482,6 @@ class QuasimAnsysAdapter:
 
         # Hardware utilization tracking
         self._hardware_metrics: dict[str, Any] = {}
-
-        logger.info(f"Initialized QuasimAnsysAdapter (mode={mode.value}, device={device})")
 
         # Log solver parameters
         if self.enable_logging:
@@ -678,7 +681,7 @@ class QuasimAnsysAdapter:
             ... )
         """
         if isinstance(model, str):
-            model = MaterialModel(model)
+            model = MaterialModel(model.lower())
 
         mat = MaterialParameters(
             material_id=material_id,
@@ -737,10 +740,9 @@ class QuasimAnsysAdapter:
         if self.enable_logging:
             self._log_solver_parameters()
 
-        start_time = time.time()
-
-        # Track hardware utilization
+        setup_start = time.time()
         self._track_hardware_utilization_start()
+        solve_start = time.time()
 
         try:
             # TODO: C++/CUDA integration - actual solver call
@@ -764,14 +766,15 @@ class QuasimAnsysAdapter:
                 displacements=displacements,
             )
 
-            solve_time = time.time() - start_time
+            solve_time = time.time() - solve_start
+            setup_time = solve_start - setup_start
 
             # Track hardware utilization
             self._track_hardware_utilization_end()
 
             self.metrics = PerformanceMetrics(
                 solve_time=solve_time,
-                setup_time=0.1,
+                setup_time=setup_time,
                 iterations=len(convergence_history),
                 convergence_history=convergence_history,
                 memory_usage=0.5,  # GB
@@ -870,7 +873,9 @@ class QuasimAnsysAdapter:
         elif format == "csv":
             # Export displacements to CSV
             header = "NodeID,Ux,Uy,Uz"
-            data = np.column_stack([np.arange(self.state.num_nodes), self.state.displacements])
+            data = np.column_stack(
+                [np.arange(1, self.state.num_nodes + 1), self.state.displacements]
+            )
             np.savetxt(filepath, data, delimiter=",", header=header, comments="")
             logger.info(f"Displacements exported to {filepath}")
 
@@ -975,6 +980,14 @@ class QuasimAnsysAdapter:
 
     def _log_hardware_metrics(self) -> None:
         """Log hardware utilization metrics."""
+        if not self._gpu_available:
+            self._hardware_metrics.update(
+                {
+                    "gpu_memory_peak": 0,
+                    "gpu_memory_reserved": 0,
+                }
+            )
+
         logger.info("-" * 60)
         logger.info("Hardware Utilization Metrics:")
         logger.info(f"  Duration: {self._hardware_metrics.get('duration', 0):.2f}s")
@@ -996,6 +1009,21 @@ class QuasimAnsysAdapter:
             Dictionary of hardware metrics
         """
         return self._hardware_metrics.copy()
+
+    def load_config_from_yaml(self, path: str | Path) -> None:
+        """Load solver configuration from YAML file.
+
+        Args:
+            path: Path to YAML configuration file.
+
+        Raises:
+            ImportError: If pyyaml is not installed.
+        """
+        if yaml is None:
+            raise ImportError("pyyaml not installed")
+        with open(path) as f:
+            cfg = yaml.safe_load(f)
+        self.set_solver_config(**cfg.get("solver", {}))
 
 
 # ============================================================================
