@@ -947,31 +947,31 @@ def test_installation() -> bool:
             f"Python 3.10+ required, found {sys.version_info.major}.{sys.version_info.minor}"
         )
         return False
-    logger.info(f"Python {sys.version_info.major}.{sys.version_info.minor}")
+    logger.info(f"✓ Python {sys.version_info.major}.{sys.version_info.minor}")
 
     # Check NumPy
-    logger.info(f"NumPy {np.__version__}")
+    logger.info(f"✓ NumPy {np.__version__}")
 
     # Check GPU availability
     try:
         import torch
 
         if torch.cuda.is_available():
-            logger.info(f"GPU available: {torch.cuda.get_device_name(0)}")
+            logger.info(f"✓ GPU available: {torch.cuda.get_device_name(0)}")
         else:
-            logger.warning("GPU not available (CPU fallback will be used)")
+            logger.warning("! GPU not available (CPU fallback will be used)")
     except ImportError:
-        logger.warning("PyTorch not installed (cannot detect GPU)")
+        logger.warning("! PyTorch not installed (cannot detect GPU)")
 
     # Test adapter creation
     try:
         QuasimAnsysAdapter(device="cpu")
-        logger.info("Adapter creation successful")
+        logger.info("✓ Adapter creation successful")
     except Exception as e:
-        logger.error(f"Adapter creation failed: {e}")
+        logger.error(f"✗ Adapter creation failed: {e}")
         return False
 
-    logger.info("\nInstallation test passed!")
+    logger.info("\n✓ Installation test passed!")
     return True
 
 
