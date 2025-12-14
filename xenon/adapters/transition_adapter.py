@@ -7,6 +7,15 @@ import numpy as np
 from qubic.visualization.core.data_model import VisualizationData
 from xenon.core.mechanism import Transition
 
+# Constants for energy barrier calculation
+BARRIER_PEAK_POSITION = 0.5  # Position of energy barrier maximum (0-1)
+BARRIER_WIDTH = 0.1  # Width parameter for Gaussian barrier
+
+# Constants for thickness calculation
+MIN_RATE_LOG = 1e-10  # Minimum rate constant for log scaling
+LOG_OFFSET = 10  # Offset for log normalization
+LOG_SCALE = 20  # Scale factor for log normalization
+
 
 class TransitionAdapter:
     """Adapter to convert Transition events to visualization format.
@@ -125,13 +134,17 @@ class TransitionAdapter:
         reaction_coord = np.linspace(0, 1, num_points)
 
         # Model energy barrier as a simple curve
-        # E = e0 + ea * exp(-((x-0.5)/0.1)^2) + ΔG * x
+        # E = e0 + ea * exp(-((x-peak)/width)^2) + ΔG * x
         e0 = 0.0  # Initial energy (reference)
         ea = self.transition.activation_energy
         delta_g = self.transition.delta_g
 
         # Energy along path (Gaussian barrier + linear ΔG)
-        energy = e0 + ea * np.exp(-(((reaction_coord - 0.5) / 0.1) ** 2)) + delta_g * reaction_coord
+        energy = (
+            e0
+            + ea * np.exp(-(((reaction_coord - BARRIER_PEAK_POSITION) / BARRIER_WIDTH) ** 2))
+            + delta_g * reaction_coord
+        )
 
         # Create 3D curve (x = reaction coordinate, y = 0, z = energy)
         vertices = np.column_stack([reaction_coord * 10, np.zeros(num_points), energy])
