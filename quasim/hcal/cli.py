@@ -22,11 +22,8 @@ except ImportError:
     click = None  # type: ignore
 
 from quasim.hcal import HCAL
-from quasim.hcal.device import DeviceManager
-from quasim.hcal.loops.reconfig_profiles import ProfileManager
-from quasim.hcal.policy import Policy, PolicyValidator
+from quasim.hcal.policy import PolicyValidator
 from quasim.hcal.topology import TopologyDiscovery
-
 
 if HAS_CLICK and click is not None:
 
