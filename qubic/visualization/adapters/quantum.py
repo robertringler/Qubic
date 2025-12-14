@@ -91,7 +91,7 @@ class QuantumSimulationAdapter(SimulationAdapter):
                 ]
             )
 
-            v_offset = len(vertices_list) * 8
+            v_offset = len(vertices_list)
             vertices_list.extend(base_vertices)
 
             # Faces for the bar (12 triangles = 6 faces * 2 triangles each)
