@@ -201,7 +201,6 @@ class ChinaPhotonicFactory:
             logger.info("Disconnecting from China Photonic Factory...")
             self._connected = False
             logger.info("✓ Disconnected")
-            return True
         else:
             logger.debug("Already disconnected from China Photonic Factory")
-            return True
+        return True

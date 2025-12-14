@@ -167,7 +167,5 @@ class SpaceXTelemetryAdapter:
         Returns:
             True if disconnection successful or already disconnected
         """
-        if self._connected:
-            self._connected = False
-            return True
+        self._connected = False
         return True
