@@ -228,7 +228,6 @@ tools/               # Utility scripts
 visuals/             # Visualization modules
 ```
 
-
 ---
 
 ## Verification & Provenance
@@ -242,7 +241,6 @@ QuNimbus provides:
 - structured experiment logs
 
 These enable:
-
 - scientific reproducibility
 - cross-team validation
 - long-term auditability
