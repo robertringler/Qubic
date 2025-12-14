@@ -40,8 +40,7 @@ except ImportError:
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -49,6 +48,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # Data Structures
 # ============================================================================
+
 
 @dataclass
 class BenchmarkDefinition:
@@ -158,6 +158,7 @@ class ComparisonResult:
 # Benchmark Executor Classes
 # ============================================================================
 
+
 class AnsysBaselineExecutor:
     """Executes Ansys baseline simulations for benchmarks.
 
@@ -209,7 +210,9 @@ class AnsysBaselineExecutor:
         solve_time = target_time * variance
 
         # Simulate convergence history
-        max_iter = self.benchmark.solver_configuration["ansys_reference"]["convergence"]["max_iterations"]
+        max_iter = self.benchmark.solver_configuration["ansys_reference"]["convergence"][
+            "max_iterations"
+        ]
         convergence_history = self._generate_convergence_history(max_iter)
 
         # Simulate memory usage
@@ -218,11 +221,16 @@ class AnsysBaselineExecutor:
 
         # Compute mock state hash (deterministic for Ansys baseline)
         # In production, this would be hash of actual displacement field
-        random_seed = self.benchmark.execution_protocol.get("reproducibility", {}).get("random_seed", 42)
+        random_seed = self.benchmark.execution_protocol.get("reproducibility", {}).get(
+            "random_seed", 42
+        )
         state_data = f"{self.benchmark.id}_ansys_seed{random_seed}".encode()
         state_hash = hashlib.sha256(state_data).hexdigest()
 
         elapsed = time.time() - start_time
+        logger.info(
+            f"Ansys baseline completed in {elapsed:.2f}s (simulated solve: {solve_time:.2f}s)"
+        )
         logger.info(f"Ansys baseline completed in {elapsed:.2f}s (simulated solve: {solve_time:.2f}s)")
 
         return BenchmarkResult(
@@ -273,7 +281,7 @@ class QuasimExecutor:
         benchmark: BenchmarkDefinition,
         working_dir: Path,
         device: str = "gpu",
-        random_seed: int = 42
+        random_seed: int = 42,
     ):
         """Initialize QuASIM executor."""
         self.benchmark = benchmark
@@ -323,7 +331,9 @@ class QuasimExecutor:
 
         # Compute mock state hash (deterministic for same seed, excludes run_id for reproducibility)
         # In production, this would be hash of actual displacement field
-        state_data = f"{self.benchmark.id}_quasim_seed{self.random_seed}_device{self.device}".encode()
+        state_data = (
+            f"{self.benchmark.id}_quasim_seed{self.random_seed}_device{self.device}".encode()
+        )
         state_hash = hashlib.sha256(state_data).hexdigest()
 
         elapsed = time.time() - start_time
@@ -362,6 +372,7 @@ class QuasimExecutor:
 # Performance Comparison and Validation
 # ============================================================================
 
+
 class PerformanceComparer:
     """Compares performance and accuracy between Ansys and QuASIM.
 
@@ -373,6 +384,7 @@ class PerformanceComparer:
         acceptance_criteria: Global acceptance criteria from YAML
     """
 
+    def __init__(self, benchmark: BenchmarkDefinition, acceptance_criteria: dict[str, Any]):
     def __init__(
         self,
         benchmark: BenchmarkDefinition,
@@ -385,9 +397,7 @@ class PerformanceComparer:
         logger.info(f"Initialized PerformanceComparer for {benchmark.id}")
 
     def compare(
-        self,
-        ansys_results: list[BenchmarkResult],
-        quasim_results: list[BenchmarkResult]
+        self, ansys_results: list[BenchmarkResult], quasim_results: list[BenchmarkResult]
     ) -> ComparisonResult:
         """Compare Ansys and QuASIM results.
 
@@ -410,7 +420,7 @@ class PerformanceComparer:
                 performance_metrics={},
                 statistical_analysis={},
                 passed=False,
-                failure_reason="Missing results (no Ansys or QuASIM runs)"
+                failure_reason="Missing results (no Ansys or QuASIM runs)",
             )
 
         # Compute accuracy metrics
@@ -424,9 +434,7 @@ class PerformanceComparer:
 
         # Check acceptance criteria
         passed, failure_reason = self._check_acceptance(
-            accuracy_metrics,
-            performance_metrics,
-            statistical_analysis
+            accuracy_metrics, performance_metrics, statistical_analysis
         )
 
         return ComparisonResult(
@@ -441,9 +449,7 @@ class PerformanceComparer:
         )
 
     def _compute_accuracy_metrics(
-        self,
-        ansys_results: list[BenchmarkResult],
-        quasim_results: list[BenchmarkResult]
+        self, ansys_results: list[BenchmarkResult], quasim_results: list[BenchmarkResult]
     ) -> dict[str, float]:
         """Compute accuracy metrics (displacement error, stress error, etc.)."""
         # TODO: C++/CUDA integration - actual accuracy computation from result files
@@ -465,9 +471,7 @@ class PerformanceComparer:
         }
 
     def _compute_performance_metrics(
-        self,
-        ansys_results: list[BenchmarkResult],
-        quasim_results: list[BenchmarkResult]
+        self, ansys_results: list[BenchmarkResult], quasim_results: list[BenchmarkResult]
     ) -> dict[str, Any]:
         """Compute performance metrics (speedup, iteration efficiency, etc.)."""
         # Extract solve times
@@ -502,9 +506,7 @@ class PerformanceComparer:
         }
 
     def _compute_statistical_analysis(
-        self,
-        ansys_results: list[BenchmarkResult],
-        quasim_results: list[BenchmarkResult]
+        self, ansys_results: list[BenchmarkResult], quasim_results: list[BenchmarkResult]
     ) -> dict[str, Any]:
         """Compute statistical analysis (confidence intervals, significance, etc.)."""
         ansys_times = [r.solve_time for r in ansys_results]
@@ -531,10 +533,7 @@ class PerformanceComparer:
         }
 
     def _bootstrap_speedup_ci(
-        self,
-        ansys_times: list[float],
-        quasim_times: list[float],
-        n_bootstrap: int = 1000
+        self, ansys_times: list[float], quasim_times: list[float], n_bootstrap: int = 1000
     ) -> tuple[float, float]:
         """Compute bootstrap confidence interval for speedup."""
         speedups = []
@@ -564,7 +563,7 @@ class PerformanceComparer:
         self,
         accuracy_metrics: dict[str, float],
         performance_metrics: dict[str, Any],
-        statistical_analysis: dict[str, Any]
+        statistical_analysis: dict[str, Any],
     ) -> tuple[bool, str | None]:
         """Check if results meet acceptance criteria.
 
@@ -572,6 +571,19 @@ class PerformanceComparer:
             (passed, failure_reason) tuple
         """
         # Check accuracy
+        if (
+            accuracy_metrics["displacement_error"]
+            > self.acceptance_criteria["accuracy"]["displacement_error_threshold"]
+        ):
+            return (
+                False,
+                f"Displacement error {accuracy_metrics['displacement_error']:.3f} exceeds threshold",
+            )
+
+        if (
+            accuracy_metrics["stress_error"]
+            > self.acceptance_criteria["accuracy"]["stress_error_threshold"]
+        ):
         if accuracy_metrics["displacement_error"] > self.acceptance_criteria["accuracy"]["displacement_error_threshold"]:
             return False, f"Displacement error {accuracy_metrics['displacement_error']:.3f} exceeds threshold"
 
@@ -579,7 +591,10 @@ class PerformanceComparer:
             return False, f"Stress error {accuracy_metrics['stress_error']:.3f} exceeds threshold"
 
         # Check performance
-        if performance_metrics["speedup"] < self.acceptance_criteria["performance"]["minimum_speedup_vs_ansys"]:
+        if (
+            performance_metrics["speedup"]
+            < self.acceptance_criteria["performance"]["minimum_speedup_vs_ansys"]
+        ):
             return False, f"Speedup {performance_metrics['speedup']:.2f}x below threshold"
 
         # All checks passed
@@ -589,6 +604,7 @@ class PerformanceComparer:
 # ============================================================================
 # Report Generation
 # ============================================================================
+
 
 class ReportGenerator:
     """Generates benchmark comparison reports.
@@ -716,18 +732,18 @@ class ReportGenerator:
         <tr>
             <td>{result.benchmark_id}</td>
             <td class="{status_class}">{status_text}</td>
-            <td>{perf.get('speedup', 0):.2f}x</td>
-            <td>{acc.get('displacement_error', 0):.2%}</td>
-            <td>{acc.get('stress_error', 0):.2%}</td>
-            <td>{perf.get('ansys_median_time', 0):.2f}</td>
-            <td>{perf.get('quasim_median_time', 0):.2f}</td>
+            <td>{perf.get("speedup", 0):.2f}x</td>
+            <td>{acc.get("displacement_error", 0):.2%}</td>
+            <td>{acc.get("stress_error", 0):.2%}</td>
+            <td>{perf.get("ansys_median_time", 0):.2f}</td>
+            <td>{perf.get("quasim_median_time", 0):.2f}</td>
         </tr>"""
 
         html = html.format(
             total=len(self.results),
             passed=sum(1 for r in self.results if r.passed),
             failed=sum(1 for r in self.results if not r.passed),
-            rows=rows
+            rows=rows,
         )
 
         with open(html_path, "w") as f:
@@ -762,11 +778,9 @@ class ReportGenerator:
         story = []
 
         # Title
-        title = Paragraph(
-            "QuASIM Ansys Performance Comparison Report",
-            styles['Title']
-        )
+        title = Paragraph("QuASIM Ansys Performance Comparison Report", styles["Title"])
         story.append(title)
+        story.append(Spacer(1, 0.3 * inch))
         story.append(Spacer(1, 0.3*inch))
 
         # Summary
@@ -775,6 +789,12 @@ class ReportGenerator:
         <b>Passed:</b> {sum(1 for r in self.results if r.passed)}<br/>
         <b>Failed:</b> {sum(1 for r in self.results if not r.passed)}
         """
+        story.append(Paragraph(summary_text, styles["Normal"]))
+        story.append(Spacer(1, 0.5 * inch))
+
+        # Results table header
+        story.append(Paragraph("<b>Benchmark Results</b>", styles["Heading2"]))
+        story.append(Spacer(1, 0.2 * inch))
         story.append(Paragraph(summary_text, styles['Normal']))
         story.append(Spacer(1, 0.5*inch))
 
@@ -784,7 +804,15 @@ class ReportGenerator:
 
         # Table data
         table_data = [
-            ['Benchmark', 'Status', 'Speedup', 'Disp Error', 'Stress Error', 'Ansys Time', 'QuASIM Time']
+            [
+                "Benchmark",
+                "Status",
+                "Speedup",
+                "Disp Error",
+                "Stress Error",
+                "Ansys Time",
+                "QuASIM Time",
+            ]
         ]
 
         for result in self.results:
@@ -792,6 +820,37 @@ class ReportGenerator:
             acc = result.accuracy_metrics
             status = "PASS" if result.passed else "FAIL"
 
+            table_data.append(
+                [
+                    result.benchmark_id,
+                    status,
+                    f"{perf.get('speedup', 0):.2f}x",
+                    f"{acc.get('displacement_error', 0):.2%}",
+                    f"{acc.get('stress_error', 0):.2%}",
+                    f"{perf.get('ansys_median_time', 0):.2f}s",
+                    f"{perf.get('quasim_median_time', 0):.2f}s",
+                ]
+            )
+
+        # Create table
+        table = Table(table_data)
+        table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.green),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, 0), 12),
+                    ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                    ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                ]
+            )
+        )
+
+        story.append(table)
+        story.append(Spacer(1, 0.5 * inch))
             table_data.append([
                 result.benchmark_id,
                 status,
@@ -821,6 +880,8 @@ class ReportGenerator:
         # Detailed results for each benchmark
         for result in self.results:
             story.append(PageBreak())
+            story.append(Paragraph(f"<b>Benchmark: {result.benchmark_id}</b>", styles["Heading2"]))
+            story.append(Spacer(1, 0.2 * inch))
             story.append(Paragraph(f"<b>Benchmark: {result.benchmark_id}</b>", styles['Heading2']))
             story.append(Spacer(1, 0.2*inch))
 
@@ -828,11 +889,13 @@ class ReportGenerator:
             perf = result.performance_metrics
             perf_text = f"""
             <b>Performance Metrics:</b><br/>
-            Ansys Median Time: {perf.get('ansys_median_time', 0):.2f}s<br/>
-            QuASIM Median Time: {perf.get('quasim_median_time', 0):.2f}s<br/>
-            Speedup: {perf.get('speedup', 0):.2f}x<br/>
-            Memory Overhead: {perf.get('memory_overhead', 0):.2f}x
+            Ansys Median Time: {perf.get("ansys_median_time", 0):.2f}s<br/>
+            QuASIM Median Time: {perf.get("quasim_median_time", 0):.2f}s<br/>
+            Speedup: {perf.get("speedup", 0):.2f}x<br/>
+            Memory Overhead: {perf.get("memory_overhead", 0):.2f}x
             """
+            story.append(Paragraph(perf_text, styles["Normal"]))
+            story.append(Spacer(1, 0.2 * inch))
             story.append(Paragraph(perf_text, styles['Normal']))
             story.append(Spacer(1, 0.2*inch))
 
@@ -840,10 +903,12 @@ class ReportGenerator:
             acc = result.accuracy_metrics
             acc_text = f"""
             <b>Accuracy Metrics:</b><br/>
-            Displacement Error: {acc.get('displacement_error', 0):.2%}<br/>
-            Stress Error: {acc.get('stress_error', 0):.2%}<br/>
-            Energy Error: {acc.get('energy_error', 0):.2e}
+            Displacement Error: {acc.get("displacement_error", 0):.2%}<br/>
+            Stress Error: {acc.get("stress_error", 0):.2%}<br/>
+            Energy Error: {acc.get("energy_error", 0):.2e}
             """
+            story.append(Paragraph(acc_text, styles["Normal"]))
+            story.append(Spacer(1, 0.2 * inch))
             story.append(Paragraph(acc_text, styles['Normal']))
             story.append(Spacer(1, 0.2*inch))
 
@@ -851,10 +916,11 @@ class ReportGenerator:
             stats = result.statistical_analysis
             stats_text = f"""
             <b>Statistical Analysis:</b><br/>
-            Speedup 95% CI: [{stats.get('speedup_ci_lower', 0):.2f}, {stats.get('speedup_ci_upper', 0):.2f}]<br/>
-            Statistical Significance: {stats.get('significance', 'UNKNOWN')}<br/>
-            P-value: {stats.get('p_value', 0):.3f}
+            Speedup 95% CI: [{stats.get("speedup_ci_lower", 0):.2f}, {stats.get("speedup_ci_upper", 0):.2f}]<br/>
+            Statistical Significance: {stats.get("significance", "UNKNOWN")}<br/>
+            P-value: {stats.get("p_value", 0):.3f}
             """
+            story.append(Paragraph(stats_text, styles["Normal"]))
             story.append(Paragraph(stats_text, styles['Normal']))
 
         # Build PDF
@@ -865,6 +931,7 @@ class ReportGenerator:
 # ============================================================================
 # Command-Line Interface
 # ============================================================================
+
 
 def main() -> int:
     """Main entry point for performance runner."""
@@ -884,7 +951,7 @@ Examples:
 
   # Generate report from existing results
   %(prog)s --report --input results/ --output report/
-        """
+        """,
     )
 
     # Benchmark selection
@@ -892,6 +959,46 @@ Examples:
     parser.add_argument("--all", action="store_true", help="Run all benchmarks")
 
     # Solver selection
+    parser.add_argument(
+        "--solver",
+        choices=["ansys", "quasim", "both"],
+        default="both",
+        help="Solver to run (ansys, quasim, or both)",
+    )
+    parser.add_argument(
+        "--device",
+        choices=["cpu", "gpu", "multi_gpu"],
+        default="gpu",
+        help="Compute device for QuASIM",
+    )
+
+    # Execution parameters
+    parser.add_argument("--runs", type=int, default=5, help="Number of runs per benchmark")
+    parser.add_argument(
+        "--seed", type=int, default=42, help="Random seed for deterministic execution"
+    )
+    parser.add_argument(
+        "--cooldown", type=int, default=60, help="Cooldown period between runs (seconds)"
+    )
+
+    # Input/output
+    parser.add_argument(
+        "--yaml",
+        type=Path,
+        default=Path("benchmarks/ansys/benchmark_definitions.yaml"),
+        help="Path to benchmark definitions YAML",
+    )
+    parser.add_argument(
+        "--output", type=Path, default=Path("results"), help="Output directory for results"
+    )
+
+    # Reporting
+    parser.add_argument(
+        "--report", action="store_true", help="Generate report from existing results"
+    )
+    parser.add_argument(
+        "--input", type=Path, help="Input directory with existing results (for --report)"
+    )
     parser.add_argument("--solver", choices=["ansys", "quasim", "both"], default="both",
                         help="Solver to run (ansys, quasim, or both)")
     parser.add_argument("--device", choices=["cpu", "gpu", "multi_gpu"], default="gpu",
@@ -942,8 +1049,9 @@ Examples:
     # Run benchmarks
     all_results = []
     for benchmark_id in benchmark_ids:
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info(f"Running benchmark: {benchmark_id}")
+        logger.info(f"{'=' * 60}\n")
         logger.info(f"{'='*60}\n")
 
         try:
@@ -953,7 +1061,9 @@ Examples:
             # Run Ansys baseline
             ansys_results = []
             if args.solver in ("ansys", "both"):
-                ansys_executor = AnsysBaselineExecutor(benchmark, args.output / "ansys" / benchmark_id)
+                ansys_executor = AnsysBaselineExecutor(
+                    benchmark, args.output / "ansys" / benchmark_id
+                )
                 for run in range(1, args.runs + 1):
                     result = ansys_executor.execute(run)
                     ansys_results.append(result)
@@ -976,7 +1086,7 @@ Examples:
                     benchmark,
                     args.output / "quasim" / benchmark_id,
                     device=args.device,
-                    random_seed=args.seed
+                    random_seed=args.seed,
                 )
                 for run in range(1, args.runs + 1):
                     result = quasim_executor.execute(run)
@@ -1010,6 +1120,12 @@ Examples:
                 if not comparison.passed:
                     logger.info(f"  Failure: {comparison.failure_reason}")
                 logger.info(f"  Speedup: {comparison.performance_metrics.get('speedup', 0):.2f}x")
+                logger.info(
+                    f"  Displacement error: {comparison.accuracy_metrics.get('displacement_error', 0):.2%}"
+                )
+                logger.info(
+                    f"  Stress error: {comparison.accuracy_metrics.get('stress_error', 0):.2%}"
+                )
                 logger.info(f"  Displacement error: {comparison.accuracy_metrics.get('displacement_error', 0):.2%}")
                 logger.info(f"  Stress error: {comparison.accuracy_metrics.get('stress_error', 0):.2%}")
 
@@ -1019,8 +1135,9 @@ Examples:
 
     # Generate reports
     if all_results:
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info("Generating reports...")
+        logger.info(f"{'=' * 60}\n")
         logger.info(f"{'='*60}\n")
 
         report_gen = ReportGenerator(all_results, args.output / "reports")
