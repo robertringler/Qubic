@@ -21,11 +21,7 @@ from __future__ import annotations
 
 import argparse
 import ast
-import hashlib
-import json
 import logging
-import re
-import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -267,7 +263,7 @@ class VisualizationGenerator:
 
         try:
             import matplotlib.pyplot as plt
-            from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+            from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
             fig, ax = plt.subplots(figsize=(14, 10))
             ax.set_xlim(0, 10)
@@ -502,20 +498,20 @@ class VisualizationGenerator:
             benchmarks = ['BM_001', 'BM_002', 'BM_003', 'BM_004', 'BM_005']
             ansys_times = [120.5, 145.2, 98.7, 156.3, 132.8]
             quasim_times = [35.2, 42.1, 28.9, 45.8, 38.5]
-            
+
             x = np.arange(len(benchmarks))
             width = 0.35
-            
+
             bars1 = ax.bar(x - width/2, ansys_times, width, label='Ansys', color='#4A90E2', alpha=0.8)
             bars2 = ax.bar(x + width/2, quasim_times, width, label='QuASIM', color='#50C878', alpha=0.8)
-            
+
             ax.set_ylabel('Execution Time (s)', fontsize=12, fontweight='bold')
             ax.set_title('Multi-Benchmark Performance Comparison', fontsize=14, fontweight='bold')
             ax.set_xticks(x)
             ax.set_xticklabels(benchmarks)
             ax.legend()
             ax.grid(axis='y', alpha=0.3)
-            
+
             plt.savefig(bench_dir / "multi_benchmark_comparison.png", dpi=300, bbox_inches='tight')
             plt.close()
             self.manifest.files.append(bench_dir / "multi_benchmark_comparison.png")
@@ -537,7 +533,7 @@ class VisualizationGenerator:
             # Architecture visualizations (15 charts)
             arch_dir = self.output_dir / "architecture"
             arch_dir.mkdir(exist_ok=True)
-            
+
             for i in range(15):
                 fig, ax = plt.subplots(figsize=(10, 6))
                 data = np.random.rand(10, 10)
@@ -644,7 +640,7 @@ class VisualizationGenerator:
                 ax.grid(axis='x', alpha=0.3)
                 for bar, val in zip(bars, compliance):
                     width = bar.get_width()
-                    ax.text(width, bar.get_y() + bar.get_height()/2, 
+                    ax.text(width, bar.get_y() + bar.get_height()/2,
                            f'{val:.1f}%', ha='left', va='center', fontweight='bold')
                 output_path = comp_dir / f"compliance_{i+1:03d}.png"
                 plt.savefig(output_path, dpi=150, bbox_inches='tight')
@@ -687,7 +683,7 @@ class VisualizationGenerator:
 
             # Create detailed placeholder specifications for each category
             viz_specs = self._get_visualization_specs(category)
-            
+
             for i, spec in enumerate(viz_specs, 1):
                 placeholder = category_dir / f"{category}_{i:03d}_{spec['name']}.md"
                 placeholder.write_text(
@@ -718,7 +714,7 @@ class VisualizationGenerator:
         """
         specs = {
             "architecture": [
-                {"name": "module_structure", "title": "Module Hierarchy", 
+                {"name": "module_structure", "title": "Module Hierarchy",
                  "description": "Tree view of module organization", "source": "Repository scan"},
                 {"name": "class_diagram", "title": "Class Relationships",
                  "description": "UML class diagram", "source": "AST analysis"},
@@ -802,7 +798,7 @@ class VisualizationGenerator:
                  "description": "CodeQL findings summary", "source": "SAST results"},
             ],
         }
-        
+
         return specs.get(category, [])
 
 
@@ -866,24 +862,24 @@ class ExecutiveSummaryGenerator:
 
             # Repository statistics
             f.write("## 2. Repository Statistics and Code Analysis\n\n")
-            f.write(f"### 2.1 Quantitative Metrics\n\n")
+            f.write("### 2.1 Quantitative Metrics\n\n")
             f.write(f"- **Total Modules Analyzed:** {len(modules):,}\n")
             f.write(f"- **Total Lines of Code:** {sum(m.lines_of_code for m in modules.values()):,}\n")
             f.write(f"- **Benchmarks Defined:** {len(benchmarks)}\n")
             f.write(f"- **Visualizations Generated:** {visualizations.total_count}\n")
-            f.write(f"- **CI/CD Workflows:** 50+ GitHub Actions workflows\n")
-            f.write(f"- **Test Coverage:** >90% for core SDK and adapters\n\n")
+            f.write("- **CI/CD Workflows:** 50+ GitHub Actions workflows\n")
+            f.write("- **Test Coverage:** >90% for core SDK and adapters\n\n")
 
             # Module breakdown
             f.write("### 2.2 Module Distribution\n\n")
             f.write("Key subsystems and their module counts:\n\n")
-            
+
             # Count modules by directory
             module_dirs = {}
-            for module_path in modules.keys():
+            for module_path in modules:
                 top_dir = module_path.split('/')[0] if '/' in module_path else 'root'
                 module_dirs[top_dir] = module_dirs.get(top_dir, 0) + 1
-            
+
             for dir_name, count in sorted(module_dirs.items(), key=lambda x: x[1], reverse=True)[:10]:
                 f.write(f"- **{dir_name}**: {count} modules\n")
             f.write("\n")
@@ -897,13 +893,13 @@ class ExecutiveSummaryGenerator:
             f.write("- Statistical analysis engine with bootstrap CI and outlier detection\n")
             f.write("- Hardware telemetry collection (CPU, GPU, memory)\n")
             f.write("- Multi-format reporting (CSV, JSON, HTML, PDF)\n\n")
-            
+
             f.write("**Solver Integration:**\n")
             f.write("- QuASIM Ansys adapter for PyMAPDL integration\n")
             f.write("- GPU-accelerated tensor network simulation\n")
             f.write("- CPU fallback execution paths\n")
             f.write("- Three integration modes: co-solver, preconditioner, standalone\n\n")
-            
+
             f.write("**Quality Assurance:**\n")
             f.write("- Deterministic execution with SHA-256 verification\n")
             f.write("- RNG seed management for reproducibility\n")
@@ -960,14 +956,14 @@ class ExecutiveSummaryGenerator:
             f.write("- Nonlinear hyperelastic material model (Mooney-Rivlin)\n")
             f.write("- 3D finite element mesh\n")
             f.write("- Contact and friction constraints\n\n")
-            
+
             f.write("**Acceptance Criteria:**\n")
             f.write("- Speedup ≥ 3x (QuASIM vs Ansys)\n")
             f.write("- Displacement error < 2%\n")
             f.write("- Stress error < 5%\n")
             f.write("- Energy error < 1e-6\n")
             f.write("- Coefficient of variation < 2%\n\n")
-            
+
             f.write("**Statistical Methods:**\n")
             f.write("- Bootstrap confidence intervals (1000 samples, 95% CI)\n")
             f.write("- Modified Z-score outlier detection (threshold: |Z| > 3.5)\n")
@@ -982,26 +978,26 @@ class ExecutiveSummaryGenerator:
             f.write("- Fixed RNG seed management\n")
             f.write("- <1μs temporal drift tolerance\n")
             f.write("- Bit-exact cross-platform reproducibility (CPU vs GPU)\n\n")
-            
+
             f.write("**2. Hybrid Quantum-Classical Architecture**\n")
             f.write("- Anti-Holographic Tensor Network (AHTN) implementation\n")
             f.write("- GPU-accelerated tensor contraction via NVIDIA cuQuantum\n")
             f.write("- Adaptive compression with error budget allocation\n")
             f.write("- Fallback CPU execution paths\n\n")
-            
+
             f.write("**3. Multi-Cloud Orchestration**\n")
             f.write("- Kubernetes-native deployment (EKS, GKE, AKS)\n")
             f.write("- Helm charts for reproducible deployments\n")
             f.write("- ArgoCD GitOps integration\n")
             f.write("- 99.95% SLA target\n\n")
-            
+
             f.write("**4. Compliance Moat**\n")
             f.write("- DO-178C Level A certification posture\n")
             f.write("- NIST 800-53 Rev 5 controls (HIGH baseline)\n")
             f.write("- CMMC 2.0 Level 2 compliance\n")
             f.write("- DFARS and ITAR awareness\n")
             f.write("- 98.75% compliance across all frameworks\n\n")
-            
+
             f.write("**5. GPU Acceleration**\n")
             f.write("- NVIDIA cuQuantum integration\n")
             f.write("- AMD ROCm support\n")
@@ -1016,7 +1012,7 @@ class ExecutiveSummaryGenerator:
             f.write("- Statistical analysis framework (validated)\n")
             f.write("- Multi-format reporting (operational)\n")
             f.write("- CI/CD pipeline (50+ workflows)\n\n")
-            
+
             f.write("### 7.2 Development/Research Components\n\n")
             f.write("- Advanced tensor network optimizations\n")
             f.write("- Multi-GPU distributed execution\n")
@@ -1041,19 +1037,19 @@ class ExecutiveSummaryGenerator:
             f.write("- **Compliance:** 98.75% compliance across aerospace and defense frameworks\n")
             f.write("- **Reproducibility:** Deterministic execution with SHA-256 verification\n")
             f.write("- **Performance:** 3x+ speedup targets for hyperelastic simulations\n\n")
-            
+
             f.write("**Key Strengths:**\n")
             f.write("1. Comprehensive benchmark validation framework\n")
             f.write("2. Multi-format reporting and audit trails\n")
             f.write("3. Strong compliance infrastructure\n")
             f.write("4. Well-documented codebase with clear architecture\n\n")
-            
+
             f.write("**Areas for Continued Development:**\n")
             f.write("1. Expand benchmark suite beyond BM_001\n")
             f.write("2. Implement multi-GPU distributed execution\n")
             f.write("3. Add real-time visualization capabilities\n")
             f.write("4. Enhance ML-based optimization features\n\n")
-            
+
             f.write("---\n\n")
             f.write("**Note:** All capabilities documented in this summary are based on actual "
                    "code analysis. No speculative or marketing claims are included.\n\n")
@@ -1251,7 +1247,7 @@ class TechnicalWhitePaperGenerator:
 
             # Section 11: Appendices
             f.write("## 11. Appendices\n\n")
-            f.write(f"### Appendix A: Module List\n\n")
+            f.write("### Appendix A: Module List\n\n")
             f.write(f"Total modules analyzed: {len(modules)}\n\n")
 
             for module_path, module_info in sorted(list(modules.items())[:20]):
@@ -1328,20 +1324,20 @@ class DocumentationPackageGenerator:
 
         # Task 8: Generate appendices and manifest
         logger.info("\n[Task 8/8] Generating appendices and delivery manifest...")
-        
+
         # Generate appendices
         try:
             import sys
             sys.path.insert(0, str(Path(__file__).parent))
             from generate_appendices import generate_all_appendices
-            
+
             appendices_dir = self.output_dir / "appendices"
             appendices = generate_all_appendices(appendices_dir)
             logger.info(f"Generated {len(appendices)} appendices")
         except Exception as e:
             logger.warning(f"Could not generate appendices: {e}")
             appendices = []
-        
+
         self.generate_manifest(exec_summary_path, whitepaper_path, appendices)
 
         logger.info("\n" + "=" * 80)
@@ -1353,8 +1349,8 @@ class DocumentationPackageGenerator:
         logger.info(f"Visualizations: {self.viz_generator.manifest.total_count}")
 
     def generate_manifest(
-        self, 
-        exec_summary_path: Path, 
+        self,
+        exec_summary_path: Path,
         whitepaper_path: Path,
         appendices: list[Path] = None
     ) -> None:
@@ -1366,7 +1362,7 @@ class DocumentationPackageGenerator:
             appendices: List of appendix file paths
         """
         manifest_path = self.output_dir / "MANIFEST.md"
-        
+
         if appendices is None:
             appendices = []
 
@@ -1407,7 +1403,7 @@ class DocumentationPackageGenerator:
             f.write("- Benchmark validation framework\n")
             f.write("- Technical differentiators\n")
             f.write("- Implementation maturity assessment\n\n")
-            
+
             f.write("### Technical White Paper\n")
             f.write("- Introduction and background\n")
             f.write("- System architecture deep dive\n")
@@ -1417,13 +1413,13 @@ class DocumentationPackageGenerator:
             f.write("- Reproducibility infrastructure\n")
             f.write("- Compliance framework\n")
             f.write("- Results and discussion\n\n")
-            
+
             f.write("### Visualizations\n")
             f.write(f"Total: {self.viz_generator.manifest.total_count} files\n\n")
             for category, files in self.viz_generator.manifest.categories.items():
                 f.write(f"- **{category.replace('_', ' ').title()}:** {len(files)} files\n")
             f.write("\n")
-            
+
             if appendices:
                 f.write("### Appendices\n")
                 f.write("- Appendix A: YAML Benchmark Specifications\n")
@@ -1439,13 +1435,13 @@ class DocumentationPackageGenerator:
             f.write(f"  --repo-path {self.repo_path} \\\n")
             f.write(f"  --output-dir {self.output_dir}\n")
             f.write("```\n\n")
-            
+
             f.write("## Package Statistics\n\n")
             f.write(f"- **Total Files:** {self.viz_generator.manifest.total_count + len(appendices) + 3}\n")
-            f.write(f"- **Documentation Pages:** ~30-40 pages (combined)\n")
+            f.write("- **Documentation Pages:** ~30-40 pages (combined)\n")
             f.write(f"- **Visualizations:** {self.viz_generator.manifest.total_count}\n")
-            f.write(f"- **Code Analysis:** 1,032 modules, 96,532 LOC\n")
-            f.write(f"- **Format:** Markdown (ready for LaTeX/HTML/PDF conversion)\n")
+            f.write("- **Code Analysis:** 1,032 modules, 96,532 LOC\n")
+            f.write("- **Format:** Markdown (ready for LaTeX/HTML/PDF conversion)\n")
 
         logger.info(f"Generated manifest: {manifest_path}")
 

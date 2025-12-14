@@ -228,7 +228,7 @@ def generate_statistical_derivations(output_dir: Path) -> Path:
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("# Appendix C: Statistical Methods and Derivations\n\n")
-        
+
         f.write("## Bootstrap Confidence Intervals\n\n")
         f.write("### Method\n\n")
         f.write("Bootstrap resampling provides non-parametric confidence intervals:\n\n")
@@ -236,7 +236,7 @@ def generate_statistical_derivations(output_dir: Path) -> Path:
         f.write("2. Generate $B$ bootstrap samples by sampling with replacement\n")
         f.write("3. Compute statistic $\\hat{\\theta}^*_b$ for each bootstrap sample\n")
         f.write("4. Confidence interval: $(\\hat{\\theta}_{\\alpha/2}, \\hat{\\theta}_{1-\\alpha/2})$\n\n")
-        
+
         f.write("### Implementation\n\n")
         f.write("```python\n")
         f.write("def bootstrap_ci(data: np.ndarray, num_samples: int = 1000, alpha: float = 0.05):\n")
@@ -263,7 +263,7 @@ def generate_statistical_derivations(output_dir: Path) -> Path:
         f.write("- $\\tilde{x}$ is the median\n")
         f.write("- $MAD = median(|x_i - \\tilde{x}|)$\n")
         f.write("- Threshold: $|M_i| > 3.5$ indicates outlier\n\n")
-        
+
         f.write("### Implementation\n\n")
         f.write("```python\n")
         f.write("def modified_z_score(data: np.ndarray, threshold: float = 3.5):\n")
@@ -306,7 +306,7 @@ def generate_reproducibility_proof(output_dir: Path) -> Path:
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("# Appendix D: Reproducibility Verification Protocol\n\n")
-        
+
         f.write("## SHA-256 State Verification\n\n")
         f.write("### Method\n\n")
         f.write("Cryptographic hashing ensures deterministic execution:\n\n")
@@ -373,7 +373,7 @@ def generate_reporting_examples(output_dir: Path) -> Path:
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("# Appendix E: Multi-Format Reporting Examples\n\n")
-        
+
         f.write("## CSV Format\n\n")
         f.write("```csv\n")
         f.write("run_id,solver,execution_time,displacement,stress,energy,hash\n")
@@ -470,7 +470,7 @@ def generate_all_appendices(output_dir: Path) -> list[Path]:
         List of generated file paths
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     appendices = [
         generate_yaml_benchmark_spec(output_dir),
         generate_cuda_pseudocode(output_dir),
@@ -478,6 +478,6 @@ def generate_all_appendices(output_dir: Path) -> list[Path]:
         generate_reproducibility_proof(output_dir),
         generate_reporting_examples(output_dir),
     ]
-    
+
     logger.info(f"Generated {len(appendices)} appendices")
     return appendices
