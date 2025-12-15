@@ -23,6 +23,7 @@ Equivalence Guarantee:
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
@@ -365,7 +366,6 @@ class QuantumAlignmentEngine:
         
         # Warn if condition number exceeds threshold
         if condition_number > self.config.stability_threshold:
-            import warnings
             warnings.warn(
                 f"High condition number {condition_number:.2e} detected. "
                 "Results may have reduced numerical precision.",
