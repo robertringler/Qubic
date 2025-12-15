@@ -89,6 +89,11 @@ quasim-tire = "quasim.cli.tire_cli:cli"
 qunimbus = "quasim.qunimbus.cli:main"
 qnx = "qnx.cli:cli"
 qstack = "qstack.launch:main"
+xenon = "xenon.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["quasim*", "qnx*", "qstack*", "xenon*"]
 qubic-viz = "qubic.visualization.cli:cli"
 
 [tool.setuptools.packages.find]
