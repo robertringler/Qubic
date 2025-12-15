@@ -1,4 +1,4 @@
-"""XENON visualization adapters."""
+"""XENON PHASE 1 visualization adapters."""
 
 from xenon.adapters.bio_mechanism_adapter import BioMechanismAdapter
 from xenon.adapters.molecular_state_adapter import MolecularStateAdapter

@@ -1,4 +1,4 @@
-"""Integration tests for XENON visualization pipeline."""
+"""Integration tests for XENON PHASE 1 visualization pipeline."""
 
 import pytest
 
