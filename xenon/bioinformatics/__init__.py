@@ -13,6 +13,8 @@ from xenon.bioinformatics.literature_miner import LiteratureMiner, Publication
 from xenon.bioinformatics.ontology_integrator import OntologyIntegrator, GOTerm, ProteinAnnotation
 from xenon.bioinformatics.structure_analyzer import StructureAnalyzer, ProteinStructure
 from xenon.bioinformatics.pathway_analyzer import PathwayAnalyzer, MetabolicPathway, Reaction
+from xenon.bioinformatics.drug_target_scoring import DrugTargetScorer, DrugCandidate
+from xenon.bioinformatics.multiomics_integrator import MultiOmicsIntegrator, OmicsData, Biomarker
 
 __all__ = [
     "SequenceAnalyzer",
@@ -27,4 +29,9 @@ __all__ = [
     "PathwayAnalyzer",
     "MetabolicPathway",
     "Reaction",
+    "DrugTargetScorer",
+    "DrugCandidate",
+    "MultiOmicsIntegrator",
+    "OmicsData",
+    "Biomarker",
 ]
