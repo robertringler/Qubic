@@ -1,6 +1,3 @@
-"""Hardware Control & Calibration Layer (HCAL) for QuASIM.
-
-HCAL provides a unified API for hardware control and calibration with:
 """HCAL - Hardware Control Abstraction Layer.
 
 HCAL provides a unified interface for hardware control and calibration with:
@@ -53,13 +50,11 @@ class HCAL:
         # Initialize policy engine
         self.policy_engine = PolicyEngine(policy_path)
 
-        # Override dry_run if policy requires it (check if method exists)
+        # Override dry_run if policy requires it
         if (
             hasattr(self.policy_engine, "is_dry_run_default")
             and self.policy_engine.is_dry_run_default()
         ):
-        # Override dry_run if policy requires it
-        if self.policy_engine.is_dry_run_default():
             dry_run = True
 
         self.dry_run = dry_run
@@ -72,7 +67,6 @@ class HCAL:
             audit_log_path=audit_log_path,
             dry_run=dry_run,
         )
-        self.actuator = Actuator(enable_actuation=not dry_run)
 
         # Initialize backends
         self.backends = {"nvidia_nvml": NvidiaNvmlBackend(dry_run=dry_run)}
