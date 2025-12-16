@@ -31,7 +31,7 @@ def explain():
       "simulate_ms": 0   # optional: simulate LLM latency in ms
     }
     """
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.get_json(force=True) or {}
     text = data.get("commit", "")
     simulate_ms = int(data.get("simulate_ms", 0))
 
@@ -54,5 +54,5 @@ def explain():
 
 
 if __name__ == "__main__":
-    # Use threaded server so benchmark can run concurrent requests from same device
-    app.run(host="0.0.0.0", port=5000, threaded=True)
+    # Flask development server is threaded by default (since Flask 2.0+)
+    app.run(host="0.0.0.0", port=5000)

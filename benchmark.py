@@ -10,12 +10,18 @@ BASE = "http://127.0.0.1:5000"
 def single_request(path, method="GET", json=None):
     url = BASE + path
     t0 = time.perf_counter()
-    if method == "GET":
-        r = requests.get(url, timeout=30)
-    else:
-        r = requests.post(url, json=json or {}, timeout=60)
-    dt = (time.perf_counter() - t0) * 1000.0
-    return dt, r.status_code, r.text[:200]
+    try:
+        if method == "GET":
+            r = requests.get(url, timeout=30)
+        else:
+            r = requests.post(url, json=json or {}, timeout=60)
+        r.raise_for_status()  # Raise exception for 4xx/5xx status codes
+        dt = (time.perf_counter() - t0) * 1000.0
+        return dt, r.status_code, r.text[:200]
+    except requests.exceptions.RequestException as e:
+        dt = (time.perf_counter() - t0) * 1000.0
+        print(f"Request failed: {e}")
+        return dt, 0, str(e)[:200]
 
 
 def run_sequential(path, n=50, method="GET", json=None):
@@ -40,10 +46,10 @@ def summarize(latencies):
     lat_sorted = sorted(latencies)
     return {
         "count": len(lat_sorted),
-        "mean_ms": statistics.mean(lat_sorted),
-        "p50_ms": statistics.median(lat_sorted),
-        "p90_ms": lat_sorted[int(len(lat_sorted) * 0.90) - 1] if len(lat_sorted) > 0 else None,
-        "p99_ms": lat_sorted[int(len(lat_sorted) * 0.99) - 1] if len(lat_sorted) > 0 else None,
+        "mean_ms": statistics.mean(lat_sorted) if lat_sorted else None,
+        "p50_ms": statistics.median(lat_sorted) if lat_sorted else None,
+        "p90_ms": lat_sorted[int(len(lat_sorted) * 0.90)] if len(lat_sorted) >= 10 else None,
+        "p99_ms": lat_sorted[int(len(lat_sorted) * 0.99)] if len(lat_sorted) >= 100 else None,
         "min_ms": min(lat_sorted) if lat_sorted else None,
         "max_ms": max(lat_sorted) if lat_sorted else None,
     }
