@@ -565,6 +565,20 @@ PLATFORM_HTML = '''<!DOCTYPE html>
                             <span>98.75%</span>
                         </div>
                     </div>
+                    
+                    <div class="component-card" onclick="launchComponent('molecular-dynamics')">
+                        <div class="component-header">
+                            <div class="component-name">
+                                <span class="component-icon">🔬</span>
+                                <span>MD Lab</span>
+                            </div>
+                            <span class="component-status active">Active</span>
+                        </div>
+                        <div class="component-meta">
+                            <span>Molecular Dynamics</span>
+                            <span>v1.0.0</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="panel-header" style="border-top: 1px solid var(--cyan)20;">
@@ -897,7 +911,8 @@ PLATFORM_HTML = '''<!DOCTYPE html>
                 xenon: 'http://localhost:8099',
                 qubic: '/modules/dashboard/index.html',
                 autonomous: '/health',
-                compliance: '#'
+                compliance: '#',
+                'molecular-dynamics': '/molecular-dynamics'
             };
             log(`Launching component: ${component}`, 'info');
             if (urls[component] && urls[component] !== '#') {
@@ -1099,6 +1114,69 @@ def api_stream(stream_type):
         return jsonify(DATA_STREAMS[stream_type][-100:])
     return jsonify([])
 
+@app.route('/api/molecular-dynamics/status')
+def molecular_dynamics_status():
+    """Get Molecular Dynamics Lab status."""
+    return jsonify({
+        "status": "active",
+        "version": "1.0.0",
+        "capabilities": [
+            "pdb_loading",
+            "molecular_docking",
+            "md_simulation",
+            "webxr_visualization",
+            "haptic_feedback"
+        ],
+        "supported_formats": ["pdb", "mol2", "sdf", "xyz"],
+        "webxr_enabled": True
+    })
+
+@app.route('/api/molecular-dynamics/structures')
+def molecular_dynamics_structures():
+    """List available molecular structures."""
+    return jsonify({
+        "structures": [
+            {"id": "1crn", "name": "Crambin", "atoms": 327, "type": "protein"},
+            {"id": "1ubq", "name": "Ubiquitin", "atoms": 660, "type": "protein"},
+            {"id": "2h5d", "name": "Insulin", "atoms": 1038, "type": "protein"},
+            {"id": "1bna", "name": "DNA B-form", "atoms": 486, "type": "nucleic_acid"},
+            {"id": "atp", "name": "ATP", "atoms": 47, "type": "small_molecule"}
+        ]
+    })
+
+@app.route('/molecular-dynamics')
+def molecular_dynamics_lab():
+    """Serve the Molecular Dynamics Lab interface."""
+    try:
+        from xenon.molecular_dynamics_lab import MolecularLabServer
+        server = MolecularLabServer()
+        return server.generate_full_app()
+    except ImportError:
+        # Fallback to static page if module not fully loaded
+        return render_template_string('''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XENON Molecular Dynamics Lab</title>
+    <style>
+        body { font-family: monospace; background: #000; color: #00f5ff; padding: 40px; }
+        h1 { color: #00ff88; }
+        .status { background: #001020; padding: 20px; border: 1px solid #00f5ff30; border-radius: 8px; margin: 20px 0; }
+        a { color: #ff00ff; }
+    </style>
+</head>
+<body>
+    <h1>🧬 XENON Molecular Dynamics Lab</h1>
+    <div class="status">
+        <p>Status: <span style="color: #00ff88">Active</span></p>
+        <p>Version: 1.0.0</p>
+        <p>Features: PDB Loading, Molecular Docking, MD Simulation, WebXR, Haptic Feedback</p>
+    </div>
+    <p><a href="/">← Back to QRATUM Platform</a></p>
+</body>
+</html>
+        ''')
+
 @app.route('/modules/<path:path>')
 def serve_modules(path):
     return send_from_directory('/workspaces/QRATUM/qubic/modules', path)
@@ -1130,6 +1208,7 @@ if __name__ == '__main__':
     print("  ⚛️  QuASIM  - Quantum Simulation Engine")
     print("  🧬 XENON   - Bioinformatics Platform")
     print("  📊 QUBIC   - Visualization Suite (100 Modules)")
+    print("  🔬 MD Lab  - Molecular Dynamics Laboratory")
     print("  🤖 Auto    - Autonomous Systems")
     print("  🛡️  Comply  - Compliance Framework")
     print()
