@@ -1,4 +1,12 @@
-"""Quantum-enhanced optimization algorithms."""
+"""Optimization algorithms (currently classical placeholders for future quantum implementation).
+
+WARNING: Despite the names, NO actual quantum computing is implemented in this module.
+All "quantum" methods are classical random search with quantum terminology as placeholders.
+See QUANTUM_CAPABILITY_AUDIT.md for details.
+
+TODO: Implement genuine quantum algorithms using Qiskit or similar frameworks.
+See QUANTUM_INTEGRATION_ROADMAP.md for implementation plan.
+"""
 
 from __future__ import annotations
 
@@ -10,17 +18,24 @@ from .problems import OptimizationProblem
 
 @dataclass
 class QuantumOptimizer:
-    """Quantum-enhanced optimizer for combinatorial and continuous problems.
+    """Classical optimizer with architecture for future quantum algorithm integration.
 
-    Supports multiple quantum optimization strategies:
-    - Quantum Annealing (QA)
-    - Quantum Approximate Optimization Algorithm (QAOA)
-    - Variational Quantum Eigensolver (VQE)
-    - Hybrid classical-quantum optimization
+    IMPORTANT: Despite the class name, this currently implements CLASSICAL optimization only.
+    The "quantum" methods below are placeholders that use random search.
+    NO actual quantum computing is performed.
+
+    Intended to support quantum optimization strategies (NOT YET IMPLEMENTED):
+    - Quantum Annealing (QA) - TODO: Requires D-Wave or quantum annealer access
+    - Quantum Approximate Optimization Algorithm (QAOA) - TODO: Requires Qiskit implementation
+    - Variational Quantum Eigensolver (VQE) - TODO: Requires quantum circuit simulation
+    - Hybrid classical-quantum optimization - TODO: After quantum backends are added
+
+    Current implementation: Classical random search with convergence checking.
 
     Attributes:
         algorithm: Optimization algorithm ('qa', 'qaoa', 'vqe', 'hybrid')
-        backend: Computation backend for quantum simulation
+                   NOTE: All currently use same classical random search
+        backend: Computation backend (currently only 'cpu', no quantum backends)
         max_iterations: Maximum number of optimization iterations
         convergence_tolerance: Convergence tolerance for objective value (default: 1e-6)
         random_seed: Random seed for reproducibility (default: 42)
@@ -68,18 +83,31 @@ class QuantumOptimizer:
     def _optimize_qaoa(
         self, problem: OptimizationProblem, initial_params: dict[str, Any]
     ) -> dict[str, Any]:
-        """Optimize using Quantum Approximate Optimization Algorithm.
+        """PLACEHOLDER: Classical random search (NOT actual QAOA).
 
-        QAOA is particularly effective for combinatorial optimization problems
-        like graph coloring, Max-Cut, and portfolio optimization.
+        WARNING: This is NOT a genuine QAOA implementation. It's classical random search.
+        
+        Real QAOA would require:
+        - Parameterized quantum circuits (cost + mixer Hamiltonians)
+        - Quantum state preparation and measurement
+        - Classical optimizer loop (COBYLA, SPSA, etc.)
+        - Quantum circuit simulation or hardware execution
+        - None of which are implemented here
+        
+        TODO: Implement actual QAOA using Qiskit:
+        from qiskit.algorithms.optimizers import COBYLA
+        from qiskit.circuit.library import QAOAAnsatz
+        # ... etc
+        
+        Current implementation: Just random search for testing architecture.
         """
         import numpy as np
 
         # Set random seed for deterministic behavior
         np.random.seed(self.random_seed)
 
-        # Simplified QAOA implementation
-        # Production version would use quantum circuits and parameter optimization
+        # PLACEHOLDER: This is NOT QAOA, just random search
+        # Keeping this to maintain API compatibility until real implementation
         iterations = 0
         best_solution = problem.get_random_solution()
         best_value = problem.evaluate(best_solution)
@@ -122,9 +150,22 @@ class QuantumOptimizer:
     def _optimize_annealing(
         self, problem: OptimizationProblem, initial_params: dict[str, Any]
     ) -> dict[str, Any]:
-        """Optimize using Quantum Annealing.
+        """PLACEHOLDER: Returns random solution (NOT actual quantum annealing).
 
-        Quantum annealing is effective for QUBO and Ising model problems.
+        WARNING: This is NOT quantum annealing. Returns one random solution.
+        
+        Real quantum annealing would require:
+        - D-Wave quantum annealer or similar hardware
+        - QUBO/Ising model formulation
+        - Annealing schedule parameters
+        - Multiple runs for statistics
+        - None of which are implemented here
+        
+        TODO: Implement actual quantum annealing using D-Wave:
+        from dwave.system import DWaveSampler, EmbeddingComposite
+        # ... formulate QUBO and submit to quantum annealer
+        
+        Current implementation: One random evaluation only.
         """
         best_solution = problem.get_random_solution()
         best_value = problem.evaluate(best_solution)
@@ -134,15 +175,30 @@ class QuantumOptimizer:
             "objective_value": best_value,
             "iterations": self.max_iterations,
             "convergence": True,
-            "algorithm": "quantum_annealing",
+            "algorithm": "annealing_placeholder",  # Renamed to indicate placeholder
         }
 
     def _optimize_vqe(
         self, problem: OptimizationProblem, initial_params: dict[str, Any]
     ) -> dict[str, Any]:
-        """Optimize using Variational Quantum Eigensolver.
+        """PLACEHOLDER: Returns random solution (NOT actual VQE).
 
-        VQE is particularly useful for chemistry and molecular simulation problems.
+        WARNING: This is NOT a genuine VQE implementation. Returns one random solution.
+        
+        Real VQE would require:
+        - Quantum Hamiltonian specification (SparsePauliOp)
+        - Parameterized ansatz circuit (e.g., UCC, hardware-efficient)
+        - Expectation value estimation via quantum circuits
+        - Classical optimizer (COBYLA, SLSQP, etc.)
+        - Multiple circuit executions (100s-1000s)
+        - None of which are implemented here
+        
+        TODO: Implement actual VQE for H2 molecule:
+        from qiskit.algorithms.minimum_eigensolvers import VQE
+        from qiskit.primitives import Estimator
+        # ... see QUANTUM_INTEGRATION_ROADMAP.md for example
+        
+        Current implementation: Returns one random evaluation.
         """
         best_solution = problem.get_random_solution()
         best_value = problem.evaluate(best_solution)
@@ -152,7 +208,7 @@ class QuantumOptimizer:
             "objective_value": best_value,
             "iterations": self.max_iterations,
             "convergence": True,
-            "algorithm": "vqe",
+            "algorithm": "vqe_placeholder",  # Renamed to indicate placeholder
         }
 
     def _optimize_hybrid(
