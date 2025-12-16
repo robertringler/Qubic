@@ -1,3 +1,10 @@
+# PROPOSED README.md - Complete Reference
+
+This document shows the complete proposed README.md that has been implemented.
+The actual README.md file has been updated with this content.
+
+---
+
 # QRATUM (formerly QuASIM)
 
 ### Classical Simulation Framework with Planned Quantum Extensions
@@ -13,6 +20,8 @@ High-Assurance • Deterministic • Modular • Multi-Domain Scientific Computi
 
 QRATUM is a deterministic, classical simulation framework designed for reproducible multi-domain modeling in research environments. 
 It provides a solid foundation for numerical simulation with plans to integrate genuine quantum computing capabilities in future versions.
+
+---
 
 ## What QRATUM Actually Is (v2.0)
 
@@ -53,7 +62,7 @@ QRATUM v2.0 provides:
 - Numerical simulation development and prototyping
 - Classical optimization algorithm research
 - Deterministic computation workflows
-- Educational projects in scientific computing  
+- Educational projects in scientific computing
 
 ---
 
@@ -71,7 +80,7 @@ QRATUM aims to provide:
 - Transparency over hype
 - Validation over claims
 - Education over marketing
-- Community over commercialization  
+- Community over commercialization
 
 ---
 
@@ -154,7 +163,7 @@ pytest --cov=quasim tests/
 
 # Run specific test module
 pytest tests/test_specific.py
-```  
+```
 
 ---
 
@@ -201,7 +210,9 @@ problem = OptimizationProblem(...)
 result = optimizer.optimize(problem)
 print(f"Best solution: {result['solution']}")
 print(f"Objective value: {result['objective_value']}")
-```  
+```
+
+---
 
 ## Future Roadmap: Genuine Quantum Integration
 
@@ -307,6 +318,8 @@ If you need **actual quantum computing**, consider:
 ### Project Documents
 - **[QUANTUM_CAPABILITY_AUDIT.md](QUANTUM_CAPABILITY_AUDIT.md)** - Detailed analysis of current capabilities
 - **[QUANTUM_INTEGRATION_ROADMAP.md](QUANTUM_INTEGRATION_ROADMAP.md)** - Path to genuine quantum features
+- **[TRANSPARENCY_RESTORATION_SUMMARY.md](TRANSPARENCY_RESTORATION_SUMMARY.md)** - Implementation report
+- **[_DOCUMENTATION_DISCLAIMER.md](_DOCUMENTATION_DISCLAIMER.md)** - Warning about legacy docs
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 - **[LICENSE](LICENSE)** - Apache 2.0 License
 
@@ -314,6 +327,7 @@ If you need **actual quantum computing**, consider:
 - **[Qiskit Textbook](https://qiskit.org/textbook/)** - Learn quantum computing
 - **[Nielsen & Chuang](https://www.amazon.com/Quantum-Computation-Information-10th-Anniversary/dp/1107002176)** - Classic textbook
 - **[Quantum Algorithm Zoo](https://quantumalgorithmzoo.org/)** - Comprehensive algorithm list
+- **[PennyLane Tutorials](https://pennylane.ai/qml/)** - Quantum ML resources
 
 ---
 
@@ -349,3 +363,46 @@ We acknowledge the importance of accurate representation in quantum computing an
 **Last Updated**: December 16, 2025  
 **Status**: Classical simulation with quantum roadmap  
 **Transparency**: Honest about capabilities
+
+---
+
+## Additional Resources
+
+### Understanding the Changes
+
+This README represents a complete rewrite from the previous version. Key changes:
+
+1. **Removed False Claims**: No more "quantum-accelerated" in title
+2. **Added Transparency Notice**: Prominent warning at top
+3. **Honest Capabilities**: Clear about classical-only implementation
+4. **Proper Disclaimers**: Separate section addressing all false claims
+5. **Realistic Roadmap**: Honest path to genuine quantum features
+6. **Alternatives Listed**: Directing users to real quantum frameworks
+7. **Educational Value**: Learning resources and honest examples
+
+### For Previous Users
+
+If you were using this project expecting quantum capabilities:
+- All "quantum" features were classical random search
+- No quantum computing was ever implemented
+- See [QUANTUM_CAPABILITY_AUDIT.md](QUANTUM_CAPABILITY_AUDIT.md) for detailed analysis
+- Consider using Qiskit, PennyLane, or Cirq for actual quantum computing
+
+### For New Users
+
+This project is best suited for:
+- Learning how quantum integration should be done
+- Understanding the difference between hype and reality in quantum computing
+- Building classical simulation frameworks
+- Educational purposes
+
+Not suited for:
+- Production quantum computing (use Qiskit, PennyLane, Cirq)
+- Actual quantum algorithm execution
+- Quantum advantage demonstrations
+
+---
+
+**The quantum computing community values transparency over hype.**
+
+This README demonstrates that principle.
