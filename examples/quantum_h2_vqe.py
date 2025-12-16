@@ -81,7 +81,7 @@ def main():
         print()
         
         # Validate against expected value
-        if result.classical_energy is not None:
+        if result.classical_energy is not None and abs(result.classical_energy) > 1e-10:
             error_pct = abs(result.error_vs_classical / result.classical_energy) * 100
             print(f"Error vs. classical: {error_pct:.2f}%")
             

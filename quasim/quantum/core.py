@@ -251,7 +251,6 @@ def create_noise_model(
     # Readout error
     p0_1 = readout_error  # Prob of measuring 1 when state is 0
     p1_0 = readout_error  # Prob of measuring 0 when state is 1
-    readout_err = pauli_error([('X', p0_1), ('I', 1 - p0_1)])
     noise_model.add_all_qubit_readout_error([[1-p0_1, p0_1], [p1_0, 1-p1_0]])
     
     return noise_model

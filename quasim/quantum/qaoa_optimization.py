@@ -277,7 +277,7 @@ class QAOA:
                     pauli_str[i] = 'Z'
                     pauli_list.append((''.join(pauli_str), -h_i))
         
-        return SparsePauliOp.from_list(pauli_list) if pauli_list else SparsePauliOp('I' * n, 0)
+        return SparsePauliOp.from_list(pauli_list) if pauli_list else SparsePauliOp.from_list([('I' * n, 0.0)])
     
     def _create_qaoa_circuit(
         self,
@@ -403,12 +403,12 @@ class QAOA:
                     bitstring, hamiltonian
                 )
                 energy += prob * bitstring_energy
-                
-                # Track best solution
-                if bitstring_energy < best_result['energy']:
-                    best_result['energy'] = bitstring_energy
-                    best_result['bitstring'] = bitstring
-                    best_result['counts'] = quasi_dists
+            
+            # Track best solution
+            if bitstring_energy < best_result['energy']:
+                best_result['energy'] = bitstring_energy
+                best_result['bitstring'] = bitstring
+                best_result['counts'] = quasi_dists
             
             if evaluation_count[0] % 10 == 0:
                 print(f"  Evaluation {evaluation_count[0]}: E = {energy:.4f}")

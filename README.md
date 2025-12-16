@@ -302,7 +302,7 @@ print(f"Ground state energy: {result.energy:.4f}")
 | Method | Energy (Hartree) | Error vs. Exact | Runtime |
 |--------|------------------|-----------------|---------|
 | Classical HF (exact) | -1.137 | 0% (reference) | <1s |
-| QuASIM VQE (simulator) | -1.12 to -1.14 | 1-5% | 30-60s |
+| QRATUM VQE (simulator) | -1.12 to -1.14 | 1-5% | 30-60s |
 | Real IBM Quantum | -1.0 to -1.2 | 5-15% | 5-10min (queue) |
 
 *Tested on H₂ at 0.735Å, STO-3G basis, 1024 shots, p=2 layers*

@@ -57,9 +57,6 @@ class TestQuantumBackend:
     
     def test_backend_execution(self):
         """Test simple circuit execution."""
-        if not QISKIT_AVAILABLE:
-            pytest.skip("Qiskit not available")
-        
         from qiskit import QuantumCircuit
         
         config = QuantumConfig(backend_type="simulator", shots=100)
