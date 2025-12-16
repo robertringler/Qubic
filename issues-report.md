@@ -5,6 +5,11 @@
  116	F401  	unused-import
   83	F821  	undefined-name
   74	UP045 	non-pep604-annotation-optional
+ 293	UP006 	non-pep585-annotation
+ 214	N806  	non-lowercase-variable-in-function
+  83	F821  	undefined-name
+  74	UP045 	non-pep604-annotation-optional
+  53	F401  	unused-import
   49	E402  	module-import-not-at-top-of-file
   36	N803  	invalid-argument-name
   29	I001  	unsorted-imports
@@ -37,6 +42,8 @@
    1	W292  	missing-newline-at-end-of-file
 Found 2427 errors.
 [*] 1464 fixable with the `--fix` option (495 hidden fixes can be enabled with the `--unsafe-fixes` option).
+Found 2657 errors.
+[*] 1409 fixable with the `--fix` option (780 hidden fixes can be enabled with the `--unsafe-fixes` option).
 ### Type Checking (mypy)
 quasim-api is not a valid Python package name
 Type checking completed

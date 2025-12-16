@@ -850,6 +850,31 @@ class ReportGenerator:
         story.append(table)
         story.append(Spacer(1, 0.5 * inch))
 
+        # Add timing details
+        timing_data = [["Benchmark", "Ansys (median)", "QuASIM (median)", "Speedup"]]
+        for result in self.results:
+            timing_data.append([
+                result.benchmark_id,
+                f"{result.performance_metrics.get('ansys_median_time', 0):.2f}s",
+                f"{result.performance_metrics.get('quasim_median_time', 0):.2f}s",
+                f"{result.performance_metrics.get('speedup', 0):.2f}x"
+            ])
+
+        timing_table = Table(timing_data)
+        timing_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.green),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+
+        story.append(table)
+        story.append(Spacer(1, 0.5*inch))
+
         # Detailed results for each benchmark
         for result in self.results:
             story.append(PageBreak())
