@@ -1,381 +1,351 @@
-QuASIM  
-### Quantum-Accelerated Simulation and Modeling Engine  
-High-Assurance • Deterministic • HPC-Optimized • Multi-Domain Scientific Computing
+# QRATUM (formerly QuASIM)
 
-QuASIM is a high-assurance, quantum-accelerated simulation framework engineered for deterministic, reproducible, multi-domain modeling.  
-It is built for research environments requiring reliability, transparency, and scientific rigor across complex systems such as aerospace studies, energy-grid analysis, orbital mechanics research, and large-scale multi-physics simulation.
+### Classical Simulation Framework with Planned Quantum Extensions
+High-Assurance • Deterministic • Modular • Multi-Domain Scientific Computing
 
-QuASIM integrates core components from the Q-Stack ecosystem:
+[![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
+[![Development Status](https://img.shields.io/badge/status-beta-yellow.svg)](QUANTUM_INTEGRATION_ROADMAP.md)
 
-- **Q-OS** — deterministic runtime environment  
-- **QNX-style scheduler** — real-time determinism & reproducibility  
-- **Q-Core** — vectorized/tensor-accelerated compute  
-- **QuNimbus** — provenance & verification logging  
-- **QNET-OS** — distributed compute & data-exchange layer  
+> **⚠️ TRANSPARENCY NOTICE**: This project currently implements **classical numerical simulation** only. 
+> Claims of "quantum-accelerated" or "quantum-enhanced" capabilities are **aspirational roadmap items**, not current features.
+> See [QUANTUM_CAPABILITY_AUDIT.md](QUANTUM_CAPABILITY_AUDIT.md) for detailed analysis.
 
-All components are aligned toward high-integrity scientific modeling, transparent reproducibility, and audit-friendly computational workflows.
+QRATUM is a deterministic, classical simulation framework designed for reproducible multi-domain modeling in research environments. 
+It provides a solid foundation for numerical simulation with plans to integrate genuine quantum computing capabilities in future versions.
 
----
+## What QRATUM Actually Is (v2.0)
 
-## Executive Summary
+**Current Capabilities** ✅:
+- **Classical Numerical Simulation**: NumPy-based computational framework
+- **Deterministic Execution**: Reproducible results via seed management
+- **Modular Architecture**: Well-organized codebase for scientific computing
+- **Configuration Management**: Runtime contexts and parameter handling
+- **Development Tooling**: pytest, ruff, CI/CD infrastructure
 
-QuASIM provides:
+**NOT Currently Implemented** ❌:
+- Quantum computing libraries (no Qiskit, PennyLane, Cirq)
+- Actual quantum circuit simulation
+- Real QAOA, VQE, or quantum algorithms
+- Quantum hardware or simulator backends
+- cuQuantum or GPU quantum acceleration
 
-- **Deterministic execution** (seeded, reproducible, audit-traceable)  
-- **High-performance numerical modeling** (tensor acceleration via Q-Core)  
-- **Extensible multi-domain simulation primitives**  
-- **Aerospace-grade runtime stability**  
-- **Scientific transparency and provenance logging**  
-- **Modular architecture for research and enterprise HPC labs**  
-
-QuASIM has been validated in scientific workflows including:
-
-- orbital mechanics modeling  
-- aerospace trajectory studies  
-- energy-grid stability analysis  
-- large-scale Monte Carlo campaigns  
-- multi-physics evaluation with coupled solvers  
-
----
-
-## Mission Context & Problem Domain
-
-Modern research environments require simulation engines that are:
-
-- deterministic  
-- verifiable  
-- high-fidelity  
-- capable of integrating heterogeneous data sources  
-- performant under high computational load  
-
-Traditional tooling often fails to provide reproducibility or deterministic scheduling when scaling across multi-region or distributed compute environments.
-
-QuASIM addresses these gaps with:
-
-- deterministic execution paths  
-- strict seed governance  
-- algorithmic reproducibility  
-- advanced tensor computation for demanding workloads  
-- transparent provenance via QuNimbus  
-- modular physics and modeling engines  
-
-This makes the platform suitable for domains such as:
-
-- aerospace research  
-- grid-level energy modeling  
-- economic and financial system simulation  
-- physics-based modeling  
-- time-series forecasting  
-- geospatial and orbital analytics  
+**Planned for Future** 🚧:
+- Genuine quantum algorithm implementations (see [Roadmap](QUANTUM_INTEGRATION_ROADMAP.md))
+- Integration with established quantum frameworks (Qiskit)
+- Hybrid classical-quantum optimization
+- Quantum simulator backends
 
 ---
 
-## Core Capabilities
+## Current Features (Classical Computing)
 
-- **Deterministic Multi-Domain Simulation**  
-Ensures reproducibility across runs, environments, and hardware.
+QRATUM v2.0 provides:
 
-- **Orbital & Aerospace Modeling Frameworks**  
-Trajectory propagation, visibility windows, coordinate transformations.
+- **Deterministic Execution**: Seeded randomness for reproducible simulations
+- **Classical Numerical Methods**: NumPy-based scientific computing
+- **Modular Design**: Clean separation of concerns for extensibility
+- **Configuration Management**: Runtime contexts and parameter validation
+- **Optimization Placeholders**: Framework for future quantum algorithm integration
+- **Development Infrastructure**: Comprehensive testing and CI/CD
 
-- **Quantum/Tensor-Accelerated Compute (Q-Core)**  
-Matrix operations, batched integrators, tensor contractions, and HPC primitives.
-
-- **Energy-Grid & Infrastructure Modeling**  
-Stability studies, time-series forecasting, renewable-integration modeling.
-
-- **Causal-Temporal Inference Tools**  
-Graph-based models for system-level behavior, scenario evaluation, and risk propagation.
-
-- **High-Fidelity Multi-Physics Engine**  
-ODE/PDE solvers, numerical integrators, interpolation modules, and uncertainty quantification.
+**Use Cases**:
+- Numerical simulation development and prototyping
+- Classical optimization algorithm research
+- Deterministic computation workflows
+- Educational projects in scientific computing  
 
 ---
 
-## System Architecture
+## Project Goals & Philosophy
 
-+-----------------------------+ | Secure Telemetry & Logging  | +-----------------------------+ | Distributed Compute Layer   | +-----------------------------+ | QuNimbus Verification Layer | +-----------------------------+ | Q-Core Acceleration Engine  | +-----------------------------+ | Deterministic Runtime (Q-OS)| +-----------------------------+ | Simulation Kernel (QuASIM)  | +-----------------------------+
+QRATUM aims to provide:
 
-### Component Summary
+1. **Honest Representation**: No false claims about capabilities
+2. **Solid Foundation**: Well-tested classical implementations first
+3. **Future-Ready Architecture**: Designed for eventual quantum integration
+4. **Educational Value**: Clear examples and transparent documentation
+5. **Scientific Integrity**: Reproducible, verifiable, well-documented
 
-- **Simulation Kernel**  
-Core orchestrator for numerical methods, integrators, and modeling pipelines.
-
-- **Deterministic Runtime (Q-OS)**  
-Reproducible scheduling, seeded randomness, stable execution envelopes.
-
-- **Acceleration Pipeline (Q-Core)**  
-Tensorized HPC backends with optional GPU support.
-
-- **QuNimbus Verification**  
-Provenance capture, metadata tracking, run fingerprints, and audit logs.
-
-- **Distributed Compute Fabric**  
-Optional Kubernetes-based scaling for parallel workloads.
-
-- **Telemetry Layer**  
-Structured logs, metrics, and dashboards.
+**Development Principles**:
+- Transparency over hype
+- Validation over claims
+- Education over marketing
+- Community over commercialization  
 
 ---
 
-## Technical Pillars
+## Current Capabilities (Detailed)
 
-### **Deterministic Compute**
-- Seed governance  
-- Controlled randomness  
-- Replayable execution  
-- Traceable compute graphs  
+### Classical Simulation
+- Deterministic execution with seed management
+- Basic numerical computation primitives
+- Configuration and runtime management
+- Modular architecture for extension
 
-### **High-Performance Acceleration**
-- Tensor contraction kernels  
-- Batched solver pipelines  
-- Multi-core/GPU optional paths  
+### Development Infrastructure
+- Python 3.10+ support
+- pytest-based testing framework
+- ruff for code quality
+- CI/CD via GitHub Actions
+- Type hints and documentation
 
-### **Scientific Transparency**
-- Config-fingerprinting  
-- Metadata embedding  
-- Provenance tracking  
-
-### **Safety-Critical Software Practices**
-- Static analysis  
-- Runtime validation  
-- Error-bounded integrators  
-- DO-178C-inspired deterministic discipline (research framing)  
+### Optimization Framework (Placeholder)
+- Architecture for future quantum algorithm integration
+- Classical baseline implementations
+- Currently implements random search (not genuine QAOA/VQE)
+- See [QUANTUM_CAPABILITY_AUDIT.md](QUANTUM_CAPABILITY_AUDIT.md) for details
 
 ---
 
-## Domain Applications (Research-Safe)
+## Architecture
 
-### **Aerospace Research**
-- Trajectory analysis  
-- Orbital propagation  
-- Reference-frame transforms  
-- Mission-planning simulation  
+QRATUM follows a modular design:
 
-### **Energy & Infrastructure Studies**
-- Grid-stability modeling  
-- Time-series forecasting  
-- Renewable-integration experiments  
-
-### **Economic & Systemic Modeling**
-- Risk propagation  
-- Monte Carlo scenario exploration  
-- Complex-system behavior analysis  
-
-### **Physics & Multi-Domain Simulation**
-- ODE/PDE numerical solving  
-- Multi-physics coupling  
-- Uncertainty quantification  
-
-### **Tire Simulation & Materials Engineering**
-- Goodyear Quantum Tire Pilot integration  
-- 1,000+ pre-characterized tire materials database  
-- Quantum-enhanced compound optimization  
-- Multi-scale physics modeling (molecular → macroscopic)  
-- Comprehensive performance analysis (grip, wear, thermal, efficiency)  
-
----
-
-## Goodyear Quantum Tire Pilot
-
-QuASIM includes a comprehensive tire simulation platform integrated with Goodyear's Quantum Pilot materials database, enabling large-scale tire performance analysis with quantum-enhanced optimization.
-
-### Quick Start
-
-Run the full Goodyear Quantum Tire Pilot to generate 10,000+ tire simulation scenarios:
-
-```bash
-python3 run_goodyear_quantum_pilot.py
+```
+qratum/
+├── quasim/              # Legacy simulation modules
+│   ├── opt/             # Optimization framework (classical + placeholders)
+│   ├── api/             # API interfaces
+│   ├── sim/             # Simulation primitives
+│   └── hcal/            # Hardware abstraction
+├── qstack/              # Stack management utilities
+├── qubic/               # Visualization components
+├── tests/               # Comprehensive test suite
+└── docs/                # Documentation
 ```
 
-This generates:
-- **10,000 unique tire simulation scenarios**
-- **1,000+ Goodyear materials** (8 families: natural rubber, synthetic rubber, biopolymer, nano-enhanced, graphene-reinforced, quantum-optimized, silica-enhanced, carbon black)
-- **Comprehensive performance metrics** (16 KPIs per scenario)
-- **Quantum-enhanced optimization** (QAOA, VQE, hybrid algorithms)
-- **DO-178C Level A compliance posture**
-
-### Features
-
-- **Materials Database**: 1,000+ pre-characterized compounds with test data and certification status
-- **Tire Types**: Passenger, truck, off-road, racing, EV-specific, winter, all-season, performance
-- **Environmental Coverage**: Temperature range -40°C to +80°C, 12 surface types, 8 weather conditions
-- **Performance Domains**: Traction, wear, thermal response, rolling resistance, hydroplaning, noise, durability
-- **Integration Ready**: CAD systems, FEA tools, AI/ML workflows, digital twin platforms
-
-### CLI Usage
-
-```bash
-# Use all 1,000+ Goodyear materials
-quasim-tire goodyear --use-all --scenarios-per-material 10
-
-# Use only quantum-validated materials
-quasim-tire goodyear --quantum-only --scenarios-per-material 20
-
-# Use only certified materials
-quasim-tire goodyear --use-certified --scenarios-per-material 5
-```
-
-### Documentation
-
-- **Usage Guide**: [GOODYEAR_PILOT_USAGE.md](GOODYEAR_PILOT_USAGE.md)
-- **Implementation Summary**: [TIRE_SIMULATION_SUMMARY.md](TIRE_SIMULATION_SUMMARY.md)
-- **Demo Script**: [demos/tire_simulation_demo.py](demos/tire_simulation_demo.py)
+### Design Principles
+- **Modularity**: Clean interfaces between components
+- **Testability**: Comprehensive test coverage
+- **Extensibility**: Ready for quantum algorithm integration
+- **Reproducibility**: Deterministic execution via seed management
 
 ---
 
-## Visualization Subsystem
-
-QuASIM includes a production-ready, unified visualization subsystem for rendering simulation results with support for tire simulations, quantum circuits, and generic mesh/field data.
-
-### Features
-
-- **Multiple Backends**: Matplotlib (CPU), Headless (CI/cluster), GPU-accelerated with automatic fallback
-- **Export Formats**: PNG, JPEG, MP4, GIF, Interactive HTML/WebGL
-- **Simulation Adapters**: Tire, Quantum, Generic Mesh, Time-Series
-- **Pipelines**: Static rendering, Animation export, Real-time WebSocket streaming
-- **CLI & Python API**: Full command-line interface and programmatic access
-
-### Quick Start
-
-```bash
-# Run tire visualization example
-qubic-viz example tire --output-dir ./viz_output
-
-# Run quantum state visualization example
-qubic-viz example quantum --output-dir ./viz_output
-
-# Render custom simulation data
-qubic-viz render --input data.json --output result.png --adapter tire --field temperature
-
-# Create animation from time-series
-qubic-viz animate --input timeseries.json --output animation.mp4 --fps 30
-```
-
-### Python API
-
-```python
-from qubic.visualization.adapters.tire import TireSimulationAdapter
-from qubic.visualization.pipelines.static import StaticPipeline
-
-# Load and visualize tire simulation
-adapter = TireSimulationAdapter()
-tire_data = adapter.create_synthetic_tire(resolution=48)
-
-pipeline = StaticPipeline(backend="headless", dpi=150)
-pipeline.render_and_save(
-    data=tire_data,
-    output_path="tire_temperature.png",
-    scalar_field="temperature",
-    colormap="hot"
-)
-```
-
-### Documentation
-
-- **Full Documentation**: [qubic/visualization/VISUALIZATION.md](qubic/visualization/VISUALIZATION.md)
-- **Examples**: [qubic/visualization/examples/](qubic/visualization/examples/)
-- **Tests**: [qubic/visualization/tests/](qubic/visualization/tests/)
-
----
-
-## Installation & Quickstart
+## Installation
 
 ### Prerequisites
-- Python 3.10+  
-- (Optional) Kubernetes 1.28+ for distributed workloads  
-- (Optional) GPU drivers for accelerated Q-Core modules  
+- Python 3.10 or later
+- pip or conda package manager
 
-### Setup
+### Basic Installation
+
 ```bash
-git clone https://github.com/robertringler/QuASIM.git
-cd QuASIM
+git clone https://github.com/robertringler/QRATUM.git
+cd QRATUM
 pip install -r requirements.txt
+```
 
-Example Run
+### Development Installation
 
-python -m quasim.simulate --scenario orbital_demo --seed 42 --output results/
+```bash
+pip install -e ".[dev]"
+```
 
+### Running Tests
 
----
+```bash
+# Run all tests
+pytest tests/
 
-Repository Structure
+# Run with coverage
+pytest --cov=quasim tests/
 
-(Structure preserved from your original README, but reframed safely.)
-
-analysis/            # Analytical tools and post-processing
-aerospace/           # Orbital & trajectory modeling (AURORA)
-benchmarks/          # Performance benchmarking
-ci/                  # Continuous integration scripts
-configs/             # Simulation configuration files
-data/                # Reference datasets
-docs/                # Documentation
-infra/               # Deployment & provisioning scripts
-models/              # ML/AI or numerical models
-quasim/              # Core simulation engine
-qcore/               # Acceleration backends
-qnet_os/             # Distributed compute & messaging utilities
-qunimbus/            # Provenance, metadata & verification
-runtime/             # Deterministic runtime layer
-tests/               # Unit & integration tests
-tools/               # Utility scripts
-visuals/             # Visualization modules
-
+# Run specific test module
+pytest tests/test_specific.py
+```  
 
 ---
 
-Verification & Provenance
+## Usage Examples
 
-QuNimbus provides:
+### Basic Simulation (Classical)
 
-run metadata
+```python
+from quasim import Config, runtime
 
-configuration hashes
+# Create configuration
+config = Config(
+    simulation_precision="fp32",
+    backend="cpu",
+    seed=42  # For reproducibility
+)
 
-reproducible seeds
+# Run simulation
+with runtime(config) as rt:
+    # Simplified example - actual usage depends on specific modules
+    result = rt.simulate(circuit_data)
+    print(f"Simulation completed with latency: {rt.average_latency}s")
+```
 
-environment fingerprints
+### Using Optimization Framework
 
-structured experiment logs
+```python
+from quasim.opt.optimizer import HybridOptimizer  # Classical implementation
+from quasim.opt.problems import OptimizationProblem
 
+# Note: Despite the name, this currently uses classical random search
+# See QUANTUM_CAPABILITY_AUDIT.md for details
+optimizer = HybridOptimizer(
+    algorithm="random_search",  # Honest naming
+    backend="cpu",
+    max_iterations=100,
+    random_seed=42
+)
 
-These enable:
+# Define your problem
+problem = OptimizationProblem(...)
 
-scientific reproducibility
+# Optimize (classically)
+result = optimizer.optimize(problem)
+print(f"Best solution: {result['solution']}")
+print(f"Objective value: {result['objective_value']}")
+```  
 
-cross-team validation
+## Future Roadmap: Genuine Quantum Integration
 
-long-term auditability
+See [QUANTUM_INTEGRATION_ROADMAP.md](QUANTUM_INTEGRATION_ROADMAP.md) for detailed plans.
 
+### Phase 1: Cleanup (Current)
+- ✅ Remove false quantum claims
+- ✅ Add transparency about capabilities
+- ✅ Document current state accurately
 
+### Phase 2: Classical Foundation
+- 🚧 Implement proper classical optimization algorithms
+- 🚧 Add comprehensive benchmarks vs scipy/numpy
+- 🚧 Validate all classical implementations
+
+### Phase 3: Quantum Foundation (Planned)
+- 📋 Add Qiskit dependency
+- 📋 Implement genuine VQE for H₂ molecule
+- 📋 Implement real QAOA for small graphs
+- 📋 Validate against known quantum results
+
+### Phase 4: Hybrid Integration (Future)
+- 📋 Intelligent classical-quantum switching
+- 📋 Backend abstraction (simulators + hardware)
+- 📋 Cost-benefit analysis framework
+
+### Phase 5: Community & Validation (Future)
+- 📋 arXiv preprint if novel contributions
+- 📋 Engagement with quantum computing community
+- 📋 Educational resources and tutorials
 
 ---
 
-License
+## Important Disclaimers
 
-Apache 2.0 License (see LICENSE file).
-Contributions welcome under open, research-safe guidelines.
+### Quantum Computing Claims
+**⚠️ CRITICAL**: Current version (v2.0) does **NOT** implement quantum computing:
+- No quantum circuit simulation
+- No QAOA, VQE, or quantum algorithms (only classical placeholders)
+- No quantum hardware or simulator backends
+- See [QUANTUM_CAPABILITY_AUDIT.md](QUANTUM_CAPABILITY_AUDIT.md) for detailed analysis
 
+### Partnership Claims
+- **"Goodyear Tire Pilot"**: Fictional demonstration only, not affiliated with Goodyear
+- No partnerships or endorsements should be inferred
+
+### Compliance Claims
+- **"DO-178C"**: Inspired by aerospace practices, **NOT CERTIFIED**
+- No formal certification has been obtained
+- Research and educational use only
+
+### Performance Claims
+- Classical simulation capabilities only
+- No quantum speedup or advantage
+- Benchmarks against classical methods TBD
+
+---
+
+## Contributing
+
+We welcome contributions that:
+- Improve classical implementations
+- Add genuine quantum capabilities
+- Enhance testing and documentation
+- Fix bugs and improve code quality
+
+**Before Contributing**:
+1. Read [QUANTUM_INTEGRATION_ROADMAP.md](QUANTUM_INTEGRATION_ROADMAP.md)
+2. Understand current capabilities vs. aspirations
+3. No false quantum claims in PRs
+4. All quantum features must use established libraries (Qiskit, etc.)
+5. Comprehensive tests required
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
-Development Philosophy
+## Alternatives & Related Projects
 
-QuASIM adheres to principles of:
+If you need **actual quantum computing**, consider:
 
-robustness
+### Established Quantum Frameworks
+- **[Qiskit](https://qiskit.org/)** - IBM's comprehensive quantum framework
+- **[PennyLane](https://pennylane.ai/)** - Quantum ML and optimization
+- **[Cirq](https://quantumai.google/cirq)** - Google's quantum framework
+- **[AWS Braket](https://aws.amazon.com/braket/)** - AWS quantum service
 
-determinism
+### Classical Simulation Tools
+- **[NumPy](https://numpy.org/)** - Fundamental numerical computing
+- **[SciPy](https://scipy.org/)** - Scientific computing (optimization, integration)
+- **[SymPy](https://www.sympy.org/)** - Symbolic mathematics
 
-clarity
-
-transparency
-
-scientific integrity
-
-safety and ethics
-
-
-The project is intended strictly for research, modeling, and computational experimentation.
+### Why Use QRATUM?
+- Learning project structure for quantum integration
+- Educational resource on quantum algorithm architecture
+- Starting point for custom quantum-classical hybrid systems
+- Example of honest vs. misleading quantum claims
 
 ---
+
+## Documentation
+
+### Project Documents
+- **[QUANTUM_CAPABILITY_AUDIT.md](QUANTUM_CAPABILITY_AUDIT.md)** - Detailed analysis of current capabilities
+- **[QUANTUM_INTEGRATION_ROADMAP.md](QUANTUM_INTEGRATION_ROADMAP.md)** - Path to genuine quantum features
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- **[LICENSE](LICENSE)** - Apache 2.0 License
+
+### Learning Resources
+- **[Qiskit Textbook](https://qiskit.org/textbook/)** - Learn quantum computing
+- **[Nielsen & Chuang](https://www.amazon.com/Quantum-Computation-Information-10th-Anniversary/dp/1107002176)** - Classic textbook
+- **[Quantum Algorithm Zoo](https://quantumalgorithmzoo.org/)** - Comprehensive algorithm list
+
+---
+
+## License
+
+Apache 2.0 License - See [LICENSE](LICENSE) file for details.
+
+Contributions welcome under honest, transparent development practices.
+
+---
+
+## Acknowledgments
+
+This project has been restructured to prioritize:
+- **Honesty** over hype
+- **Transparency** over marketing
+- **Education** over commercialization
+- **Community** over claims
+
+We acknowledge the importance of accurate representation in quantum computing and strive to contribute positively to the field.
+
+---
+
+## Contact & Support
+
+- **Issues**: [GitHub Issues](https://github.com/robertringler/QRATUM/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/robertringler/QRATUM/discussions)
+
+**Note**: This project is for educational and research purposes. For production quantum computing, use established frameworks like Qiskit or PennyLane.
+
+---
+
+**Last Updated**: December 16, 2025  
+**Status**: Classical simulation with quantum roadmap  
+**Transparency**: Honest about capabilities
