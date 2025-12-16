@@ -41,23 +41,24 @@ if str(_repo_root) not in sys.path:
     sys.path.insert(0, str(_repo_root))
 
 # Import generators and validators
-from benchmarks.compression.generators.quantum_states import (
+from benchmarks.compression.generators.quantum_states import (  # noqa: E402
     generate_ghz_state,
     generate_product_state,
     generate_random_circuit_state,
     generate_random_state,
     generate_w_state,
 )
-from benchmarks.compression.validators.compression_ratio import (
+from benchmarks.compression.validators.compression_ratio import (  # noqa: E402
     aggregate_compression_statistics,
-    compute_compression_metrics,
     validate_compression_claim,
 )
-from benchmarks.compression.validators.fidelity import compute_fidelity, validate_fidelity_bound
+from benchmarks.compression.validators.fidelity import (  # noqa: E402
+    validate_fidelity_bound,
+)
 
 # Import AHTC compression
 try:
-    from quasim.holo.anti_tensor import compress, decompress
+    from quasim.holo.anti_tensor import compress  # noqa: E402
 
     AHTC_AVAILABLE = True
 except ImportError:
@@ -135,7 +136,7 @@ class BenchmarkOrchestrator:
             self._run_test_case(test_case)
 
         print(f"\n{'=' * 70}")
-        print(f"Benchmark Complete!")
+        print("Benchmark Complete!")
         print(f"Total tests: {self.total_tests}")
         print(f"Passed: {self.passed_tests}")
         print(f"Failed: {self.failed_tests}")

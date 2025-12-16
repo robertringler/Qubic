@@ -264,7 +264,7 @@ def generate_vqe_h2_state(bond_length: float = 0.735) -> Optional[Array]:
         # Run VQE to get H2 state
         config = QuantumConfig(shots=1024, seed=42)
         vqe = MolecularVQE(config)
-        result = vqe.compute_h2_energy(
+        _result = vqe.compute_h2_energy(
             bond_length=bond_length, max_iterations=50, optimizer="COBYLA"
         )
 
@@ -300,7 +300,7 @@ def generate_qaoa_maxcut_state(n_nodes: int, edges: list[tuple[int, int]]) -> Op
 
         # Run QAOA to get state
         config = QuantumConfig(shots=1024, seed=42)
-        qaoa = QAOA(config, p_layers=3)
+        _qaoa = QAOA(config, p_layers=3)
 
         # For state vector, we'd need to extract from optimal parameters
         # This is complex, so we'll return None for now
