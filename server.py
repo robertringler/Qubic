@@ -31,7 +31,9 @@ def explain():
       "simulate_ms": 0   # optional: simulate LLM latency in ms
     }
     """
-    data = request.get_json(force=True) or {}
+    data = request.get_json()
+    if data is None:
+        data = {}
     text = data.get("commit", "")
     simulate_ms = int(data.get("simulate_ms", 0))
 

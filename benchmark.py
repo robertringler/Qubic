@@ -44,12 +44,13 @@ def run_concurrent(path, total=200, concurrency=20, method="GET", json=None):
 
 def summarize(latencies):
     lat_sorted = sorted(latencies)
+    n = len(lat_sorted)
     return {
-        "count": len(lat_sorted),
+        "count": n,
         "mean_ms": statistics.mean(lat_sorted) if lat_sorted else None,
         "p50_ms": statistics.median(lat_sorted) if lat_sorted else None,
-        "p90_ms": lat_sorted[int(len(lat_sorted) * 0.90)] if len(lat_sorted) >= 10 else None,
-        "p99_ms": lat_sorted[int(len(lat_sorted) * 0.99)] if len(lat_sorted) >= 100 else None,
+        "p90_ms": lat_sorted[min(int(n * 0.90), n - 1)] if n >= 10 else None,
+        "p99_ms": lat_sorted[min(int(n * 0.99), n - 1)] if n >= 100 else None,
         "min_ms": min(lat_sorted) if lat_sorted else None,
         "max_ms": max(lat_sorted) if lat_sorted else None,
     }
