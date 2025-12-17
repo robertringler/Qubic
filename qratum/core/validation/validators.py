@@ -11,22 +11,17 @@ Classification: UNCLASSIFIED // CUI
 
 from __future__ import annotations
 
-import hashlib
 import logging
-import math
 import time
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum, auto
 from typing import (
     Any,
-    Callable,
     Dict,
     Generic,
     List,
     Optional,
-    Protocol,
-    Set,
     Tuple,
     TypeVar,
     Union,
@@ -52,9 +47,9 @@ __all__ = [
 class ValidationLevel(Enum):
     """Validation strictness levels."""
 
-    RELAXED = auto()    # Basic checks only (development)
-    STANDARD = auto()   # Standard validation (default)
-    STRICT = auto()     # Strict validation (production)
+    RELAXED = auto()  # Basic checks only (development)
+    STANDARD = auto()  # Standard validation (default)
+    STRICT = auto()  # Strict validation (production)
     AEROSPACE = auto()  # DO-178C Level A compliance
 
 
@@ -163,7 +158,7 @@ class Validator(ABC, Generic[T]):
         """Callable interface for validation."""
         return self.validate(target)
 
-    def and_then(self, other: "Validator[T]") -> "ValidationChain[T]":
+    def and_then(self, other: Validator[T]) -> ValidationChain[T]:
         """Chain this validator with another."""
         return ValidationChain([self, other])
 
@@ -219,7 +214,7 @@ class ValidationChain(Validator[T]):
             validator_id=self.validator_id,
         )
 
-    def add(self, validator: Validator[T]) -> "ValidationChain[T]":
+    def add(self, validator: Validator[T]) -> ValidationChain[T]:
         """Add a validator to the chain."""
         self._validators.append(validator)
         return self
@@ -301,9 +296,7 @@ class NumericValidator(Validator[Union[float, np.ndarray]]):
             checks_performed += 1
             finite_arr = arr[np.isfinite(arr)]
             if len(finite_arr) > 0 and np.min(finite_arr) < self.min_value - self.tolerance:
-                errors.append(
-                    f"Value {np.min(finite_arr):.6e} below minimum {self.min_value:.6e}"
-                )
+                errors.append(f"Value {np.min(finite_arr):.6e} below minimum {self.min_value:.6e}")
             else:
                 checks_passed += 1
 
@@ -312,9 +305,7 @@ class NumericValidator(Validator[Union[float, np.ndarray]]):
             checks_performed += 1
             finite_arr = arr[np.isfinite(arr)]
             if len(finite_arr) > 0 and np.max(finite_arr) > self.max_value + self.tolerance:
-                errors.append(
-                    f"Value {np.max(finite_arr):.6e} above maximum {self.max_value:.6e}"
-                )
+                errors.append(f"Value {np.max(finite_arr):.6e} above maximum {self.max_value:.6e}")
             else:
                 checks_passed += 1
 
@@ -322,9 +313,7 @@ class NumericValidator(Validator[Union[float, np.ndarray]]):
         if self.level == ValidationLevel.AEROSPACE:
             checks_performed += 1
             # Check for denormalized values
-            denorm_count = np.count_nonzero(
-                (arr != 0) & (np.abs(arr) < np.finfo(float).tiny)
-            )
+            denorm_count = np.count_nonzero((arr != 0) & (np.abs(arr) < np.finfo(float).tiny))
             if denorm_count > 0:
                 warnings.append(f"Found {denorm_count} denormalized value(s)")
             checks_passed += 1
@@ -425,9 +414,7 @@ class StateVectorValidator(Validator[np.ndarray]):
             checks_passed += 1
 
         # Check for numeric issues (delegate to NumericValidator)
-        numeric_validator = NumericValidator(
-            level=self.level, allow_nan=False, allow_inf=False
-        )
+        numeric_validator = NumericValidator(level=self.level, allow_nan=False, allow_inf=False)
         numeric_result = numeric_validator.validate(target)
         checks_performed += numeric_result.checks_performed
         checks_passed += numeric_result.checks_passed
@@ -438,9 +425,7 @@ class StateVectorValidator(Validator[np.ndarray]):
         if self.level == ValidationLevel.AEROSPACE:
             # Check for near-zero amplitudes that should be exactly zero
             checks_performed += 1
-            tiny_count = np.count_nonzero(
-                (np.abs(target) > 0) & (np.abs(target) < 1e-15)
-            )
+            tiny_count = np.count_nonzero((np.abs(target) > 0) & (np.abs(target) < 1e-15))
             if tiny_count > 0:
                 warnings.append(
                     f"Found {tiny_count} near-zero amplitude(s) that may cause precision issues"
@@ -508,14 +493,41 @@ class CircuitValidator(Validator[CircuitSpec]):
     - Resource estimation bounds
     """
 
-    VALID_GATES = frozenset([
-        "h", "x", "y", "z", "s", "t", "sdg", "tdg",
-        "rx", "ry", "rz", "u1", "u2", "u3",
-        "cnot", "cx", "cy", "cz", "ch", "crx", "cry", "crz",
-        "swap", "iswap", "dcx",
-        "ccx", "ccz", "cswap",
-        "measure", "reset", "barrier",
-    ])
+    VALID_GATES = frozenset(
+        [
+            "h",
+            "x",
+            "y",
+            "z",
+            "s",
+            "t",
+            "sdg",
+            "tdg",
+            "rx",
+            "ry",
+            "rz",
+            "u1",
+            "u2",
+            "u3",
+            "cnot",
+            "cx",
+            "cy",
+            "cz",
+            "ch",
+            "crx",
+            "cry",
+            "crz",
+            "swap",
+            "iswap",
+            "dcx",
+            "ccx",
+            "ccz",
+            "cswap",
+            "measure",
+            "reset",
+            "barrier",
+        ]
+    )
 
     def __init__(
         self,
@@ -564,7 +576,7 @@ class CircuitValidator(Validator[CircuitSpec]):
             checks_passed += 1
 
         # Validate each instruction
-        depth_tracker: Dict[int, int] = {i: 0 for i in range(num_qubits)}
+        depth_tracker: Dict[int, int] = dict.fromkeys(range(num_qubits), 0)
 
         for idx, (gate_name, qubits, matrix, params) in enumerate(instructions):
             # Check gate name
@@ -614,17 +626,14 @@ class CircuitValidator(Validator[CircuitSpec]):
             # Check for measurement placement
             checks_performed += 1
             measurement_positions = [
-                i for i, (name, _, _, _) in enumerate(instructions)
-                if name.lower() == "measure"
+                i for i, (name, _, _, _) in enumerate(instructions) if name.lower() == "measure"
             ]
             if measurement_positions:
                 # Measurements should be at the end
                 last_measure = max(measurement_positions)
                 gates_after_measure = len(instructions) - 1 - last_measure
                 if gates_after_measure > 0:
-                    warnings.append(
-                        f"Found {gates_after_measure} gate(s) after measurement"
-                    )
+                    warnings.append(f"Found {gates_after_measure} gate(s) after measurement")
             checks_passed += 1
 
         metadata = {
@@ -817,7 +826,7 @@ def validate_measurement(
 
     # Check state string lengths
     checks_performed += 1
-    invalid_states = [s for s in counts.keys() if len(s) != num_qubits]
+    invalid_states = [s for s in counts if len(s) != num_qubits]
     if invalid_states:
         errors.append(
             f"Invalid state string lengths: {invalid_states[:5]}... "
@@ -828,7 +837,7 @@ def validate_measurement(
 
     # Check for valid binary strings
     checks_performed += 1
-    non_binary = [s for s in counts.keys() if not all(c in "01" for c in s)]
+    non_binary = [s for s in counts if not all(c in "01" for c in s)]
     if non_binary:
         errors.append(f"Non-binary state strings: {non_binary[:5]}...")
     else:

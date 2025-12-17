@@ -10,7 +10,7 @@ import json
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, Callable, Any
+from typing import Callable, Optional
 
 import numpy as np
 
@@ -773,9 +773,7 @@ function updateVRStatus() {
             "grabbedAtom": self._grabbed_atom,
         }
 
-    def add_interaction_callback(
-        self, callback: Callable[[XRInteraction], None]
-    ) -> None:
+    def add_interaction_callback(self, callback: Callable[[XRInteraction], None]) -> None:
         """Add callback for VR interactions.
 
         Args:

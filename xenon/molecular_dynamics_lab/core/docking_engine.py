@@ -10,14 +10,13 @@ Provides interactive docking simulation capabilities including:
 from __future__ import annotations
 
 import logging
-import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
 import numpy as np
 
-from .pdb_loader import PDBStructure, Atom
+from .pdb_loader import PDBStructure
 
 logger = logging.getLogger(__name__)
 
@@ -197,9 +196,18 @@ class DockingEngine:
 
     # Van der Waals radii for common elements
     VDW_RADII = {
-        "H": 1.20, "C": 1.70, "N": 1.55, "O": 1.52,
-        "S": 1.80, "P": 1.80, "F": 1.47, "Cl": 1.75,
-        "Br": 1.85, "I": 1.98, "Fe": 2.00, "Zn": 1.39,
+        "H": 1.20,
+        "C": 1.70,
+        "N": 1.55,
+        "O": 1.52,
+        "S": 1.80,
+        "P": 1.80,
+        "F": 1.47,
+        "Cl": 1.75,
+        "Br": 1.85,
+        "I": 1.98,
+        "Fe": 2.00,
+        "Zn": 1.39,
     }
 
     # Hydrogen bond donors/acceptors by atom name
@@ -274,8 +282,9 @@ class DockingEngine:
             coords = np.array([a.coords for a in reference_ligand.all_atoms])
         elif self._receptor and self._receptor.hetatms:
             # Use HETATM records (existing ligands/cofactors)
-            coords = np.array([h.coords for h in self._receptor.hetatms
-                             if h.res_name not in ("HOH", "WAT")])
+            coords = np.array(
+                [h.coords for h in self._receptor.hetatms if h.res_name not in ("HOH", "WAT")]
+            )
         else:
             # Use geometric center of receptor
             coords = np.array([a.coords for a in self._receptor.all_atoms])
@@ -355,7 +364,7 @@ class DockingEngine:
             return 1000.0  # Clash penalty
 
         ratio = sigma / r
-        return 4 * epsilon * (ratio ** 12 - ratio ** 6)
+        return 4 * epsilon * (ratio**12 - ratio**6)
 
     def _score_pose(
         self,
@@ -397,22 +406,25 @@ class DockingEngine:
                     lig_elem = lig_atom.element or lig_atom.name[0]
                     rec_elem = rec_atom.element or rec_atom.name[0]
 
-                    if (lig_elem in self.HB_DONORS and rec_elem in self.HB_ACCEPTORS) or \
-                       (lig_elem in self.HB_ACCEPTORS and rec_elem in self.HB_DONORS):
-                        hb_energy = -2.5 * (1 - (dist - 2.8) ** 2 / 0.7 ** 2)
+                    if (lig_elem in self.HB_DONORS and rec_elem in self.HB_ACCEPTORS) or (
+                        lig_elem in self.HB_ACCEPTORS and rec_elem in self.HB_DONORS
+                    ):
+                        hb_energy = -2.5 * (1 - (dist - 2.8) ** 2 / 0.7**2)
                         hb_energy = max(hb_energy, -2.5)
                         score += hb_energy
 
                         if hb_energy < -0.5:
-                            interactions.append(Interaction(
-                                interaction_type=InteractionType.HYDROGEN_BOND,
-                                receptor_atom=rec_atom.serial,
-                                ligand_atom=lig_atom.serial,
-                                distance=dist,
-                                energy=hb_energy,
-                                receptor_residue=f"{rec_atom.res_name}{rec_atom.res_seq}",
-                                receptor_chain=rec_atom.chain_id,
-                            ))
+                            interactions.append(
+                                Interaction(
+                                    interaction_type=InteractionType.HYDROGEN_BOND,
+                                    receptor_atom=rec_atom.serial,
+                                    ligand_atom=lig_atom.serial,
+                                    distance=dist,
+                                    energy=hb_energy,
+                                    receptor_residue=f"{rec_atom.res_name}{rec_atom.res_seq}",
+                                    receptor_chain=rec_atom.chain_id,
+                                )
+                            )
 
                 # Hydrophobic contacts
                 if dist < 4.0:
@@ -424,15 +436,17 @@ class DockingEngine:
                         score += hp_energy
 
                         if hp_energy < -0.5:
-                            interactions.append(Interaction(
-                                interaction_type=InteractionType.HYDROPHOBIC,
-                                receptor_atom=rec_atom.serial,
-                                ligand_atom=lig_atom.serial,
-                                distance=dist,
-                                energy=hp_energy,
-                                receptor_residue=f"{rec_atom.res_name}{rec_atom.res_seq}",
-                                receptor_chain=rec_atom.chain_id,
-                            ))
+                            interactions.append(
+                                Interaction(
+                                    interaction_type=InteractionType.HYDROPHOBIC,
+                                    receptor_atom=rec_atom.serial,
+                                    ligand_atom=lig_atom.serial,
+                                    distance=dist,
+                                    energy=hp_energy,
+                                    receptor_residue=f"{rec_atom.res_name}{rec_atom.res_seq}",
+                                    receptor_chain=rec_atom.chain_id,
+                                )
+                            )
 
         return score, interactions
 
@@ -455,11 +469,13 @@ class DockingEngine:
         cx, cy, cz = np.cos(angles)
         sx, sy, sz = np.sin(angles)
 
-        rotation = np.array([
-            [cy * cz, sx * sy * cz - cx * sz, cx * sy * cz + sx * sz],
-            [cy * sz, sx * sy * sz + cx * cz, cx * sy * sz - sx * cz],
-            [-sy, sx * cy, cx * cy],
-        ])
+        rotation = np.array(
+            [
+                [cy * cz, sx * sy * cz - cx * sz, cx * sy * cz + sx * sz],
+                [cy * sz, sx * sy * sz + cx * cz, cx * sy * sz - sx * cz],
+                [-sy, sx * cy, cx * cy],
+            ]
+        )
 
         # Build transformation matrix
         transform = np.eye(4)
@@ -596,9 +612,7 @@ class DockingEngine:
             initial_transform = self._generate_random_pose()
 
             # Optimize pose
-            transform, score, interactions = self._optimize_pose(
-                initial_transform, ligand_coords
-            )
+            transform, score, interactions = self._optimize_pose(initial_transform, ligand_coords)
 
             # Calculate RMSD to reference (first pose)
             transformed_coords = self._apply_transform(ligand_coords, transform)
@@ -607,7 +621,7 @@ class DockingEngine:
                 rmsd = 0.0
             else:
                 diff = transformed_coords - reference_coords
-                rmsd = np.sqrt(np.mean(np.sum(diff ** 2, axis=1)))
+                rmsd = np.sqrt(np.mean(np.sum(diff**2, axis=1)))
 
             pose = DockingPose(
                 pose_id=len(poses),
@@ -624,10 +638,9 @@ class DockingEngine:
         best_score = poses[0].score if poses else 0
 
         # Filter by energy range
-        filtered_poses = [
-            p for p in poses
-            if p.score - best_score <= self.config.energy_range
-        ][:self.config.num_poses]
+        filtered_poses = [p for p in poses if p.score - best_score <= self.config.energy_range][
+            : self.config.num_poses
+        ]
 
         # Cluster similar poses
         self._cluster_poses(filtered_poses)
@@ -673,7 +686,7 @@ class DockingEngine:
                     continue
 
                 diff = pose.ligand_coords - other.ligand_coords
-                rmsd = np.sqrt(np.mean(np.sum(diff ** 2, axis=1)))
+                rmsd = np.sqrt(np.mean(np.sum(diff**2, axis=1)))
 
                 if rmsd < rmsd_cutoff:
                     other.cluster_id = cluster_id
@@ -700,11 +713,13 @@ class DockingEngine:
         cx, cy, cz = np.cos(angles)
         sx, sy, sz = np.sin(angles)
 
-        rotation = np.array([
-            [cy * cz, sx * sy * cz - cx * sz, cx * sy * cz + sx * sz],
-            [cy * sz, sx * sy * sz + cx * cz, cx * sy * sz - sx * cz],
-            [-sy, sx * cy, cx * cy],
-        ])
+        rotation = np.array(
+            [
+                [cy * cz, sx * sy * cz - cx * sz, cx * sy * cz + sx * sz],
+                [cy * sz, sx * sy * sz + cx * cz, cx * sy * sz - sx * cz],
+                [-sy, sx * cy, cx * cy],
+            ]
+        )
 
         transform = np.eye(4)
         transform[:3, :3] = rotation

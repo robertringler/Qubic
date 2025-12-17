@@ -282,9 +282,7 @@ if FASTAPI_AVAILABLE:
                 elif action == "unsubscribe" and job_id:
                     manager.unsubscribe(websocket, job_id)
                     await websocket.send_text(
-                        json.dumps(
-                            {"type": "unsubscribed", "job_id": job_id}
-                        )
+                        json.dumps({"type": "unsubscribed", "job_id": job_id})
                     )
 
                 elif action == "ping":

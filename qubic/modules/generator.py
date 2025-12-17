@@ -4,8 +4,8 @@ QUBIC Module Generator - Creates 100 interactive visualization modules
 with a unified centralized dashboard launcher.
 """
 
-import os
 import json
+import os
 
 # Base directory for modules
 BASE_DIR = "/workspaces/QRATUM/qubic/modules"
@@ -13,74 +13,254 @@ BASE_DIR = "/workspaces/QRATUM/qubic/modules"
 # Module categories and their modules
 MODULES = {
     "quantum": [
-        ("quantum_state_viewer", "Quantum State Viewer", "Visualize quantum state vectors and superposition", "#00f5ff", "⚛️"),
-        ("qubit_simulator", "Qubit Simulator", "Interactive qubit manipulation and measurement", "#ff00ff", "🔮"),
-        ("entanglement_lab", "Entanglement Lab", "Explore quantum entanglement between particles", "#00ff88", "🔗"),
-        ("quantum_gate_designer", "Gate Designer", "Design and test quantum gate circuits", "#ffaa00", "🚪"),
-        ("decoherence_monitor", "Decoherence Monitor", "Track quantum decoherence over time", "#ff3366", "📉"),
-        ("bell_state_analyzer", "Bell State Analyzer", "Analyze Bell states and violations", "#9933ff", "🔔"),
+        (
+            "quantum_state_viewer",
+            "Quantum State Viewer",
+            "Visualize quantum state vectors and superposition",
+            "#00f5ff",
+            "⚛️",
+        ),
+        (
+            "qubit_simulator",
+            "Qubit Simulator",
+            "Interactive qubit manipulation and measurement",
+            "#ff00ff",
+            "🔮",
+        ),
+        (
+            "entanglement_lab",
+            "Entanglement Lab",
+            "Explore quantum entanglement between particles",
+            "#00ff88",
+            "🔗",
+        ),
+        (
+            "quantum_gate_designer",
+            "Gate Designer",
+            "Design and test quantum gate circuits",
+            "#ffaa00",
+            "🚪",
+        ),
+        (
+            "decoherence_monitor",
+            "Decoherence Monitor",
+            "Track quantum decoherence over time",
+            "#ff3366",
+            "📉",
+        ),
+        (
+            "bell_state_analyzer",
+            "Bell State Analyzer",
+            "Analyze Bell states and violations",
+            "#9933ff",
+            "🔔",
+        ),
         ("quantum_walk", "Quantum Walk", "Visualize quantum random walks", "#33ffcc", "🚶"),
-        ("grover_search", "Grover Search", "Interactive Grover's algorithm visualization", "#ff9933", "🔍"),
-        ("shor_factoring", "Shor Factoring", "Shor's algorithm for integer factorization", "#66ff33", "🔢"),
-        ("vqe_optimizer", "VQE Optimizer", "Variational Quantum Eigensolver optimization", "#ff66cc", "📈"),
+        (
+            "grover_search",
+            "Grover Search",
+            "Interactive Grover's algorithm visualization",
+            "#ff9933",
+            "🔍",
+        ),
+        (
+            "shor_factoring",
+            "Shor Factoring",
+            "Shor's algorithm for integer factorization",
+            "#66ff33",
+            "🔢",
+        ),
+        (
+            "vqe_optimizer",
+            "VQE Optimizer",
+            "Variational Quantum Eigensolver optimization",
+            "#ff66cc",
+            "📈",
+        ),
     ],
     "bioinformatics": [
         ("dna_sequencer", "DNA Sequencer", "Real-time DNA sequence analysis", "#00ff88", "🧬"),
         ("protein_folder", "Protein Folder", "3D protein folding visualization", "#ff6633", "🔬"),
         ("genome_browser", "Genome Browser", "Interactive genome navigation", "#33ccff", "📊"),
-        ("phylo_tree", "Phylogenetic Tree", "Evolutionary relationship visualization", "#99ff33", "🌳"),
-        ("mutation_tracker", "Mutation Tracker", "Track genetic mutations in real-time", "#ff3399", "🦠"),
+        (
+            "phylo_tree",
+            "Phylogenetic Tree",
+            "Evolutionary relationship visualization",
+            "#99ff33",
+            "🌳",
+        ),
+        (
+            "mutation_tracker",
+            "Mutation Tracker",
+            "Track genetic mutations in real-time",
+            "#ff3399",
+            "🦠",
+        ),
         ("rna_structure", "RNA Structure", "RNA secondary structure prediction", "#ffcc00", "🔄"),
         ("crispr_designer", "CRISPR Designer", "Design CRISPR gene edits", "#00ffcc", "✂️"),
-        ("metabolic_pathway", "Metabolic Pathway", "Metabolic network visualization", "#ff9966", "🔀"),
-        ("expression_heatmap", "Expression Heatmap", "Gene expression heatmap analysis", "#cc33ff", "🌡️"),
+        (
+            "metabolic_pathway",
+            "Metabolic Pathway",
+            "Metabolic network visualization",
+            "#ff9966",
+            "🔀",
+        ),
+        (
+            "expression_heatmap",
+            "Expression Heatmap",
+            "Gene expression heatmap analysis",
+            "#cc33ff",
+            "🌡️",
+        ),
         ("variant_caller", "Variant Caller", "Identify genetic variants", "#66ffcc", "📋"),
     ],
     "neural": [
-        ("neural_network", "Neural Network", "Deep learning architecture visualization", "#ff00ff", "🧠"),
+        (
+            "neural_network",
+            "Neural Network",
+            "Deep learning architecture visualization",
+            "#ff00ff",
+            "🧠",
+        ),
         ("activation_maps", "Activation Maps", "CNN activation map visualization", "#00f5ff", "🗺️"),
-        ("gradient_flow", "Gradient Flow", "Backpropagation gradient visualization", "#ffaa00", "➡️"),
+        (
+            "gradient_flow",
+            "Gradient Flow",
+            "Backpropagation gradient visualization",
+            "#ffaa00",
+            "➡️",
+        ),
         ("attention_viz", "Attention Viz", "Transformer attention visualization", "#00ff88", "👁️"),
-        ("embedding_space", "Embedding Space", "High-dimensional embedding projection", "#ff3366", "🌐"),
+        (
+            "embedding_space",
+            "Embedding Space",
+            "High-dimensional embedding projection",
+            "#ff3366",
+            "🌐",
+        ),
         ("loss_landscape", "Loss Landscape", "3D loss function landscape", "#9933ff", "⛰️"),
-        ("gan_generator", "GAN Generator", "Generative adversarial network output", "#33ffcc", "🎨"),
-        ("reinforcement_env", "RL Environment", "Reinforcement learning environment", "#ff9933", "🎮"),
+        (
+            "gan_generator",
+            "GAN Generator",
+            "Generative adversarial network output",
+            "#33ffcc",
+            "🎨",
+        ),
+        (
+            "reinforcement_env",
+            "RL Environment",
+            "Reinforcement learning environment",
+            "#ff9933",
+            "🎮",
+        ),
         ("autoencoder_latent", "Autoencoder Latent", "Latent space visualization", "#66ff33", "🔐"),
-        ("transformer_layers", "Transformer Layers", "Layer-by-layer transformer analysis", "#ff66cc", "📚"),
+        (
+            "transformer_layers",
+            "Transformer Layers",
+            "Layer-by-layer transformer analysis",
+            "#ff66cc",
+            "📚",
+        ),
     ],
     "physics": [
-        ("particle_collider", "Particle Collider", "High-energy particle collision simulation", "#ff3366", "💥"),
+        (
+            "particle_collider",
+            "Particle Collider",
+            "High-energy particle collision simulation",
+            "#ff3366",
+            "💥",
+        ),
         ("wave_equation", "Wave Equation", "2D wave equation visualization", "#00f5ff", "🌊"),
-        ("electromagnetic_field", "EM Field", "Electromagnetic field visualization", "#ffaa00", "⚡"),
+        (
+            "electromagnetic_field",
+            "EM Field",
+            "Electromagnetic field visualization",
+            "#ffaa00",
+            "⚡",
+        ),
         ("fluid_dynamics", "Fluid Dynamics", "Navier-Stokes fluid simulation", "#00ff88", "💧"),
         ("pendulum_chaos", "Pendulum Chaos", "Double pendulum chaotic motion", "#ff00ff", "🔄"),
-        ("orbital_mechanics", "Orbital Mechanics", "Gravitational orbit simulation", "#33ccff", "🌍"),
+        (
+            "orbital_mechanics",
+            "Orbital Mechanics",
+            "Gravitational orbit simulation",
+            "#33ccff",
+            "🌍",
+        ),
         ("black_hole", "Black Hole", "Black hole gravitational lensing", "#9933ff", "🕳️"),
-        ("string_vibrations", "String Vibrations", "String theory vibration modes", "#ff9933", "🎸"),
-        ("plasma_dynamics", "Plasma Dynamics", "Magnetohydrodynamic plasma simulation", "#66ff33", "🔥"),
+        (
+            "string_vibrations",
+            "String Vibrations",
+            "String theory vibration modes",
+            "#ff9933",
+            "🎸",
+        ),
+        (
+            "plasma_dynamics",
+            "Plasma Dynamics",
+            "Magnetohydrodynamic plasma simulation",
+            "#66ff33",
+            "🔥",
+        ),
         ("superconductor", "Superconductor", "Superconductivity visualization", "#00ffcc", "❄️"),
     ],
     "chemistry": [
-        ("molecular_viewer", "Molecular Viewer", "3D molecular structure visualization", "#00ff88", "⚗️"),
-        ("reaction_kinetics", "Reaction Kinetics", "Chemical reaction rate visualization", "#ff6633", "⏱️"),
+        (
+            "molecular_viewer",
+            "Molecular Viewer",
+            "3D molecular structure visualization",
+            "#00ff88",
+            "⚗️",
+        ),
+        (
+            "reaction_kinetics",
+            "Reaction Kinetics",
+            "Chemical reaction rate visualization",
+            "#ff6633",
+            "⏱️",
+        ),
         ("periodic_explorer", "Periodic Explorer", "Interactive periodic table", "#33ccff", "📋"),
         ("orbital_viewer", "Orbital Viewer", "Atomic orbital visualization", "#9933ff", "🔵"),
         ("bond_analyzer", "Bond Analyzer", "Chemical bond strength analysis", "#ffcc00", "🔗"),
         ("spectroscopy", "Spectroscopy", "Molecular spectroscopy simulation", "#ff3399", "🌈"),
         ("catalyst_sim", "Catalyst Sim", "Catalytic reaction simulation", "#00ffcc", "⚡"),
-        ("crystal_structure", "Crystal Structure", "Crystal lattice visualization", "#ff9966", "💎"),
+        (
+            "crystal_structure",
+            "Crystal Structure",
+            "Crystal lattice visualization",
+            "#ff9966",
+            "💎",
+        ),
         ("solubility_map", "Solubility Map", "Solubility phase diagram", "#66ffcc", "💧"),
         ("thermodynamics", "Thermodynamics", "Thermodynamic process visualization", "#cc33ff", "🌡️"),
     ],
     "crypto": [
         ("hash_visualizer", "Hash Visualizer", "Cryptographic hash visualization", "#ff3366", "🔐"),
-        ("blockchain_explorer", "Blockchain Explorer", "Blockchain network visualization", "#ffaa00", "⛓️"),
-        ("encryption_flow", "Encryption Flow", "Encryption algorithm visualization", "#00f5ff", "🔒"),
+        (
+            "blockchain_explorer",
+            "Blockchain Explorer",
+            "Blockchain network visualization",
+            "#ffaa00",
+            "⛓️",
+        ),
+        (
+            "encryption_flow",
+            "Encryption Flow",
+            "Encryption algorithm visualization",
+            "#00f5ff",
+            "🔒",
+        ),
         ("key_exchange", "Key Exchange", "Diffie-Hellman key exchange viz", "#00ff88", "🔑"),
         ("merkle_tree", "Merkle Tree", "Merkle tree structure visualization", "#ff00ff", "🌲"),
         ("zero_knowledge", "Zero Knowledge", "Zero-knowledge proof visualization", "#9933ff", "❓"),
         ("signature_verify", "Signature Verify", "Digital signature verification", "#33ffcc", "✍️"),
-        ("entropy_analyzer", "Entropy Analyzer", "Randomness and entropy analysis", "#ff9933", "🎲"),
+        (
+            "entropy_analyzer",
+            "Entropy Analyzer",
+            "Randomness and entropy analysis",
+            "#ff9933",
+            "🎲",
+        ),
         ("cipher_wheel", "Cipher Wheel", "Classical cipher visualization", "#66ff33", "⚙️"),
         ("quantum_crypto", "Quantum Crypto", "Quantum cryptography simulation", "#ff66cc", "🔮"),
     ],
@@ -106,7 +286,13 @@ MODULES = {
         ("pulsar_timing", "Pulsar Timing", "Pulsar signal analysis", "#33ffcc", "📻"),
         ("redshift_map", "Redshift Map", "Cosmological redshift visualization", "#ff9933", "🔴"),
         ("dark_matter", "Dark Matter", "Dark matter distribution map", "#666699", "🌑"),
-        ("gravitational_waves", "Gravitational Waves", "Gravitational wave detection", "#66ff33", "〰️"),
+        (
+            "gravitational_waves",
+            "Gravitational Waves",
+            "Gravitational wave detection",
+            "#66ff33",
+            "〰️",
+        ),
     ],
     "financial": [
         ("market_depth", "Market Depth", "Order book depth visualization", "#00ff88", "📊"),
@@ -118,7 +304,13 @@ MODULES = {
         ("sentiment_tracker", "Sentiment Tracker", "Market sentiment analysis", "#33ffcc", "😊"),
         ("flow_analyzer", "Flow Analyzer", "Money flow visualization", "#ff9933", "💰"),
         ("yield_curve", "Yield Curve", "Interest rate yield curve", "#66ff33", "📉"),
-        ("portfolio_optimizer", "Portfolio Optimizer", "Efficient frontier visualization", "#ff66cc", "🎯"),
+        (
+            "portfolio_optimizer",
+            "Portfolio Optimizer",
+            "Efficient frontier visualization",
+            "#ff66cc",
+            "🎯",
+        ),
     ],
     "data": [
         ("scatter_3d", "3D Scatter", "3D scatter plot visualization", "#00f5ff", "📍"),
@@ -135,7 +327,7 @@ MODULES = {
 }
 
 # HTML template for each module - ENHANCED VERSION
-MODULE_TEMPLATE = '''<!DOCTYPE html>
+MODULE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1740,11 +1932,13 @@ MODULE_TEMPLATE = '''<!DOCTYPE html>
         connectPlatform();
     </script>
 </body>
-</html>'''
+</html>"""
+
 
 # Central dashboard template - using string concatenation to avoid format issues
 def get_dashboard_template(category_buttons, module_cards):
-    return '''<!DOCTYPE html>
+    return (
+        """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -2001,11 +2195,15 @@ def get_dashboard_template(category_buttons, module_cards):
         
         <div class="category-nav">
             <button class="cat-btn active" onclick="filterCategory('all')">ALL (100)</button>
-            ''' + category_buttons + '''
+            """
+        + category_buttons
+        + """
         </div>
         
         <div class="modules-grid" id="modulesGrid">
-            ''' + module_cards + '''
+            """
+        + module_cards
+        + """
         </div>
         
         <div class="footer">
@@ -2099,11 +2297,13 @@ def get_dashboard_template(category_buttons, module_cards):
         }
     </script>
 </body>
-</html>'''
+</html>"""
+    )
+
 
 def generate_modules():
     """Generate all 100 module HTML files and the central dashboard."""
-    
+
     # Component mapping for platform integration
     COMPONENT_MAP = {
         "quantum": "quasim",
@@ -2115,23 +2315,23 @@ def generate_modules():
         "network": "autonomous",
         "space": "quasim",
         "financial": "autonomous",
-        "data": "qubic"
+        "data": "qubic",
     }
-    
+
     # Create base directories
     os.makedirs(f"{BASE_DIR}/dashboard", exist_ok=True)
-    
+
     all_modules = []
-    
+
     # Generate each module
     for category, modules in MODULES.items():
         component = COMPONENT_MAP.get(category, "qubic")
-        
+
         for module_id, title, description, color, icon in modules:
             # Create module directory
             module_dir = f"{BASE_DIR}/{module_id}"
             os.makedirs(module_dir, exist_ok=True)
-            
+
             # Generate module HTML with platform integration
             html = MODULE_TEMPLATE.format(
                 title=title,
@@ -2141,72 +2341,74 @@ def generate_modules():
                 module_id=module_id,
                 module_type=module_id,
                 category=category.upper(),
-                component=component
+                component=component,
             )
-            
-            with open(f"{module_dir}/index.html", 'w') as f:
+
+            with open(f"{module_dir}/index.html", "w") as f:
                 f.write(html)
-            
-            all_modules.append({
-                'id': module_id,
-                'title': title,
-                'description': description,
-                'color': color,
-                'icon': icon,
-                'category': category,
-                'component': component
-            })
-            
+
+            all_modules.append(
+                {
+                    "id": module_id,
+                    "title": title,
+                    "description": description,
+                    "color": color,
+                    "icon": icon,
+                    "category": category,
+                    "component": component,
+                }
+            )
+
             print(f"✓ Generated: {module_id} [{component}]")
-    
+
     # Generate category buttons
     category_buttons = []
-    for cat in MODULES.keys():
+    for cat in MODULES:
         count = len(MODULES[cat])
         category_buttons.append(
             f'<button class="cat-btn" onclick="filterCategory(\'{cat}\')">{cat.upper()} ({count})</button>'
         )
-    
+
     # Generate module cards
     module_cards = []
     for m in all_modules:
-        card = f'''
+        card = f"""
             <div class="module-card" style="--color: {m['color']}" data-category="{m['category']}" onclick="launchModule('{m['id']}')">
                 <div class="module-category">{m['category']}</div>
                 <div class="module-icon">{m['icon']}</div>
                 <div class="module-title">{m['title']}</div>
                 <div class="module-desc">{m['description']}</div>
             </div>
-        '''
+        """
         module_cards.append(card)
-    
+
     # Generate dashboard
     dashboard_html = get_dashboard_template(
-        '\n            '.join(category_buttons),
-        '\n            '.join(module_cards)
+        "\n            ".join(category_buttons), "\n            ".join(module_cards)
     )
-    
-    with open(f"{BASE_DIR}/dashboard/index.html", 'w') as f:
+
+    with open(f"{BASE_DIR}/dashboard/index.html", "w") as f:
         f.write(dashboard_html)
-    
-    print(f"\n✓ Generated central dashboard")
-    
+
+    print("\n✓ Generated central dashboard")
+
     # Save module manifest
-    with open(f"{BASE_DIR}/modules.json", 'w') as f:
+    with open(f"{BASE_DIR}/modules.json", "w") as f:
         json.dump(all_modules, f, indent=2)
-    
-    print(f"✓ Saved module manifest")
-    
+
+    print("✓ Saved module manifest")
+
     return len(all_modules)
+
 
 if __name__ == "__main__":
     print("=" * 60)
     print("QUBIC Module Generator")
     print("=" * 60)
     print()
-    
+
     count = generate_modules()
-    
+
     print()
     print("=" * 60)
     print(f"✅ Successfully generated {count} modules!")

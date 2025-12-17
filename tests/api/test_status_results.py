@@ -1,7 +1,6 @@
 """Tests for status and results endpoints."""
 
 
-
 class TestStatusEndpoints:
     """Tests for status monitoring endpoints."""
 

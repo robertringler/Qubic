@@ -10,21 +10,16 @@ Classification: UNCLASSIFIED // CUI
 from __future__ import annotations
 
 import hashlib
-import hmac
 import json
 import logging
-import os
 import threading
 import time
 import uuid
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum, auto
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Protocol, TypeVar
-
-import numpy as np
 
 __all__ = [
     "AuditLevel",
@@ -40,14 +35,14 @@ __all__ = [
 class AuditLevel(Enum):
     """Audit event severity levels aligned with NIST 800-53 AU-2."""
 
-    TRACE = auto()      # Detailed debugging (not for production)
-    DEBUG = auto()      # Development diagnostics
-    INFO = auto()       # Routine operational events
-    WARNING = auto()    # Anomalies that may require attention
-    ERROR = auto()      # Recoverable errors
-    CRITICAL = auto()   # Non-recoverable failures
-    SECURITY = auto()   # Security-relevant events (AC, AU, IA controls)
-    COMPLIANCE = auto() # Compliance verification events
+    TRACE = auto()  # Detailed debugging (not for production)
+    DEBUG = auto()  # Development diagnostics
+    INFO = auto()  # Routine operational events
+    WARNING = auto()  # Anomalies that may require attention
+    ERROR = auto()  # Recoverable errors
+    CRITICAL = auto()  # Non-recoverable failures
+    SECURITY = auto()  # Security-relevant events (AC, AU, IA controls)
+    COMPLIANCE = auto()  # Compliance verification events
 
 
 @dataclass(frozen=True)
@@ -140,7 +135,7 @@ class ExecutionContext:
     device: str = "cpu"
     precision: str = "fp64"
 
-    def create_child_span(self) -> "ExecutionContext":
+    def create_child_span(self) -> ExecutionContext:
         """Create a child execution context for nested operations."""
         return ExecutionContext(
             context_id=str(uuid.uuid4()),
@@ -400,7 +395,7 @@ class ComplianceAuditor:
     support for DO-178C, NIST 800-53, and CMMC 2.0 compliance.
     """
 
-    _instance: Optional["ComplianceAuditor"] = None
+    _instance: Optional[ComplianceAuditor] = None
     _lock = threading.Lock()
 
     def __init__(
@@ -426,7 +421,7 @@ class ComplianceAuditor:
         self._logger = logging.getLogger("qratum.compliance")
 
     @classmethod
-    def get_instance(cls) -> "ComplianceAuditor":
+    def get_instance(cls) -> ComplianceAuditor:
         """Get singleton auditor instance."""
         if cls._instance is None:
             with cls._lock:
@@ -595,6 +590,7 @@ def audit_operation(
     Returns:
         Decorated function with audit logging
     """
+
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         def wrapper(*args: Any, **kwargs: Any) -> T:
             auditor = get_auditor()
@@ -640,4 +636,5 @@ def audit_operation(
                 auditor.pop_context()
 
         return wrapper
+
     return decorator

@@ -123,7 +123,9 @@ def get_rate_limiter(config: RateLimitConfig | None = None) -> TokenBucket:
     global _rate_limiter
     if _rate_limiter is None:
         config = config or RateLimitConfig()
-        _rate_limiter = TokenBucket(rate=config.requests_per_minute / 60.0, capacity=config.burst_size)
+        _rate_limiter = TokenBucket(
+            rate=config.requests_per_minute / 60.0, capacity=config.burst_size
+        )
     return _rate_limiter
 
 
@@ -391,9 +393,7 @@ if FASTAPI_AVAILABLE:
         - Required headers
         """
 
-        def __init__(
-            self, app: FastAPI, max_body_size: int = 10 * 1024 * 1024  # 10MB default
-        ):
+        def __init__(self, app: FastAPI, max_body_size: int = 10 * 1024 * 1024):  # 10MB default
             """Initialize middleware.
 
             Args:
@@ -443,7 +443,7 @@ if FASTAPI_AVAILABLE:
             return await call_next(request)
 
 
-def setup_middleware(app: "FastAPI", config: dict[str, Any] | None = None) -> None:
+def setup_middleware(app: FastAPI, config: dict[str, Any] | None = None) -> None:
     """Set up all middleware for the application.
 
     Args:
@@ -461,7 +461,8 @@ def setup_middleware(app: "FastAPI", config: dict[str, Any] | None = None) -> No
         RequestValidationMiddleware, max_body_size=config.get("max_body_size", 10 * 1024 * 1024)
     )
     app.add_middleware(
-        AuditLogMiddleware, excluded_paths=config.get("audit_excluded_paths", ["/health", "/readiness"])
+        AuditLogMiddleware,
+        excluded_paths=config.get("audit_excluded_paths", ["/health", "/readiness"]),
     )
     app.add_middleware(
         RateLimitMiddleware,

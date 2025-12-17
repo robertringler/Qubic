@@ -1,7 +1,6 @@
 """Tests for job management endpoints."""
 
 
-
 class TestJobEndpoints:
     """Tests for job management endpoints."""
 

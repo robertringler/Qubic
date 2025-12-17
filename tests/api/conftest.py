@@ -40,7 +40,9 @@ def api_client():
         from api.v1.main import create_app
 
         # Create app with rate limiting disabled
-        app = create_app({"rate_limit_enabled": False, "rate_limit_rpm": 100000, "rate_limit_burst": 100000})
+        app = create_app(
+            {"rate_limit_enabled": False, "rate_limit_rpm": 100000, "rate_limit_burst": 100000}
+        )
         if app is None:
             pytest.skip("FastAPI application not available")
         return TestClient(app)

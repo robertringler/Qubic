@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-import pytest
 import tempfile
 from pathlib import Path
 
 from xenon.molecular_dynamics_lab.core.pdb_loader import (
-    PDBLoader,
-    PDBStructure,
     Atom,
-    Residue,
     Chain,
+    PDBLoader,
+    Residue,
 )
-
 
 # Sample PDB content for testing
 SAMPLE_PDB = """HEADER    PLANT PROTEIN                           15-APR-81   1CRN
@@ -114,9 +111,7 @@ class TestPDBLoader:
         """Test loading PDB from file."""
         loader = PDBLoader()
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".pdb", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as f:
             f.write(SAMPLE_PDB)
             temp_path = Path(f.name)
 

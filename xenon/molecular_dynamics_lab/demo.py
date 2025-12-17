@@ -17,27 +17,27 @@ interactive 3D molecular viewer.
 
 from __future__ import annotations
 
-import webbrowser
-import time
 import sys
+import time
+import webbrowser
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from xenon.molecular_dynamics_lab import (
-    MolecularViewer,
-    ViewerConfig,
-    PDBLoader,
-    DockingEngine,
     DockingConfig,
-    MDSimulator,
-    MDConfig,
-    VRController,
-    VRConfig,
-    HapticEngine,
+    DockingEngine,
     HapticConfig,
+    HapticEngine,
+    MDConfig,
+    MDSimulator,
     MolecularLabServer,
+    MolecularViewer,
+    PDBLoader,
+    ViewerConfig,
+    VRConfig,
+    VRController,
 )
 from xenon.molecular_dynamics_lab.web.server import ServerConfig
 
@@ -54,7 +54,7 @@ def demo_pdb_loading():
     print("\n📥 Loading 1CRN (Crambin) from RCSB...")
     try:
         structure = loader.load_from_rcsb("1CRN")
-        print(f"   ✅ Loaded successfully!")
+        print("   ✅ Loaded successfully!")
         print(f"   📊 PDB ID: {structure.pdb_id}")
         print(f"   🔢 Atoms: {len(structure.atoms)}")
         print(f"   🧪 Residues: {sum(len(c.residues) for c in structure.chains)}")
@@ -300,9 +300,7 @@ def main():
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Advanced Molecular Dynamics Lab Demo"
-    )
+    parser = argparse.ArgumentParser(description="Advanced Molecular Dynamics Lab Demo")
     parser.add_argument(
         "--server",
         action="store_true",

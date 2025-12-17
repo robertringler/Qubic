@@ -26,7 +26,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, TypeVar
+from typing import Any, Dict, Generator, List, Optional, Tuple, TypeVar
 
 import numpy as np
 
@@ -45,10 +45,10 @@ __all__ = [
 class DeterminismLevel(Enum):
     """Determinism enforcement levels."""
 
-    RELAXED = auto()      # Best-effort determinism
-    STANDARD = auto()     # Standard enforcement
-    STRICT = auto()       # Strict enforcement with validation
-    CERTIFIED = auto()    # DO-178C certified determinism
+    RELAXED = auto()  # Best-effort determinism
+    STANDARD = auto()  # Standard enforcement
+    STRICT = auto()  # Strict enforcement with validation
+    CERTIFIED = auto()  # DO-178C certified determinism
 
 
 @dataclass(frozen=True)
@@ -134,7 +134,7 @@ class SeedAuthority:
     - Audit logging
     """
 
-    _instance: Optional["SeedAuthority"] = None
+    _instance: Optional[SeedAuthority] = None
     _lock = threading.Lock()
 
     # Production-certified seed (DO-178C validated)
@@ -162,12 +162,10 @@ class SeedAuthority:
 
         # Validate seed range
         if not (0 <= self._master_seed <= self.MAX_SEED):
-            raise ValueError(
-                f"Seed must be in range [0, {self.MAX_SEED}], got {self._master_seed}"
-            )
+            raise ValueError(f"Seed must be in range [0, {self.MAX_SEED}], got {self._master_seed}")
 
     @classmethod
-    def get_instance(cls, seed: Optional[int] = None) -> "SeedAuthority":
+    def get_instance(cls, seed: Optional[int] = None) -> SeedAuthority:
         """Get or create singleton seed authority.
 
         Args:
@@ -309,14 +307,10 @@ class SeedAuthority:
             self._sequence_number += 1
 
             # Capture Python random state
-            python_state = hashlib.sha256(
-                str(random.getstate()).encode("utf-8")
-            ).hexdigest()[:16]
+            python_state = hashlib.sha256(str(random.getstate()).encode("utf-8")).hexdigest()[:16]
 
             # Capture NumPy state
-            numpy_state = hashlib.sha256(
-                np.random.get_state()[1].tobytes()
-            ).hexdigest()[:16]
+            numpy_state = hashlib.sha256(np.random.get_state()[1].tobytes()).hexdigest()[:16]
 
             # Capture PyTorch state (if available)
             torch_state = None
@@ -468,7 +462,7 @@ class DeterministicContext:
         self._authority: Optional[SeedAuthority] = None
         self._start_time: int = 0
 
-    def __enter__(self) -> "DeterministicContext":
+    def __enter__(self) -> DeterministicContext:
         """Enter deterministic context."""
         self._authority = SeedAuthority.get_instance(self._seed)
 
@@ -611,7 +605,7 @@ class ReplayEngine:
             self._logger.warning(f"Snapshot not found: {path}")
             return None
 
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
 
         seed_state_data = data["seed_state"]
