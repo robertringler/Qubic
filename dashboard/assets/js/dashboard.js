@@ -411,10 +411,26 @@
     }
 
     // ========================================
-    // Charts
+    // Charts - Crisp Standard: 1.5-2px lines, subtle grids
     // ========================================
     
+    // Chart.js global defaults for scientific instrument look
+    const chartDefaults = {
+        font: {
+            family: "'Roboto Mono', 'SF Mono', monospace",
+            size: 10
+        },
+        color: '#606070'
+    };
+    
     function initCharts() {
+        // Apply global defaults if Chart is available
+        if (typeof Chart !== 'undefined') {
+            Chart.defaults.font.family = chartDefaults.font.family;
+            Chart.defaults.font.size = chartDefaults.font.size;
+            Chart.defaults.color = chartDefaults.color;
+        }
+        
         // Convergence Chart
         const convergenceCtx = document.getElementById('convergence-chart');
         if (convergenceCtx) {
@@ -426,9 +442,12 @@
                         label: 'Loss',
                         data: [],
                         borderColor: '#00f5ff',
-                        backgroundColor: 'rgba(0, 245, 255, 0.1)',
+                        backgroundColor: 'rgba(0, 245, 255, 0.05)',
+                        borderWidth: 1.5,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.3,
+                        pointRadius: 0,
+                        pointHoverRadius: 3
                     }]
                 },
                 options: {
@@ -443,19 +462,29 @@
                         x: {
                             display: true,
                             grid: {
-                                color: 'rgba(255,255,255,0.1)'
+                                color: 'rgba(255,255,255,0.05)',
+                                lineWidth: 1
                             },
                             ticks: {
-                                color: '#a0a0b0'
+                                color: '#606070',
+                                font: { size: 9 }
+                            },
+                            border: {
+                                color: 'rgba(255,255,255,0.15)'
                             }
                         },
                         y: {
                             display: true,
                             grid: {
-                                color: 'rgba(255,255,255,0.1)'
+                                color: 'rgba(255,255,255,0.05)',
+                                lineWidth: 1
                             },
                             ticks: {
-                                color: '#a0a0b0'
+                                color: '#606070',
+                                font: { size: 9 }
+                            },
+                            border: {
+                                color: 'rgba(255,255,255,0.15)'
                             }
                         }
                     }
@@ -475,13 +504,17 @@
                             label: 'CPU',
                             data: [],
                             borderColor: '#00ff88',
-                            tension: 0.4
+                            borderWidth: 1.5,
+                            tension: 0.3,
+                            pointRadius: 0
                         },
                         {
                             label: 'Memory',
                             data: [],
                             borderColor: '#7b2cbf',
-                            tension: 0.4
+                            borderWidth: 1.5,
+                            tension: 0.3,
+                            pointRadius: 0
                         }
                     ]
                 },
@@ -492,7 +525,10 @@
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#a0a0b0'
+                                color: '#606070',
+                                boxWidth: 12,
+                                padding: 8,
+                                font: { size: 9 }
                             }
                         }
                     },
@@ -504,10 +540,15 @@
                             display: true,
                             max: 100,
                             grid: {
-                                color: 'rgba(255,255,255,0.1)'
+                                color: 'rgba(255,255,255,0.05)',
+                                lineWidth: 1
                             },
                             ticks: {
-                                color: '#a0a0b0'
+                                color: '#606070',
+                                font: { size: 9 }
+                            },
+                            border: {
+                                color: 'rgba(255,255,255,0.15)'
                             }
                         }
                     }
@@ -529,17 +570,22 @@
                             '#4285f4',
                             '#00bcf2'
                         ],
-                        borderWidth: 0
+                        borderWidth: 1,
+                        borderColor: 'rgba(0,0,0,0.3)'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '65%',
                     plugins: {
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#a0a0b0'
+                                color: '#606070',
+                                boxWidth: 10,
+                                padding: 8,
+                                font: { size: 9 }
                             }
                         }
                     }
@@ -547,7 +593,7 @@
             });
         }
         
-        // Usage Chart
+        // Usage Chart - Bar chart with subtle styling
         const usageCtx = document.getElementById('usage-chart');
         if (usageCtx) {
             state.charts.usage = new Chart(usageCtx, {
@@ -557,9 +603,10 @@
                     datasets: [{
                         label: 'GPU Hours',
                         data: [],
-                        backgroundColor: 'rgba(0, 245, 255, 0.5)',
-                        borderColor: '#00f5ff',
-                        borderWidth: 1
+                        backgroundColor: 'rgba(0, 245, 255, 0.3)',
+                        borderColor: 'rgba(0, 245, 255, 0.6)',
+                        borderWidth: 1,
+                        borderRadius: 2
                     }]
                 },
                 options: {
@@ -573,18 +620,29 @@
                     scales: {
                         x: {
                             grid: {
-                                color: 'rgba(255,255,255,0.1)'
+                                color: 'rgba(255,255,255,0.05)',
+                                lineWidth: 1
                             },
                             ticks: {
-                                color: '#a0a0b0'
+                                color: '#606070',
+                                font: { size: 8 },
+                                maxRotation: 0
+                            },
+                            border: {
+                                color: 'rgba(255,255,255,0.15)'
                             }
                         },
                         y: {
                             grid: {
-                                color: 'rgba(255,255,255,0.1)'
+                                color: 'rgba(255,255,255,0.05)',
+                                lineWidth: 1
                             },
                             ticks: {
-                                color: '#a0a0b0'
+                                color: '#606070',
+                                font: { size: 9 }
+                            },
+                            border: {
+                                color: 'rgba(255,255,255,0.15)'
                             }
                         }
                     }

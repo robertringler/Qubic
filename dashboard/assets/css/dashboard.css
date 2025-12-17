@@ -2,6 +2,7 @@
  * QRATUM Customer Dashboard Styles
  * Version: 2.0.0
  * WCAG 2.1 AA Compliant
+ * Design System: "The Crisp Standard" - Scientific Instrument Aesthetic
  */
 
 /* ========================================== */
@@ -31,20 +32,21 @@
     /* Background Colors */
     --bg-dark: #0a0a0f;
     --bg-darker: #050508;
-    --bg-panel: rgba(15, 15, 25, 0.85);
-    --bg-card: rgba(20, 20, 35, 0.9);
-    --bg-hover: rgba(0, 245, 255, 0.1);
+    --bg-panel: rgba(12, 12, 18, 0.95);
+    --bg-card: rgba(16, 16, 24, 0.98);
+    --bg-hover: rgba(0, 245, 255, 0.08);
     
     /* Text Colors */
     --text-primary: #ffffff;
     --text-secondary: #a0a0b0;
     --text-muted: #606070;
     
-    /* Border Colors */
-    --border-glow: rgba(0, 245, 255, 0.3);
-    --border-subtle: rgba(255, 255, 255, 0.1);
+    /* Border Colors - Sharp 1px borders instead of shadows */
+    --border-glow: rgba(0, 245, 255, 0.25);
+    --border-subtle: rgba(255, 255, 255, 0.15);
+    --border-strong: rgba(255, 255, 255, 0.25);
     
-    /* Spacing */
+    /* Spacing - Aligned to 4px/8px grid */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 16px;
@@ -52,23 +54,17 @@
     --spacing-xl: 32px;
     --spacing-2xl: 48px;
     
-    /* Border Radius */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
-    --radius-full: 9999px;
-    
-    /* Shadows */
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 0 20px rgba(0, 245, 255, 0.3);
+    /* Border Radius - Sharp geometry (max 4px) */
+    --radius-sm: 2px;
+    --radius-md: 4px;
+    --radius-lg: 4px;
+    --radius-xl: 4px;
+    --radius-full: 4px;
     
     /* Transitions */
-    --transition-fast: 150ms ease;
-    --transition-normal: 300ms ease;
-    --transition-slow: 500ms ease;
+    --transition-fast: 100ms ease-out;
+    --transition-normal: 200ms ease-out;
+    --transition-slow: 400ms ease-out;
     
     /* Z-Index Layers */
     --z-base: 1;
@@ -77,10 +73,15 @@
     --z-toast: 1100;
     --z-loader: 2000;
     
-    /* Font Families */
-    --font-display: 'Orbitron', sans-serif;
-    --font-body: 'Rajdhani', sans-serif;
-    --font-mono: 'Share Tech Mono', monospace;
+    /* Font Families - Scientific/Technical */
+    --font-display: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'Roboto Mono', 'SF Mono', 'Consolas', monospace;
+    
+    /* Typography - Tight tracking */
+    --letter-spacing-tight: -0.01em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.05em;
 }
 
 /* ========================================== */
@@ -97,12 +98,17 @@
 html {
     font-size: 16px;
     scroll-behavior: smooth;
+    /* Crisp font rendering - applied to html for inheritance */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 body {
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.5;
+    letter-spacing: var(--letter-spacing-tight);
     color: var(--text-primary);
     background: var(--bg-dark);
     min-height: 100vh;
@@ -258,32 +264,34 @@ body {
 .logo-subtitle {
     font-size: 0.75rem;
     color: var(--text-muted);
-    letter-spacing: 1px;
+    letter-spacing: var(--letter-spacing-tight);
 }
 
 .nav-tabs {
     display: flex;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs);
-    background: var(--bg-panel);
-    border-radius: var(--radius-full);
+    gap: 1px;
+    padding: 0;
+    background: var(--border-subtle);
+    border-radius: var(--radius-sm);
     border: 1px solid var(--border-subtle);
+    overflow: hidden;
 }
 
 .nav-tab {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    background: transparent;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-panel);
     border: none;
     color: var(--text-secondary);
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    font-weight: 600;
-    border-radius: var(--radius-full);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: var(--letter-spacing-wide);
+    border-radius: 0;
     cursor: pointer;
-    transition: all var(--transition-normal);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .nav-tab:hover {
@@ -297,7 +305,7 @@ body {
 }
 
 .nav-icon {
-    font-size: 1rem;
+    font-size: 0.875rem;
 }
 
 .nav-actions {
@@ -310,32 +318,24 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-xs) var(--spacing-md);
-    background: rgba(0, 255, 136, 0.1);
-    border: 1px solid var(--success);
-    border-radius: var(--radius-full);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: rgba(0, 255, 136, 0.08);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    border-radius: var(--radius-sm);
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    animation: statusPulse 2s ease-in-out infinite;
 }
 
 .status-dot.online {
     background: var(--success);
-    box-shadow: 0 0 10px var(--success);
 }
 
 .status-dot.offline {
     background: var(--error);
-    box-shadow: 0 0 10px var(--error);
-}
-
-@keyframes statusPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.7; }
 }
 
 .status-text {
@@ -480,15 +480,15 @@ body {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    border-radius: var(--radius-md);
+    letter-spacing: var(--letter-spacing-wide);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .btn-primary {
@@ -499,8 +499,7 @@ body {
 
 .btn-primary:hover {
     background: var(--primary-light);
-    box-shadow: var(--shadow-glow);
-    transform: translateY(-2px);
+    border-color: var(--primary-light);
 }
 
 .btn-secondary {
@@ -515,37 +514,36 @@ body {
 }
 
 /* ========================================== */
-/* CARDS */
+/* CARDS - Scientific Instrument Style */
 /* ========================================== */
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    backdrop-filter: blur(10px);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(12px);
     overflow: hidden;
-    transition: all var(--transition-normal);
+    transition: border-color var(--transition-fast);
 }
 
 .card:hover {
-    border-color: var(--border-glow);
-    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
 }
 
 .card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
     border-bottom: 1px solid var(--border-subtle);
-    background: rgba(0, 245, 255, 0.05);
+    background: rgba(0, 245, 255, 0.03);
 }
 
 .card-title {
-    font-family: var(--font-display);
-    font-size: 0.875rem;
-    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
     color: var(--primary);
-    letter-spacing: 1px;
+    letter-spacing: var(--letter-spacing-wide);
     text-transform: uppercase;
 }
 
@@ -940,49 +938,54 @@ input[type="checkbox"] {
 }
 
 /* ========================================== */
-/* METRICS & GAUGES */
+/* METRICS & GAUGES - Scientific Instrument Style */
 /* ========================================== */
 .metric-badge {
-    padding: 2px 8px;
-    font-size: 0.625rem;
-    font-weight: 700;
+    padding: 2px 6px;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    border-radius: var(--radius-full);
+    letter-spacing: var(--letter-spacing-wide);
+    border-radius: var(--radius-sm);
+    border: 1px solid currentColor;
+    background: transparent;
 }
 
 .metric-badge.nvidia {
-    background: rgba(118, 185, 0, 0.2);
     color: #76b900;
+    border-color: rgba(118, 185, 0, 0.4);
 }
 
 .gauge-container {
     display: flex;
     justify-content: center;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
 }
 
 .gauge {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     background: conic-gradient(
         var(--primary) calc(var(--value, 0) * 3.6deg),
-        var(--border-subtle) 0deg
+        rgba(255, 255, 255, 0.08) 0deg
     );
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid var(--border-subtle);
 }
 
 .gauge::before {
     content: '';
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: 96px;
+    height: 96px;
     border-radius: 50%;
     background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
 }
 
 .gauge-center {
@@ -992,31 +995,44 @@ input[type="checkbox"] {
 }
 
 .gauge-value {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 600;
     color: var(--primary);
+    letter-spacing: var(--letter-spacing-tight);
 }
 
 .gauge-label {
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
     color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
 }
 
 .metric-details {
     border-top: 1px solid var(--border-subtle);
-    padding-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
 }
 
 .metric-row {
     display: flex;
     justify-content: space-between;
-    padding: var(--spacing-sm) 0;
-    font-size: 0.875rem;
+    padding: var(--spacing-xs) 0;
+    font-size: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.metric-row:last-child {
+    border-bottom: none;
 }
 
 .metric-row span:first-child {
-    color: var(--text-secondary);
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    text-transform: uppercase;
+    font-size: 0.625rem;
+    letter-spacing: var(--letter-spacing-wide);
 }
 
 .metric-row span:last-child {
@@ -1024,38 +1040,38 @@ input[type="checkbox"] {
     color: var(--text-primary);
 }
 
-/* Jobs Summary */
+/* Jobs Summary - Scientific Instrument Style */
 .jobs-summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
     text-align: center;
 }
 
 .summary-item {
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    background: transparent;
 }
 
 .summary-item.running {
-    background: rgba(0, 245, 255, 0.1);
-    border: 1px solid var(--primary);
+    border-color: rgba(0, 245, 255, 0.3);
 }
 
 .summary-item.queued {
-    background: rgba(255, 170, 0, 0.1);
-    border: 1px solid var(--warning);
+    border-color: rgba(255, 170, 0, 0.3);
 }
 
 .summary-item.completed {
-    background: rgba(0, 255, 136, 0.1);
-    border: 1px solid var(--success);
+    border-color: rgba(0, 255, 136, 0.3);
 }
 
 .summary-value {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: var(--letter-spacing-tight);
 }
 
 .summary-item.running .summary-value { color: var(--primary); }
@@ -1063,35 +1079,38 @@ input[type="checkbox"] {
 .summary-item.completed .summary-value { color: var(--success); }
 
 .summary-label {
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: var(--letter-spacing-wide);
 }
 
-/* Charts */
+/* Charts - Subtle grid lines */
 .chart-container {
-    height: 200px;
+    height: 180px;
     position: relative;
 }
 
 .chart-container.small {
-    height: 150px;
+    height: 140px;
 }
 
-/* Console Output */
+/* Console Output - Monospace */
 .console-output {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
+    line-height: 1.6;
     background: var(--bg-darker);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    max-height: 200px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    padding: var(--spacing-sm);
+    max-height: 180px;
     overflow-y: auto;
 }
 
 .console-line {
-    padding: 2px 0;
+    padding: 1px 0;
     color: var(--text-secondary);
 }
 

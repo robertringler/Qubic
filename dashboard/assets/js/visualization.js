@@ -82,10 +82,23 @@ const QratumVisualization = (function() {
         );
         camera.position.set(0, 15, 30);
 
-        // Create renderer
-        renderer = new THREE.WebGLRenderer({ antialias: true });
+        // Create renderer - Crisp Standard: devicePixelRatio + antialias + sRGB
+        renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: false,
+            powerPreference: 'high-performance'
+        });
         renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(window.devicePixelRatio); // Use full device pixel ratio for crisp rendering
+        renderer.setClearColor(0x0a0a0f, 1);
+        
+        // sRGB color space for accurate colors
+        if (renderer.outputColorSpace !== undefined) {
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
+        } else if (renderer.outputEncoding !== undefined) {
+            renderer.outputEncoding = THREE.sRGBEncoding; // Legacy fallback
+        }
+        
         container.appendChild(renderer.domElement);
 
         // Create controls (with fallback if OrbitControls not available)
