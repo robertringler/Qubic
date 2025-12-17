@@ -1,6 +1,5 @@
 """Tests for job management endpoints."""
 
-import pytest
 
 
 class TestJobEndpoints:

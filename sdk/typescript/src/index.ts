@@ -618,7 +618,13 @@ class StatusAPI {
     }
 
     return new Promise((resolve, reject) => {
-      const wsUrl = this.config.baseUrl?.replace('http', 'ws') || 'wss://api.qratum.io/v1';
+      // Properly convert HTTP(S) URL to WS(S) URL
+      let wsUrl = this.config.baseUrl || 'https://api.qratum.io/v1';
+      if (wsUrl.startsWith('https://')) {
+        wsUrl = wsUrl.replace('https://', 'wss://');
+      } else if (wsUrl.startsWith('http://')) {
+        wsUrl = wsUrl.replace('http://', 'ws://');
+      }
       const token = this.config.accessToken;
 
       this.ws = new WebSocket(`${wsUrl}/ws/status?token=${token}`);

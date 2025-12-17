@@ -1,6 +1,5 @@
 """Tests for status and results endpoints."""
 
-import pytest
 
 
 class TestStatusEndpoints:

@@ -21,13 +21,10 @@ os.environ["JWT_SECRET"] = "test-jwt-secret-key-for-testing-12345678"
 @pytest.fixture(scope="session", autouse=True)
 def disable_rate_limiting():
     """Disable rate limiting for tests."""
-    from api.v1.middleware import RateLimitConfig, _rate_limiter
+    from api.v1.middleware import configure_rate_limiter
 
-    # Create a rate limiter with very high limits
-    global _rate_limiter
-    from api.v1 import middleware
-
-    middleware._rate_limiter = middleware.TokenBucket(rate=10000, capacity=10000)
+    # Configure with very high limits for testing
+    configure_rate_limiter(rate=10000, capacity=10000)
 
 
 @pytest.fixture

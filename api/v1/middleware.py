@@ -127,6 +127,17 @@ def get_rate_limiter(config: RateLimitConfig | None = None) -> TokenBucket:
     return _rate_limiter
 
 
+def configure_rate_limiter(rate: float, capacity: int) -> None:
+    """Configure the rate limiter (for testing purposes).
+
+    Args:
+        rate: Tokens per second refill rate
+        capacity: Maximum bucket capacity
+    """
+    global _rate_limiter
+    _rate_limiter = TokenBucket(rate=rate, capacity=capacity)
+
+
 if FASTAPI_AVAILABLE:
 
     class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -169,7 +180,12 @@ if FASTAPI_AVAILABLE:
                         "error_description": "Too many requests",
                         "retry_after": retry_after,
                     },
-                    headers={"Retry-After": str(retry_after)},
+                    headers={
+                        "Retry-After": str(retry_after),
+                        "X-RateLimit-Limit": str(self.config.requests_per_minute),
+                        "X-RateLimit-Remaining": "0",
+                        "X-RateLimit-Reset": str(int(time.time()) + retry_after),
+                    },
                 )
 
             return await call_next(request)

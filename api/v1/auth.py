@@ -16,6 +16,7 @@ Security Controls:
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
 import logging
@@ -331,6 +332,7 @@ class TokenManager:
                 algorithms=[self.config.jwt_algorithm],
                 audience=self.config.audience,
                 issuer=self.config.issuer,
+                options={"require": ["exp", "iat", "sub"]},
             )
 
             # Check if token is revoked
@@ -550,8 +552,6 @@ def sign_request(method: str, url: str, body: bytes, secret: str) -> str:
     Returns:
         Base64-encoded signature
     """
-    import base64
-
     message = f"{method.upper()}\n{url}\n{body.decode('utf-8') if body else ''}"
     signature = hmac.new(secret.encode(), message.encode(), hashlib.sha256).digest()
     return base64.b64encode(signature).decode()
