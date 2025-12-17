@@ -173,7 +173,7 @@ if FASTAPI_AVAILABLE:
         )
 
 
-def _get_clusters() -> list["ClusterSummary"]:
+def _get_clusters() -> list[ClusterSummary]:
     """Get list of available clusters.
 
     Returns:

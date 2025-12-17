@@ -11,10 +11,9 @@ Provides real-time molecular dynamics simulation capabilities including:
 from __future__ import annotations
 
 import logging
-import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 import numpy as np
 
@@ -169,17 +168,35 @@ class MDSimulator:
 
     # Atomic masses (g/mol)
     MASSES = {
-        "H": 1.008, "C": 12.011, "N": 14.007, "O": 15.999,
-        "S": 32.065, "P": 30.974, "F": 18.998, "Cl": 35.453,
-        "Br": 79.904, "I": 126.904, "Fe": 55.845, "Zn": 65.38,
-        "Ca": 40.078, "Mg": 24.305, "Na": 22.990, "K": 39.098,
+        "H": 1.008,
+        "C": 12.011,
+        "N": 14.007,
+        "O": 15.999,
+        "S": 32.065,
+        "P": 30.974,
+        "F": 18.998,
+        "Cl": 35.453,
+        "Br": 79.904,
+        "I": 126.904,
+        "Fe": 55.845,
+        "Zn": 65.38,
+        "Ca": 40.078,
+        "Mg": 24.305,
+        "Na": 22.990,
+        "K": 39.098,
     }
 
     # Lennard-Jones parameters (epsilon in kcal/mol, sigma in Angstroms)
     LJ_PARAMS = {
-        "H": (0.0157, 1.00), "C": (0.1094, 3.40), "N": (0.1700, 3.25),
-        "O": (0.2100, 3.12), "S": (0.2500, 3.55), "P": (0.2000, 3.74),
-        "F": (0.0610, 3.12), "Cl": (0.2650, 3.47), "Br": (0.3200, 3.59),
+        "H": (0.0157, 1.00),
+        "C": (0.1094, 3.40),
+        "N": (0.1700, 3.25),
+        "O": (0.2100, 3.12),
+        "S": (0.2500, 3.55),
+        "P": (0.2000, 3.74),
+        "F": (0.0610, 3.12),
+        "Cl": (0.2650, 3.47),
+        "Br": (0.3200, 3.59),
     }
 
     def __init__(self, config: Optional[MDConfig] = None):
@@ -251,9 +268,7 @@ class MDSimulator:
 
         # Remove center of mass motion
         total_mass = np.sum(self._state.masses)
-        com_velocity = np.sum(
-            velocities * self._state.masses[:, np.newaxis], axis=0
-        ) / total_mass
+        com_velocity = np.sum(velocities * self._state.masses[:, np.newaxis], axis=0) / total_mass
         velocities -= com_velocity
 
         self._state.velocities = velocities
@@ -312,7 +327,7 @@ class MDSimulator:
         potential = 0.0
 
         cutoff = self.config.cutoff
-        cutoff_sq = cutoff ** 2
+        cutoff_sq = cutoff**2
         box = np.array(self.config.box_size)
 
         # Lennard-Jones interactions
@@ -335,7 +350,7 @@ class MDSimulator:
                 if self.config.pbc:
                     rij -= box * np.round(rij / box)
 
-                r_sq = np.sum(rij ** 2)
+                r_sq = np.sum(rij**2)
 
                 if r_sq > cutoff_sq or r_sq < 0.01:
                     continue
@@ -343,8 +358,8 @@ class MDSimulator:
                 r = np.sqrt(r_sq)
                 r_inv = 1.0 / r
                 sig_r = sigma * r_inv
-                sig_r6 = sig_r ** 6
-                sig_r12 = sig_r6 ** 2
+                sig_r6 = sig_r**6
+                sig_r12 = sig_r6**2
 
                 # Lennard-Jones energy
                 lj_energy = 4 * epsilon * (sig_r12 - sig_r6)
@@ -421,7 +436,9 @@ class MDSimulator:
             # Velocity Verlet integrator
 
             # Half-step velocity update
-            self._state.velocities += 0.5 * dt * self._state.forces / self._state.masses[:, np.newaxis]
+            self._state.velocities += (
+                0.5 * dt * self._state.forces / self._state.masses[:, np.newaxis]
+            )
 
             # Full-step position update
             self._state.positions += dt * self._state.velocities
@@ -434,7 +451,9 @@ class MDSimulator:
             self._compute_forces()
 
             # Half-step velocity update
-            self._state.velocities += 0.5 * dt * self._state.forces / self._state.masses[:, np.newaxis]
+            self._state.velocities += (
+                0.5 * dt * self._state.forces / self._state.masses[:, np.newaxis]
+            )
 
         elif self.config.integrator == Integrator.LEAPFROG:
             # Leapfrog integrator
@@ -592,7 +611,7 @@ class MDSimulator:
             reference_positions = self._trajectory[0].positions
 
         diff = self._state.positions - reference_positions
-        return np.sqrt(np.mean(np.sum(diff ** 2, axis=1)))
+        return np.sqrt(np.mean(np.sum(diff**2, axis=1)))
 
     def calculate_radius_of_gyration(self) -> float:
         """Calculate radius of gyration.
@@ -609,7 +628,7 @@ class MDSimulator:
 
         # Radius of gyration
         diff = positions - com
-        r_sq = np.sum(diff ** 2, axis=1)
+        r_sq = np.sum(diff**2, axis=1)
         rg_sq = np.sum(masses * r_sq) / total_mass
 
         return np.sqrt(rg_sq)

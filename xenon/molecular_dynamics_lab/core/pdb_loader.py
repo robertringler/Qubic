@@ -11,8 +11,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
-from urllib.request import urlopen
 from urllib.error import URLError
+from urllib.request import urlopen
 
 import numpy as np
 
@@ -118,11 +118,26 @@ class Chain:
     def sequence(self) -> str:
         """Get one-letter amino acid sequence."""
         aa_map = {
-            "ALA": "A", "ARG": "R", "ASN": "N", "ASP": "D",
-            "CYS": "C", "GLN": "Q", "GLU": "E", "GLY": "G",
-            "HIS": "H", "ILE": "I", "LEU": "L", "LYS": "K",
-            "MET": "M", "PHE": "F", "PRO": "P", "SER": "S",
-            "THR": "T", "TRP": "W", "TYR": "Y", "VAL": "V",
+            "ALA": "A",
+            "ARG": "R",
+            "ASN": "N",
+            "ASP": "D",
+            "CYS": "C",
+            "GLN": "Q",
+            "GLU": "E",
+            "GLY": "G",
+            "HIS": "H",
+            "ILE": "I",
+            "LEU": "L",
+            "LYS": "K",
+            "MET": "M",
+            "PHE": "F",
+            "PRO": "P",
+            "SER": "S",
+            "THR": "T",
+            "TRP": "W",
+            "TYR": "Y",
+            "VAL": "V",
         }
         return "".join(aa_map.get(r.name, "X") for r in self.residues)
 
@@ -253,32 +268,36 @@ class PDBStructure:
         """Convert to 3Dmol.js compatible format."""
         atoms = []
         for atom in self.all_atoms:
-            atoms.append({
-                "elem": atom.element or atom.name[0],
-                "x": atom.x,
-                "y": atom.y,
-                "z": atom.z,
-                "serial": atom.serial,
-                "atom": atom.name,
-                "resn": atom.res_name,
-                "chain": atom.chain_id,
-                "resi": atom.res_seq,
-                "b": atom.temp_factor,
-            })
+            atoms.append(
+                {
+                    "elem": atom.element or atom.name[0],
+                    "x": atom.x,
+                    "y": atom.y,
+                    "z": atom.z,
+                    "serial": atom.serial,
+                    "atom": atom.name,
+                    "resn": atom.res_name,
+                    "chain": atom.chain_id,
+                    "resi": atom.res_seq,
+                    "b": atom.temp_factor,
+                }
+            )
 
         for het in self.hetatms:
-            atoms.append({
-                "elem": het.element or het.name[0],
-                "x": het.x,
-                "y": het.y,
-                "z": het.z,
-                "serial": het.serial,
-                "atom": het.name,
-                "resn": het.res_name,
-                "chain": het.chain_id,
-                "resi": het.res_seq,
-                "hetflag": True,
-            })
+            atoms.append(
+                {
+                    "elem": het.element or het.name[0],
+                    "x": het.x,
+                    "y": het.y,
+                    "z": het.z,
+                    "serial": het.serial,
+                    "atom": het.name,
+                    "resn": het.res_name,
+                    "chain": het.chain_id,
+                    "resi": het.res_seq,
+                    "hetflag": True,
+                }
+            )
 
         return {"atoms": atoms}
 
@@ -309,7 +328,7 @@ class PDBLoader:
             Parsed PDBStructure
         """
         logger.info(f"Loading PDB from file: {filepath}")
-        with open(filepath, "r") as f:
+        with open(filepath) as f:
             content = f.read()
 
         pdb_id = filepath.stem.upper()

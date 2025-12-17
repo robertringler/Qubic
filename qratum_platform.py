@@ -10,7 +10,8 @@ import random
 import threading
 import time
 from datetime import datetime
-from flask import Flask, jsonify, request, render_template_string, send_from_directory
+
+from flask import Flask, jsonify, render_template_string, send_from_directory
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -27,26 +28,16 @@ PLATFORM_STATE = {
         "quasim": {"status": "active", "version": "2.0.0", "port": 8000},
         "xenon": {"status": "active", "version": "5.0.0", "port": 8099},
         "qubic": {"status": "active", "version": "2.0.0", "port": 8100},
-        "backend": {"status": "active", "version": "1.0.0", "port": 8080}
+        "backend": {"status": "active", "version": "1.0.0", "port": 8080},
     },
-    "metrics": {
-        "cpu_usage": 0,
-        "memory_usage": 0,
-        "gpu_usage": 0,
-        "network_io": 0
-    }
+    "metrics": {"cpu_usage": 0, "memory_usage": 0, "gpu_usage": 0, "network_io": 0},
 }
 
 # Simulated real-time data streams
-DATA_STREAMS = {
-    "quantum": [],
-    "bioinformatics": [],
-    "neural": [],
-    "physics": [],
-    "financial": []
-}
+DATA_STREAMS = {"quantum": [], "bioinformatics": [], "neural": [], "physics": [], "financial": []}
 
-PLATFORM_HTML = '''<!DOCTYPE html>
+PLATFORM_HTML = (
+    """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -686,27 +677,69 @@ PLATFORM_HTML = '''<!DOCTYPE html>
 
     <script>
         // Module data
-        const MODULES = ''' + json.dumps([
-            {"id": "quantum_state_viewer", "title": "Quantum State", "icon": "⚛️", "category": "quantum"},
+        const MODULES = """
+    + json.dumps(
+        [
+            {
+                "id": "quantum_state_viewer",
+                "title": "Quantum State",
+                "icon": "⚛️",
+                "category": "quantum",
+            },
             {"id": "qubit_simulator", "title": "Qubit Sim", "icon": "🔮", "category": "quantum"},
             {"id": "entanglement_lab", "title": "Entangle", "icon": "🔗", "category": "quantum"},
-            {"id": "quantum_gate_designer", "title": "Gate Design", "icon": "🚪", "category": "quantum"},
+            {
+                "id": "quantum_gate_designer",
+                "title": "Gate Design",
+                "icon": "🚪",
+                "category": "quantum",
+            },
             {"id": "decoherence_monitor", "title": "Decohere", "icon": "📉", "category": "quantum"},
-            {"id": "bell_state_analyzer", "title": "Bell State", "icon": "🔔", "category": "quantum"},
+            {
+                "id": "bell_state_analyzer",
+                "title": "Bell State",
+                "icon": "🔔",
+                "category": "quantum",
+            },
             {"id": "quantum_walk", "title": "Q-Walk", "icon": "🚶", "category": "quantum"},
             {"id": "grover_search", "title": "Grover", "icon": "🔍", "category": "quantum"},
             {"id": "shor_factoring", "title": "Shor", "icon": "🔢", "category": "quantum"},
             {"id": "vqe_optimizer", "title": "VQE", "icon": "📈", "category": "quantum"},
             {"id": "dna_sequencer", "title": "DNA Seq", "icon": "🧬", "category": "bioinformatics"},
-            {"id": "protein_folder", "title": "Protein", "icon": "🔬", "category": "bioinformatics"},
+            {
+                "id": "protein_folder",
+                "title": "Protein",
+                "icon": "🔬",
+                "category": "bioinformatics",
+            },
             {"id": "genome_browser", "title": "Genome", "icon": "📊", "category": "bioinformatics"},
             {"id": "phylo_tree", "title": "Phylo", "icon": "🌳", "category": "bioinformatics"},
-            {"id": "mutation_tracker", "title": "Mutation", "icon": "🦠", "category": "bioinformatics"},
+            {
+                "id": "mutation_tracker",
+                "title": "Mutation",
+                "icon": "🦠",
+                "category": "bioinformatics",
+            },
             {"id": "rna_structure", "title": "RNA", "icon": "🔄", "category": "bioinformatics"},
             {"id": "crispr_designer", "title": "CRISPR", "icon": "✂️", "category": "bioinformatics"},
-            {"id": "metabolic_pathway", "title": "Metabolic", "icon": "🔀", "category": "bioinformatics"},
-            {"id": "expression_heatmap", "title": "Expression", "icon": "🌡️", "category": "bioinformatics"},
-            {"id": "variant_caller", "title": "Variant", "icon": "📋", "category": "bioinformatics"},
+            {
+                "id": "metabolic_pathway",
+                "title": "Metabolic",
+                "icon": "🔀",
+                "category": "bioinformatics",
+            },
+            {
+                "id": "expression_heatmap",
+                "title": "Expression",
+                "icon": "🌡️",
+                "category": "bioinformatics",
+            },
+            {
+                "id": "variant_caller",
+                "title": "Variant",
+                "icon": "📋",
+                "category": "bioinformatics",
+            },
             {"id": "neural_network", "title": "Neural Net", "icon": "🧠", "category": "neural"},
             {"id": "activation_maps", "title": "Activation", "icon": "🗺️", "category": "neural"},
             {"id": "gradient_flow", "title": "Gradient", "icon": "➡️", "category": "neural"},
@@ -719,7 +752,12 @@ PLATFORM_HTML = '''<!DOCTYPE html>
             {"id": "transformer_layers", "title": "Transform", "icon": "📚", "category": "neural"},
             {"id": "particle_collider", "title": "Collider", "icon": "💥", "category": "physics"},
             {"id": "wave_equation", "title": "Wave Eq", "icon": "🌊", "category": "physics"},
-            {"id": "electromagnetic_field", "title": "EM Field", "icon": "⚡", "category": "physics"},
+            {
+                "id": "electromagnetic_field",
+                "title": "EM Field",
+                "icon": "⚡",
+                "category": "physics",
+            },
             {"id": "fluid_dynamics", "title": "Fluid", "icon": "💧", "category": "physics"},
             {"id": "pendulum_chaos", "title": "Pendulum", "icon": "🔄", "category": "physics"},
             {"id": "orbital_mechanics", "title": "Orbital", "icon": "🌍", "category": "physics"},
@@ -768,15 +806,30 @@ PLATFORM_HTML = '''<!DOCTYPE html>
             {"id": "dark_matter", "title": "Dark Mat", "icon": "🌑", "category": "space"},
             {"id": "gravitational_waves", "title": "Grav Wave", "icon": "〰️", "category": "space"},
             {"id": "market_depth", "title": "Market", "icon": "📊", "category": "financial"},
-            {"id": "volatility_surface", "title": "Volatility", "icon": "📈", "category": "financial"},
+            {
+                "id": "volatility_surface",
+                "title": "Volatility",
+                "icon": "📈",
+                "category": "financial",
+            },
             {"id": "correlation_matrix", "title": "Correl", "icon": "🔢", "category": "financial"},
             {"id": "risk_dashboard", "title": "Risk", "icon": "⚠️", "category": "financial"},
             {"id": "monte_carlo_sim", "title": "Monte C", "icon": "🎲", "category": "financial"},
             {"id": "candlestick_chart", "title": "Candle", "icon": "🕯️", "category": "financial"},
-            {"id": "sentiment_tracker", "title": "Sentiment", "icon": "😊", "category": "financial"},
+            {
+                "id": "sentiment_tracker",
+                "title": "Sentiment",
+                "icon": "😊",
+                "category": "financial",
+            },
             {"id": "flow_analyzer", "title": "Flow", "icon": "💰", "category": "financial"},
             {"id": "yield_curve", "title": "Yield", "icon": "📉", "category": "financial"},
-            {"id": "portfolio_optimizer", "title": "Portfolio", "icon": "🎯", "category": "financial"},
+            {
+                "id": "portfolio_optimizer",
+                "title": "Portfolio",
+                "icon": "🎯",
+                "category": "financial",
+            },
             {"id": "scatter_3d", "title": "3D Scatter", "icon": "📍", "category": "data"},
             {"id": "parallel_coords", "title": "Parallel", "icon": "📏", "category": "data"},
             {"id": "treemap_viz", "title": "Treemap", "icon": "🗺️", "category": "data"},
@@ -787,7 +840,9 @@ PLATFORM_HTML = '''<!DOCTYPE html>
             {"id": "radar_chart", "title": "Radar", "icon": "📡", "category": "data"},
             {"id": "stream_graph", "title": "Stream", "icon": "🌊", "category": "data"},
             {"id": "hexbin_map", "title": "Hexbin", "icon": "🔷", "category": "data"},
-        ]) + ''';
+        ]
+    )
+    + """;
         
         let currentFilter = 'all';
         let metricsChart;
@@ -1066,41 +1121,51 @@ PLATFORM_HTML = '''<!DOCTYPE html>
         init();
     </script>
 </body>
-</html>'''
+</html>"""
+)
+
 
 # API Routes
-@app.route('/')
+@app.route("/")
 def index():
     return render_template_string(PLATFORM_HTML)
 
-@app.route('/health')
-def health():
-    return jsonify({
-        "status": "healthy",
-        "uptime": time.time() - PLATFORM_STATE["uptime_start"],
-        "components": PLATFORM_STATE["components"],
-        "timestamp": datetime.now().isoformat()
-    })
 
-@app.route('/api/status')
+@app.route("/health")
+def health():
+    return jsonify(
+        {
+            "status": "healthy",
+            "uptime": time.time() - PLATFORM_STATE["uptime_start"],
+            "components": PLATFORM_STATE["components"],
+            "timestamp": datetime.now().isoformat(),
+        }
+    )
+
+
+@app.route("/api/status")
 def api_status():
     return jsonify(PLATFORM_STATE)
 
-@app.route('/api/metrics')
+
+@app.route("/api/metrics")
 def api_metrics():
     # Simulated metrics
-    return jsonify({
-        "iterations": PLATFORM_STATE["total_iterations"],
-        "active_simulations": PLATFORM_STATE["active_simulations"],
-        "entropy": 2.1 - random.random() * 0.5,
-        "convergence": min(0.95, random.random() * 0.8),
-        "cpu": 20 + random.random() * 30,
-        "memory": 30 + random.random() * 20,
-        "gpu": 40 + random.random() * 40,
-        "network": 100 + random.random() * 500
-    })
+    return jsonify(
+        {
+            "iterations": PLATFORM_STATE["total_iterations"],
+            "active_simulations": PLATFORM_STATE["active_simulations"],
+            "entropy": 2.1 - random.random() * 0.5,
+            "convergence": min(0.95, random.random() * 0.8),
+            "cpu": 20 + random.random() * 30,
+            "memory": 30 + random.random() * 20,
+            "gpu": 40 + random.random() * 40,
+            "network": 100 + random.random() * 500,
+        }
+    )
 
-@app.route('/api/modules')
+
+@app.route("/api/modules")
 def api_modules():
     modules_path = "/workspaces/QRATUM/qubic/modules/modules.json"
     if os.path.exists(modules_path):
@@ -1108,52 +1173,62 @@ def api_modules():
             return jsonify(json.load(f))
     return jsonify([])
 
-@app.route('/api/stream/<stream_type>')
+
+@app.route("/api/stream/<stream_type>")
 def api_stream(stream_type):
     if stream_type in DATA_STREAMS:
         return jsonify(DATA_STREAMS[stream_type][-100:])
     return jsonify([])
 
-@app.route('/api/molecular-dynamics/status')
+
+@app.route("/api/molecular-dynamics/status")
 def molecular_dynamics_status():
     """Get Molecular Dynamics Lab status."""
-    return jsonify({
-        "status": "active",
-        "version": "1.0.0",
-        "capabilities": [
-            "pdb_loading",
-            "molecular_docking",
-            "md_simulation",
-            "webxr_visualization",
-            "haptic_feedback"
-        ],
-        "supported_formats": ["pdb", "mol2", "sdf", "xyz"],
-        "webxr_enabled": True
-    })
+    return jsonify(
+        {
+            "status": "active",
+            "version": "1.0.0",
+            "capabilities": [
+                "pdb_loading",
+                "molecular_docking",
+                "md_simulation",
+                "webxr_visualization",
+                "haptic_feedback",
+            ],
+            "supported_formats": ["pdb", "mol2", "sdf", "xyz"],
+            "webxr_enabled": True,
+        }
+    )
 
-@app.route('/api/molecular-dynamics/structures')
+
+@app.route("/api/molecular-dynamics/structures")
 def molecular_dynamics_structures():
     """List available molecular structures."""
-    return jsonify({
-        "structures": [
-            {"id": "1crn", "name": "Crambin", "atoms": 327, "type": "protein"},
-            {"id": "1ubq", "name": "Ubiquitin", "atoms": 660, "type": "protein"},
-            {"id": "2h5d", "name": "Insulin", "atoms": 1038, "type": "protein"},
-            {"id": "1bna", "name": "DNA B-form", "atoms": 486, "type": "nucleic_acid"},
-            {"id": "atp", "name": "ATP", "atoms": 47, "type": "small_molecule"}
-        ]
-    })
+    return jsonify(
+        {
+            "structures": [
+                {"id": "1crn", "name": "Crambin", "atoms": 327, "type": "protein"},
+                {"id": "1ubq", "name": "Ubiquitin", "atoms": 660, "type": "protein"},
+                {"id": "2h5d", "name": "Insulin", "atoms": 1038, "type": "protein"},
+                {"id": "1bna", "name": "DNA B-form", "atoms": 486, "type": "nucleic_acid"},
+                {"id": "atp", "name": "ATP", "atoms": 47, "type": "small_molecule"},
+            ]
+        }
+    )
 
-@app.route('/molecular-dynamics')
+
+@app.route("/molecular-dynamics")
 def molecular_dynamics_lab():
     """Serve the Molecular Dynamics Lab interface."""
     try:
         from xenon.molecular_dynamics_lab import MolecularLabServer
+
         server = MolecularLabServer()
         return server.generate_full_app()
     except ImportError:
         # Fallback to static page if module not fully loaded
-        return render_template_string('''
+        return render_template_string(
+            """
 <!DOCTYPE html>
 <html>
 <head>
@@ -1175,31 +1250,37 @@ def molecular_dynamics_lab():
     <p><a href="/">← Back to QRATUM Platform</a></p>
 </body>
 </html>
-        ''')
+        """
+        )
 
-@app.route('/modules/<path:path>')
+
+@app.route("/modules/<path:path>")
 def serve_modules(path):
-    return send_from_directory('/workspaces/QRATUM/qubic/modules', path)
+    return send_from_directory("/workspaces/QRATUM/qubic/modules", path)
+
 
 # Background data generator
 def generate_data():
     while True:
         PLATFORM_STATE["total_iterations"] += random.randint(10, 100)
         PLATFORM_STATE["active_simulations"] = random.randint(1, 10)
-        
+
         for stream in DATA_STREAMS:
-            DATA_STREAMS[stream].append({
-                "timestamp": datetime.now().isoformat(),
-                "entropy": 2.1 - random.random() * 0.5,
-                "fidelity": random.random() * 0.95,
-                "convergence": random.random() * 0.8
-            })
+            DATA_STREAMS[stream].append(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "entropy": 2.1 - random.random() * 0.5,
+                    "fidelity": random.random() * 0.95,
+                    "convergence": random.random() * 0.8,
+                }
+            )
             if len(DATA_STREAMS[stream]) > 1000:
                 DATA_STREAMS[stream] = DATA_STREAMS[stream][-500:]
-        
+
         time.sleep(0.5)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print("=" * 70)
     print("🚀 QRATUM UNIFIED PLATFORM")
     print("=" * 70)
@@ -1213,13 +1294,13 @@ if __name__ == '__main__':
     print("  🛡️  Comply  - Compliance Framework")
     print()
     print("Starting background data generator...")
-    
+
     # Start background thread
     thread = threading.Thread(target=generate_data, daemon=True)
     thread.start()
-    
+
     print("Starting platform server on port 9000...")
     print()
     print("=" * 70)
-    
-    app.run(host='0.0.0.0', port=9000, debug=False, threaded=True)
+
+    app.run(host="0.0.0.0", port=9000, debug=False, threaded=True)

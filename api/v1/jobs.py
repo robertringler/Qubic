@@ -71,9 +71,7 @@ if FASTAPI_AVAILABLE:
             default=3600, ge=60, le=86400, description="Job timeout in seconds"
         )
         tags: list[str] | None = Field(None, max_length=10, description="Job tags")
-        callback_url: str | None = Field(
-            None, description="URL to POST results when job completes"
-        )
+        callback_url: str | None = Field(None, description="URL to POST results when job completes")
 
     class JobSubmitResponse(BaseModel):
         """Response after job submission."""
@@ -81,9 +79,7 @@ if FASTAPI_AVAILABLE:
         job_id: str = Field(..., description="Unique job identifier")
         status: JobStatus = Field(..., description="Initial job status")
         submitted_at: str = Field(..., description="Submission timestamp")
-        estimated_duration_seconds: int | None = Field(
-            None, description="Estimated duration"
-        )
+        estimated_duration_seconds: int | None = Field(None, description="Estimated duration")
 
     class JobSummary(BaseModel):
         """Job summary for list responses."""
@@ -219,9 +215,7 @@ if FASTAPI_AVAILABLE:
             List of jobs
         """
         # Filter jobs for current user
-        user_jobs = [
-            j for j in _job_store.values() if j["user_id"] == user["user_id"]
-        ]
+        user_jobs = [j for j in _job_store.values() if j["user_id"] == user["user_id"]]
 
         # Apply filters
         if status_filter:

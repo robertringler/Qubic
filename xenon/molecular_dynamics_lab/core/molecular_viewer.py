@@ -8,11 +8,9 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional
-
-import numpy as np
 
 from .pdb_loader import PDBStructure
 
@@ -361,10 +359,12 @@ class MolecularViewer:
             state["labels"].append({"text": text, "spec": spec})
 
         for selection, surface in self._surfaces:
-            state["surfaces"].append({
-                "selection": selection.to_3dmol_selection(),
-                "surface": surface.to_3dmol_surface(),
-            })
+            state["surfaces"].append(
+                {
+                    "selection": selection.to_3dmol_selection(),
+                    "surface": surface.to_3dmol_surface(),
+                }
+            )
 
         return state
 

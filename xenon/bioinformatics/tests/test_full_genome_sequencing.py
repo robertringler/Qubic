@@ -249,9 +249,9 @@ class TestFullGenomeSequencingPipeline:
             zip(alignment_results1["alignments"], alignment_results2["alignments"])
         ):
             assert align1["score"] == align2["score"], f"Alignment {i} score differs"
-            assert align1["circuit_depth"] == align2["circuit_depth"], (
-                f"Alignment {i} depth differs"
-            )
+            assert (
+                align1["circuit_depth"] == align2["circuit_depth"]
+            ), f"Alignment {i} depth differs"
 
     def test_hardware_detection(self, pipeline_config):
         """Test hardware detection and backend selection."""
