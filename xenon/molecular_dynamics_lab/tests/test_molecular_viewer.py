@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
-
 from xenon.molecular_dynamics_lab.core.molecular_viewer import (
-    MolecularViewer,
-    ViewerConfig,
-    StyleSpec,
-    Selection,
     Label,
+    MolecularViewer,
+    Selection,
+    StyleSpec,
+    ViewerConfig,
 )
 
 

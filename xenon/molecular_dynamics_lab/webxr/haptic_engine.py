@@ -8,10 +8,9 @@ from __future__ import annotations
 
 import json
 import logging
-import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 import numpy as np
 
@@ -108,7 +107,7 @@ class HapticWaveform:
         }
 
     @classmethod
-    def from_pattern(cls, pattern: HapticPattern) -> "HapticWaveform":
+    def from_pattern(cls, pattern: HapticPattern) -> HapticWaveform:
         """Create waveform from predefined pattern.
 
         Args:
@@ -526,11 +525,7 @@ class HapticEngine:
         Args:
             channel: Channel(s) to stop
         """
-        hands = (
-            ["left", "right"]
-            if channel == HapticChannel.BOTH
-            else [channel.value]
-        )
+        hands = ["left", "right"] if channel == HapticChannel.BOTH else [channel.value]
 
         for hand in hands:
             if hand in self._active_waveforms:

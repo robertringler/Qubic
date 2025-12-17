@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import pytest
 import numpy as np
 
 from xenon.molecular_dynamics_lab.core.md_simulator import (
-    MDSimulator,
     MDConfig,
+    MDSimulator,
     SimulationState,
     TrajectoryFrame,
 )

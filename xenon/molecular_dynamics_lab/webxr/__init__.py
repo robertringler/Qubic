@@ -1,7 +1,7 @@
 """WebXR VR/AR components."""
 
-from .vr_controller import VRController, VRConfig
-from .haptic_engine import HapticEngine, HapticConfig, HapticFeedback
+from .haptic_engine import HapticConfig, HapticEngine, HapticFeedback
+from .vr_controller import VRConfig, VRController
 
 __all__ = [
     "VRController",

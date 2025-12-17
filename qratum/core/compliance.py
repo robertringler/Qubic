@@ -14,18 +14,15 @@ Certificate: QRATUM-COMPLIANCE-20251216-V1
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
-import os
 import threading
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum, auto
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, TypeVar
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 __all__ = [
     "ComplianceFramework",
@@ -62,10 +59,10 @@ class ComplianceFramework(Enum):
 class ComplianceLevel(Enum):
     """Compliance check severity levels."""
 
-    CRITICAL = auto()    # Must pass for certification
-    HIGH = auto()        # Should pass for production
-    MEDIUM = auto()      # Recommended for security
-    LOW = auto()         # Best practice
+    CRITICAL = auto()  # Must pass for certification
+    HIGH = auto()  # Should pass for production
+    MEDIUM = auto()  # Recommended for security
+    LOW = auto()  # Best practice
     INFORMATIONAL = auto()  # Advisory only
 
 
@@ -91,7 +88,7 @@ class ComplianceCheck:
     level: ComplianceLevel
     verification: Optional[Callable[[], bool]] = None
 
-    def execute(self, context: Dict[str, Any]) -> "ComplianceResult":
+    def execute(self, context: Dict[str, Any]) -> ComplianceResult:
         """Execute compliance check.
 
         Args:
@@ -113,7 +110,9 @@ class ComplianceCheck:
                 passed = context.get(f"control_{self.control_id}", False)
 
             if passed:
-                evidence.append(f"Control {self.control_id} verified at {datetime.now(timezone.utc).isoformat()}")
+                evidence.append(
+                    f"Control {self.control_id} verified at {datetime.now(timezone.utc).isoformat()}"
+                )
         except Exception as e:
             passed = False
             error_message = str(e)
@@ -626,7 +625,7 @@ class ComplianceEngine:
     compliance state for the QRATUM platform.
     """
 
-    _instance: Optional["ComplianceEngine"] = None
+    _instance: Optional[ComplianceEngine] = None
     _lock = threading.Lock()
 
     def __init__(self):
@@ -641,7 +640,7 @@ class ComplianceEngine:
         self.register_checker(CMMC20Compliance())
 
     @classmethod
-    def get_instance(cls) -> "ComplianceEngine":
+    def get_instance(cls) -> ComplianceEngine:
         """Get singleton engine instance."""
         if cls._instance is None:
             with cls._lock:
@@ -759,7 +758,9 @@ class ComplianceEngine:
 
         return {
             "status": "COMPLIANT" if all_compliant else "NON_COMPLIANT",
-            "overall_pass_rate": f"{(passed_checks / total_checks) * 100:.2f}%" if total_checks > 0 else "N/A",
+            "overall_pass_rate": (
+                f"{(passed_checks / total_checks) * 100:.2f}%" if total_checks > 0 else "N/A"
+            ),
             "frameworks_assessed": len(latest_reports),
             "total_checks": total_checks,
             "passed_checks": passed_checks,

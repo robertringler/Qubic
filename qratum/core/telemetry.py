@@ -14,17 +14,14 @@ Classification: UNCLASSIFIED // CUI
 
 from __future__ import annotations
 
-import atexit
-import logging
 import threading
 import time
 from abc import ABC, abstractmethod
-from collections import defaultdict
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum, auto
-from typing import Any, Callable, Dict, Generator, List, Optional, Set, TypeVar
+from typing import Any, Callable, Dict, Generator, List, Optional, TypeVar
 
 __all__ = [
     "MetricType",
@@ -48,10 +45,10 @@ __all__ = [
 class MetricType(Enum):
     """Types of metrics supported."""
 
-    COUNTER = auto()     # Monotonically increasing counter
-    GAUGE = auto()       # Value that can go up or down
-    HISTOGRAM = auto()   # Distribution of values
-    SUMMARY = auto()     # Similar to histogram with quantiles
+    COUNTER = auto()  # Monotonically increasing counter
+    GAUGE = auto()  # Value that can go up or down
+    HISTOGRAM = auto()  # Distribution of values
+    SUMMARY = auto()  # Similar to histogram with quantiles
 
 
 @dataclass
@@ -80,7 +77,7 @@ class Metric:
     labels: Dict[str, str] = field(default_factory=dict)
     unit: str = ""
 
-    def with_labels(self, **labels: str) -> "Metric":
+    def with_labels(self, **labels: str) -> Metric:
         """Create metric variant with additional labels."""
         new_labels = {**self.labels, **labels}
         return Metric(
@@ -199,8 +196,19 @@ class Histogram:
     """
 
     DEFAULT_BUCKETS = (
-        0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
-        1.0, 2.5, 5.0, 10.0, float("inf")
+        0.001,
+        0.005,
+        0.01,
+        0.025,
+        0.05,
+        0.1,
+        0.25,
+        0.5,
+        1.0,
+        2.5,
+        5.0,
+        10.0,
+        float("inf"),
     )
 
     def __init__(
@@ -222,7 +230,7 @@ class Histogram:
         self.description = description
         self.labels = labels or {}
         self._buckets = buckets or self.DEFAULT_BUCKETS
-        self._bucket_counts: Dict[float, int] = {b: 0 for b in self._buckets}
+        self._bucket_counts: Dict[float, int] = dict.fromkeys(self._buckets, 0)
         self._sum = 0.0
         self._count = 0
         self._lock = threading.Lock()
@@ -290,11 +298,27 @@ class Timer:
             name=name,
             description=description,
             labels=labels,
-            buckets=(0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, float("inf")),
+            buckets=(
+                0.001,
+                0.005,
+                0.01,
+                0.025,
+                0.05,
+                0.1,
+                0.25,
+                0.5,
+                1.0,
+                2.5,
+                5.0,
+                10.0,
+                30.0,
+                60.0,
+                float("inf"),
+            ),
         )
         self._start_time: Optional[int] = None
 
-    def start(self) -> "Timer":
+    def start(self) -> Timer:
         """Start timer."""
         self._start_time = time.perf_counter_ns()
         return self
@@ -334,7 +358,7 @@ class MetricsRegistry:
     Thread-safe registry for managing metrics across the application.
     """
 
-    _instance: Optional["MetricsRegistry"] = None
+    _instance: Optional[MetricsRegistry] = None
     _lock = threading.Lock()
 
     def __init__(self):
@@ -344,13 +368,13 @@ class MetricsRegistry:
         self._histograms: Dict[str, Histogram] = {}
         self._timers: Dict[str, Timer] = {}
         self._registry_lock = threading.Lock()
-        self._exporters: List["TelemetryExporter"] = []
+        self._exporters: List[TelemetryExporter] = []
 
         # Register default metrics
         self._register_default_metrics()
 
     @classmethod
-    def get_instance(cls) -> "MetricsRegistry":
+    def get_instance(cls) -> MetricsRegistry:
         """Get singleton registry instance."""
         if cls._instance is None:
             with cls._lock:
@@ -472,7 +496,7 @@ class MetricsRegistry:
             return f"{name}{{{label_str}}}"
         return name
 
-    def add_exporter(self, exporter: "TelemetryExporter") -> None:
+    def add_exporter(self, exporter: TelemetryExporter) -> None:
         """Add telemetry exporter."""
         self._exporters.append(exporter)
 
@@ -523,7 +547,7 @@ class TelemetryExporter(ABC):
         pass
 
     @abstractmethod
-    def export_span(self, span: "Span") -> None:
+    def export_span(self, span: Span) -> None:
         """Export span to destination."""
         pass
 
@@ -548,7 +572,7 @@ class PrometheusExporter(TelemetryExporter):
         # or expose via HTTP endpoint
         pass
 
-    def export_span(self, span: "Span") -> None:
+    def export_span(self, span: Span) -> None:
         """Export span (no-op for Prometheus)."""
         pass
 
@@ -651,11 +675,13 @@ class Span:
 
     def add_event(self, name: str, attributes: Optional[Dict[str, Any]] = None) -> None:
         """Add event to span."""
-        self.events.append({
-            "name": name,
-            "timestamp": time.perf_counter_ns(),
-            "attributes": attributes or {},
-        })
+        self.events.append(
+            {
+                "name": name,
+                "timestamp": time.perf_counter_ns(),
+                "attributes": attributes or {},
+            }
+        )
 
     def set_attribute(self, key: str, value: Any) -> None:
         """Set span attribute."""
@@ -674,7 +700,7 @@ class Tracer:
     Creates and manages spans for distributed tracing.
     """
 
-    _instance: Optional["Tracer"] = None
+    _instance: Optional[Tracer] = None
     _lock = threading.Lock()
 
     def __init__(self, service_name: str = "qratum"):
@@ -689,7 +715,7 @@ class Tracer:
         self._exporters: List[TelemetryExporter] = []
 
     @classmethod
-    def get_instance(cls, service_name: str = "qratum") -> "Tracer":
+    def get_instance(cls, service_name: str = "qratum") -> Tracer:
         """Get singleton tracer instance."""
         if cls._instance is None:
             with cls._lock:
@@ -801,6 +827,7 @@ def timed(
     Returns:
         Decorated function
     """
+
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         timer_name = name or f"qratum_{func.__name__}_duration_seconds"
         timer = get_metrics_registry().timer(
@@ -814,6 +841,7 @@ def timed(
                 return func(*args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
@@ -830,6 +858,7 @@ def counted(
     Returns:
         Decorated function
     """
+
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         counter_name = name or f"qratum_{func.__name__}_total"
         counter = get_metrics_registry().counter(
@@ -843,4 +872,5 @@ def counted(
             return func(*args, **kwargs)
 
         return wrapper
+
     return decorator

@@ -6,15 +6,13 @@ docking, and dynamics simulation.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
-import mimetypes
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Callable, Optional
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
+from dataclasses import dataclass
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from pathlib import Path
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +32,7 @@ class ServerConfig:
 class MolecularLabHandler(SimpleHTTPRequestHandler):
     """HTTP request handler for Molecular Lab."""
 
-    def __init__(self, *args, lab_server: "MolecularLabServer" = None, **kwargs):
+    def __init__(self, *args, lab_server: MolecularLabServer = None, **kwargs):
         self.lab_server = lab_server
         super().__init__(*args, **kwargs)
 
@@ -147,12 +145,12 @@ class MolecularLabServer:
         self._running = False
 
         # Import components
-        from ..core.pdb_loader import PDBLoader
+        from ..core.docking_engine import DockingEngine
+        from ..core.md_simulator import MDSimulator
         from ..core.molecular_viewer import MolecularViewer, ViewerConfig
-        from ..core.docking_engine import DockingEngine, DockingConfig
-        from ..core.md_simulator import MDSimulator, MDConfig
-        from ..webxr.vr_controller import VRController, VRConfig
-        from ..webxr.haptic_engine import HapticEngine, HapticConfig
+        from ..core.pdb_loader import PDBLoader
+        from ..webxr.haptic_engine import HapticEngine
+        from ..webxr.vr_controller import VRController
 
         self.pdb_loader = PDBLoader()
         self.viewer = MolecularViewer(ViewerConfig(webxr_enabled=True))
@@ -264,7 +262,7 @@ class MolecularLabServer:
         haptic_js = self.haptic_engine.generate_haptic_js()
         vr_controls = self.vr_controller.generate_vr_controls_ui()
 
-        return f'''<!DOCTYPE html>
+        return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1306,17 +1304,13 @@ class MolecularLabServer:
         {haptic_js}
     </script>
 </body>
-</html>'''
+</html>"""
 
     def start(self) -> None:
         """Start the server."""
-        handler = lambda *args, **kwargs: MolecularLabHandler(
-            *args, lab_server=self, **kwargs
-        )
+        handler = lambda *args, **kwargs: MolecularLabHandler(*args, lab_server=self, **kwargs)
 
-        self._http_server = HTTPServer(
-            (self.config.host, self.config.http_port), handler
-        )
+        self._http_server = HTTPServer((self.config.host, self.config.http_port), handler)
 
         self._server_thread = threading.Thread(target=self._http_server.serve_forever)
         self._server_thread.daemon = True

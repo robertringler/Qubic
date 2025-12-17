@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
 """XENON Live Simulation Server with WebSocket streaming."""
 
-import json
 import random
 import threading
 import time
+
 from flask import Flask, render_template_string
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'xenon-live-sim'
+app.config["SECRET_KEY"] = "xenon-live-sim"
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Simulation state
 sim_state = {
-    'running': False,
-    'iteration': 0,
-    'max_iterations': 100,
-    'entropy': 2.1,
-    'posterior': 0.0,
-    'mechanisms': 0,
-    'phase': 'IDLE',
-    'sequences': [],
-    'energy_history': [],
-    'waveform': []
+    "running": False,
+    "iteration": 0,
+    "max_iterations": 100,
+    "entropy": 2.1,
+    "posterior": 0.0,
+    "mechanisms": 0,
+    "phase": "IDLE",
+    "sequences": [],
+    "energy_history": [],
+    "waveform": [],
 }
 
-HTML_TEMPLATE = '''
+HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -673,126 +673,151 @@ HTML_TEMPLATE = '''
     </script>
 </body>
 </html>
-'''
+"""
 
-@app.route('/')
+
+@app.route("/")
 def index():
     return render_template_string(HTML_TEMPLATE)
 
-@socketio.on('connect')
-def handle_connect():
-    print('Client connected')
-    emit('log', {'text': 'Connected to XENON server', 'type': 'success'})
 
-@socketio.on('start')
+@socketio.on("connect")
+def handle_connect():
+    print("Client connected")
+    emit("log", {"text": "Connected to XENON server", "type": "success"})
+
+
+@socketio.on("start")
 def handle_start(data):
     global sim_state
-    sim_state['running'] = True
-    sim_state['iteration'] = 0
-    sim_state['max_iterations'] = data.get('iterations', 100)
-    sim_state['entropy'] = 2.1
-    sim_state['posterior'] = 0.0
-    sim_state['mechanisms'] = 0
-    
+    sim_state["running"] = True
+    sim_state["iteration"] = 0
+    sim_state["max_iterations"] = data.get("iterations", 100)
+    sim_state["entropy"] = 2.1
+    sim_state["posterior"] = 0.0
+    sim_state["mechanisms"] = 0
+
     # Start simulation in background thread
     thread = threading.Thread(target=run_simulation)
     thread.daemon = True
     thread.start()
 
-@socketio.on('stop')
+
+@socketio.on("stop")
 def handle_stop():
     global sim_state
-    sim_state['running'] = False
+    sim_state["running"] = False
 
-@socketio.on('reset')
+
+@socketio.on("reset")
 def handle_reset():
     global sim_state
     sim_state = {
-        'running': False,
-        'iteration': 0,
-        'max_iterations': 100,
-        'entropy': 2.1,
-        'posterior': 0.0,
-        'mechanisms': 0,
-        'phase': 'IDLE',
-        'sequences': [],
-        'energy_history': [],
-        'waveform': []
+        "running": False,
+        "iteration": 0,
+        "max_iterations": 100,
+        "entropy": 2.1,
+        "posterior": 0.0,
+        "mechanisms": 0,
+        "phase": "IDLE",
+        "sequences": [],
+        "energy_history": [],
+        "waveform": [],
     }
+
 
 def run_simulation():
     global sim_state
     import numpy as np
+
     np.random.seed(42)
-    
-    phases = ['ALIGNMENT', 'FUSION', 'ENTROPY', 'INFERENCE', 'COMPLETE']
-    bases = 'ATGC'
-    
-    socketio.emit('log', {'text': 'Starting XENON quantum bioinformatics simulation...', 'type': 'info'})
-    
-    while sim_state['running'] and sim_state['iteration'] < sim_state['max_iterations']:
-        sim_state['iteration'] += 1
-        i = sim_state['iteration']
-        max_i = sim_state['max_iterations']
-        
+
+    phases = ["ALIGNMENT", "FUSION", "ENTROPY", "INFERENCE", "COMPLETE"]
+    bases = "ATGC"
+
+    socketio.emit(
+        "log", {"text": "Starting XENON quantum bioinformatics simulation...", "type": "info"}
+    )
+
+    while sim_state["running"] and sim_state["iteration"] < sim_state["max_iterations"]:
+        sim_state["iteration"] += 1
+        i = sim_state["iteration"]
+        max_i = sim_state["max_iterations"]
+
         # Update metrics with some randomness
         progress = i / max_i
-        sim_state['entropy'] = max(0.1, 2.1 - progress * 1.8 + np.random.randn() * 0.05)
-        sim_state['posterior'] = min(0.55, progress * 0.55 + np.random.randn() * 0.02)
-        sim_state['mechanisms'] = min(14, 1 + i // 7)
-        sim_state['phase'] = phases[min(4, int(progress * 5))]
-        
+        sim_state["entropy"] = max(0.1, 2.1 - progress * 1.8 + np.random.randn() * 0.05)
+        sim_state["posterior"] = min(0.55, progress * 0.55 + np.random.randn() * 0.02)
+        sim_state["mechanisms"] = min(14, 1 + i // 7)
+        sim_state["phase"] = phases[min(4, int(progress * 5))]
+
         # Generate sequence
-        seq = ''.join(random.choice(bases) for _ in range(50))
-        
+        seq = "".join(random.choice(bases) for _ in range(50))
+
         # Waveform value
         waveform = np.sin(i * 0.2) * 0.5 + np.random.randn() * 0.2
-        
+
         # Energy value
         energy = -20 - np.random.random() * 20 + np.sin(i * 0.1) * 10
-        
+
         # Emit update
-        socketio.emit('update', {
-            'iteration': sim_state['iteration'],
-            'max_iterations': sim_state['max_iterations'],
-            'entropy': sim_state['entropy'],
-            'posterior': sim_state['posterior'],
-            'mechanisms': sim_state['mechanisms'],
-            'phase': sim_state['phase'],
-            'waveform': waveform,
-            'energy': energy
-        })
-        
+        socketio.emit(
+            "update",
+            {
+                "iteration": sim_state["iteration"],
+                "max_iterations": sim_state["max_iterations"],
+                "entropy": sim_state["entropy"],
+                "posterior": sim_state["posterior"],
+                "mechanisms": sim_state["mechanisms"],
+                "phase": sim_state["phase"],
+                "waveform": waveform,
+                "energy": energy,
+            },
+        )
+
         # Emit sequence
-        socketio.emit('sequence', seq)
-        
+        socketio.emit("sequence", seq)
+
         # Log phase changes
         if i == 1:
-            socketio.emit('log', {'text': 'Phase 1: Quantum Alignment started', 'type': 'info'})
+            socketio.emit("log", {"text": "Phase 1: Quantum Alignment started", "type": "info"})
         elif i == max_i // 5:
-            socketio.emit('log', {'text': 'Phase 2: Multi-omics Fusion started', 'type': 'info'})
+            socketio.emit("log", {"text": "Phase 2: Multi-omics Fusion started", "type": "info"})
         elif i == 2 * max_i // 5:
-            socketio.emit('log', {'text': 'Phase 3: Transfer Entropy analysis', 'type': 'info'})
+            socketio.emit("log", {"text": "Phase 3: Transfer Entropy analysis", "type": "info"})
         elif i == 3 * max_i // 5:
-            socketio.emit('log', {'text': 'Phase 4: Neural-Symbolic Inference', 'type': 'info'})
+            socketio.emit("log", {"text": "Phase 4: Neural-Symbolic Inference", "type": "info"})
         elif i == 4 * max_i // 5:
-            socketio.emit('log', {'text': f'Discovered {sim_state["mechanisms"]} mechanisms', 'type': 'success'})
-        
-        time.sleep(0.1)  # 100ms per iteration
-    
-    if sim_state['iteration'] >= sim_state['max_iterations']:
-        sim_state['running'] = False
-        sim_state['phase'] = 'COMPLETE'
-        socketio.emit('complete', {
-            'top_mechanism': f'EGFR_target_mutant_5_{random.randint(1,9)}',
-            'posterior': sim_state['posterior'],
-            'mechanisms': sim_state['mechanisms']
-        })
-        socketio.emit('log', {'text': f'✅ Simulation complete! Final posterior: {sim_state["posterior"]:.4f}', 'type': 'success'})
+            socketio.emit(
+                "log",
+                {"text": f'Discovered {sim_state["mechanisms"]} mechanisms', "type": "success"},
+            )
 
-if __name__ == '__main__':
-    print('=' * 60)
-    print('🧬 XENON Live Simulation Server')
-    print('=' * 60)
+        time.sleep(0.1)  # 100ms per iteration
+
+    if sim_state["iteration"] >= sim_state["max_iterations"]:
+        sim_state["running"] = False
+        sim_state["phase"] = "COMPLETE"
+        socketio.emit(
+            "complete",
+            {
+                "top_mechanism": f"EGFR_target_mutant_5_{random.randint(1,9)}",
+                "posterior": sim_state["posterior"],
+                "mechanisms": sim_state["mechanisms"],
+            },
+        )
+        socketio.emit(
+            "log",
+            {
+                "text": f'✅ Simulation complete! Final posterior: {sim_state["posterior"]:.4f}',
+                "type": "success",
+            },
+        )
+
+
+if __name__ == "__main__":
+    print("=" * 60)
+    print("🧬 XENON Live Simulation Server")
+    print("=" * 60)
     print()
-    socketio.run(app, host='0.0.0.0', port=8099, debug=False, allow_unsafe_werkzeug=True)
+    socketio.run(app, host="0.0.0.0", port=8099, debug=False, allow_unsafe_werkzeug=True)
