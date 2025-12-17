@@ -12,7 +12,9 @@ WORKDIR /workspace
 COPY . .
 
 # Pin dependency versions (SC-28 Integrity/Reproducibility - NIST 800-53/CMMC 2.0)
-RUN pip3 install pybind11==2.11.1 numpy==1.26.4
+# pybind11==2.11.1: Latest stable compatible with CMake 3.x and CUDA 12.4
+# numpy==1.24.3: Aligned with requirements-prod.txt for consistency across project
+RUN pip3 install pybind11==2.11.1 numpy==1.24.3
 
 # Build as root (required for cmake build artifacts)
 RUN cmake -S . -B build && cmake --build build --parallel

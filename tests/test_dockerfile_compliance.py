@@ -46,9 +46,9 @@ class TestDockerfileCompliance:
         assert "pybind11==" in dockerfile_content, "pybind11 must be pinned"
         assert "2.11.1" in dockerfile_content, "pybind11 must be pinned to 2.11.1"
 
-        # Verify numpy is pinned
+        # Verify numpy is pinned (aligned with requirements-prod.txt)
         assert "numpy==" in dockerfile_content, "numpy must be pinned"
-        assert "1.26.4" in dockerfile_content, "numpy must be pinned to 1.26.4"
+        assert "1.24.3" in dockerfile_content, "numpy must be pinned to 1.24.3"
 
     def test_docker_best_practice_apt_cleanup(self, dockerfile_content):
         """Test Docker best practice: apt cache cleanup."""
@@ -133,11 +133,11 @@ class TestDockerfileCompliance:
             lambda line: line.startswith("COPY"), "COPY command not found"
         )
         pip_idx = find_command_index(
-            lambda line: line.startswith("RUN") and "pip3 install" in line,
+            lambda line: line.startswith("RUN") and "pip3 install" in line and "pybind11" in line,
             "RUN pip3 install command not found"
         )
         cmake_idx = find_command_index(
-            lambda line: line.startswith("RUN") and "cmake -S" in line,
+            lambda line: line.startswith("RUN") and "cmake -S . -B build" in line,
             "RUN cmake command not found"
         )
         chown_idx = find_command_index(
