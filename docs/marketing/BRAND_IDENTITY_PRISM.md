@@ -238,7 +238,7 @@ Reserved exclusively for compliance badges (DO-178C-ready, CMMC-compliant, NIST-
 **Psychological Trigger**: Warning systems, critical indicators, high-stakes decision points. Subconscious association with aerospace safety protocols.
 
 **Usage Rules**:
-- Only for certification badges and mission proof points
+- Only for compliance badges and mission proof points
 - Never use decoratively
 - Pair with dark backgrounds (never light)
 - Minimum surface area to maintain impact
@@ -302,7 +302,7 @@ Timestamp: 2025-11-14T09:15:22Z
 **Critical Metrics (Highest Importance)**:
 - Font: Roboto Mono Bold
 - Size: 48-64px
-- Color: Accent Cyan (#2aa198) or Orange (#cb4b16) for certification
+- Color: Accent Cyan (#2aa198) or Orange (#cb4b16) for compliance badges
 - Context: Always provide unit and methodology
 
 **Technical Specifications**:

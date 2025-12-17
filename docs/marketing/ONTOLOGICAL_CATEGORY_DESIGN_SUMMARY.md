@@ -131,7 +131,7 @@ This isn't semantic—it's a fundamental shift from **optimization** (making pro
 
 **Year 0 (2025-2026)**: QRATUM launches category via arXiv, defense forums, NVIDIA ecosystem  
 **Year 1-2 (2026-2027)**: Competitors realize category exists, begin re-architecture (probabilistic → deterministic)  
-**Year 3-5 (2027-2029)**: First competitors achieve deterministic simulation + certification  
+**Year 3-5 (2027-2029)**: First competitors achieve deterministic simulation + certification readiness  
 **Year 5+ (2029+)**: Market consolidation around deterministic category
 
 **QRATUM Advantage**: 3-5 year lead + first-mover network effects (arXiv citations, defense pilots, NVIDIA partnership)
@@ -315,13 +315,13 @@ Marketing fluff that undermines category position:
 
 ### For Sales/Business Development
 1. Positioning: "We created new category, legacy tools solve wrong problems"
-2. Proof points: DO-178C certification, SpaceX/NASA validation
+2. Proof points: DO-178C certification-ready architecture, SpaceX/NASA validation
 3. Competitive response: "They optimize probabilistic systems; we architect deterministic realms"
 4. Objection handling: Frame as technical requirement, not vendor preference
 
 ### For Executives
-1. **Elevator Pitch**: "QRATUM architects Deterministic Quantum Realms—self-contained simulation universes where aerospace-grade reproducibility is mathematically proven, not probabilistically approximated. We have no competitors because DO-178C Level A certification requires deterministic execution, which probabilistic quantum tools cannot achieve."
-2. **Investment Thesis**: 3-5 year competitive moat via category creation, certification barrier, and mission validation
+1. **Elevator Pitch**: "QRATUM architects Deterministic Quantum Realms—self-contained simulation universes where aerospace-grade reproducibility is mathematically proven, not probabilistically approximated. We have no competitors because DO-178C Level A compliance requires deterministic execution, which probabilistic quantum tools cannot achieve."
+2. **Investment Thesis**: 3-5 year competitive moat via category creation, certification-readiness barrier, and mission validation
 3. **Market Opportunity**: $7.4B valuation justified by sole ownership of deterministic quantum category for aerospace/defense
 
 ---
@@ -355,7 +355,7 @@ Marketing fluff that undermines category position:
 - Base Dark: `#002b36` (70% of surface)
 - Light Beige: `#fdf6e3` (primary text)
 - Accent Cyan: `#2aa198` (<5% surface, quantum elements only)
-- Orange: `#cb4b16` (certification badges only)
+- Orange: `#cb4b16` (compliance badges only)
 
 ### Typography (Quick Reference)
 - **Metrics**: Roboto Mono Bold 48-64px, cyan accent

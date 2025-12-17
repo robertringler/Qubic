@@ -95,7 +95,7 @@ Quantum researchers and aerospace engineers treat arXiv as canonical source for 
 ### Channel 2: Defense Tech Forums (CMMC/NIST Compliance Community)
 
 **Rationale**:
-Defense contractors must achieve CMMC 2.0 Level 2 certification by 2026 to bid on DoD contracts. Simulation tools used in defense applications must demonstrate deterministic reproducibility for audit trails. QRATUM becomes mandatory infrastructure, not optional vendor.
+Defense contractors must achieve CMMC 2.0 Level 2 by 2026 to bid on DoD contracts. Simulation tools used in defense applications must demonstrate deterministic reproducibility for audit trails. QRATUM becomes mandatory infrastructure, not optional vendor.
 
 **Tactical Implementation**:
 
@@ -304,7 +304,7 @@ This theme frames QRATUM not as simulation software, but as gateway to determini
 - **Monday**: arXiv paper submission ("Deterministic Quantum Realms" paper)
 - **Tuesday**: LinkedIn announcement post (contrarian hook: "Quantum decoherence isn't a problem to solve—it's a category error")
 - **Wednesday**: Hacker News post (arXiv link + GitHub repo)
-- **Thursday**: Twitter/X thread (5-tweet narrative on certification requirements)
+- **Thursday**: Twitter/X thread (5-tweet narrative on compliance requirements)
 - **Friday**: Email to existing aerospace contacts (200+ engineers)
 
 **Week 2: Defense Tech Forum Entry**
@@ -463,7 +463,7 @@ This theme frames QRATUM not as simulation software, but as gateway to determini
 **Long-Term Impact**:
 - QRATUM becomes canonical reference for deterministic quantum simulation
 - Competitors forced to acknowledge category or remain in probabilistic niche
-- 3-5 year competitive lead secured via certification and mission validation
+- 3-5 year competitive lead secured via certification-ready architecture and mission validation
 - $7.4B valuation justified by category creation moat
 
 ---
