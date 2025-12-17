@@ -218,7 +218,7 @@
 
 - ✅ **SpaceX Falcon 9 Telemetry** — <2% RMSE on stage separation dynamics
 - ✅ **NASA Orion/SLS Mission Data** — Validated trajectory analysis
-- ✅ **Goodyear Tire Pilot** — $20B/year value unlock potential demonstrated
+- ✅ **Goodyear Conceptual Pilot Analysis** — $20B/year value unlock potential modeled
 - ✅ **DO-178C Compliance Posture** — 100% MC/DC coverage on safety-critical paths
 - ✅ **CMMC 2.0 Level 2 Framework** — 110/110 practices implemented
 - ✅ **NIST 800-53 Framework Coverage** — 474 controls (HIGH baseline) implemented

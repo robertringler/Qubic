@@ -321,7 +321,7 @@ Hybrid Middleware ───────────┘
 - "Can we pilot this in Q1?"
 
 **QRATUM's Response:**
-> "Yes. Here's the Goodyear tire pilot case study. Here's the deployment guide for EKS/GKE/AKS. Here's the ANSYS integration adapter. Let's design your proof-of-concept."
+> "Yes. Here's the conceptual Goodyear tire pilot analysis. Here's the deployment guide for EKS/GKE/AKS. Here's the ANSYS integration adapter. Let's design your proof-of-concept."
 
 #### Month 6: Adoption
 - "QRATUM is now our computational infrastructure standard."
@@ -377,7 +377,7 @@ Hybrid Middleware ───────────┘
 >
 > QRATUM doesn't build quantum computers. QRATUM built the first Certifiable Quantum-Classical Convergence system — a new category that combines quantum-enhanced performance with regulatory compliance. How? GPU-accelerated tensor networks deliver quantum algorithmic advantages without quantum hardware. Deterministic execution with <1μs reproducibility drift. DO-178C Level A compliance posture. CMMC 2.0 Level 2 compliance framework implementation. Validated against real SpaceX and NASA mission data with <2% error.
 >
-> The market response: Goodyear pilot demonstrating $20B value unlock potential. 75 aerospace, defense, automotive, pharmaceutical, and financial services enterprises identified as high-fit adopters. $2.6B total addressable market with $300M Year 3 revenue target. Our competitive advantage: It takes 3-5 years to replicate certification posture, mission data validation, and autonomous evolution architecture. By then, we own the category.
+> The market opportunity: Conceptual Goodyear pilot analysis showing $20B value unlock potential. 75 aerospace, defense, automotive, pharmaceutical, and financial services enterprises identified as high-fit adopters. $2.6B total addressable market with $300M Year 3 revenue target. Our competitive advantage: It takes 3-5 years to replicate certification posture, mission data validation, and autonomous evolution architecture. By then, we own the category.
 >
 > This isn't incremental innovation. This is category creation. And QRATUM is the only inhabitant."
 
