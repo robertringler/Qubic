@@ -53,9 +53,7 @@ class TestDockerfileCompliance:
     def test_docker_best_practice_apt_cleanup(self, dockerfile_content):
         """Test Docker best practice: apt cache cleanup."""
         # Verify apt lists are cleaned up
-        assert "rm -rf /var/lib/apt/lists/*" in dockerfile_content, (
-            "apt cache must be cleaned up"
-        )
+        assert "rm -rf /var/lib/apt/lists/*" in dockerfile_content, "apt cache must be cleaned up"
 
         # Verify cleanup is in same RUN command as apt-get
         # Split on RUN commands to check each separately
@@ -124,7 +122,7 @@ class TestDockerfileCompliance:
         )
         user_create_idx = find_command_index(
             lambda line: line.startswith("RUN") and "useradd" in line,
-            "RUN useradd command not found"
+            "RUN useradd command not found",
         )
         workdir_idx = find_command_index(
             lambda line: line.startswith("WORKDIR"), "WORKDIR command not found"
@@ -134,22 +132,19 @@ class TestDockerfileCompliance:
         )
         pip_idx = find_command_index(
             lambda line: line.startswith("RUN") and "pip3 install" in line and "pybind11" in line,
-            "RUN pip3 install command not found"
+            "RUN pip3 install command not found",
         )
         cmake_idx = find_command_index(
             lambda line: line.startswith("RUN") and "cmake -S . -B build" in line,
-            "RUN cmake command not found"
+            "RUN cmake command not found",
         )
         chown_idx = find_command_index(
-            lambda line: line.startswith("RUN") and "chown" in line,
-            "RUN chown command not found"
+            lambda line: line.startswith("RUN") and "chown" in line, "RUN chown command not found"
         )
         user_switch_idx = find_command_index(
             lambda line: line.startswith("USER"), "USER command not found"
         )
-        cmd_idx = find_command_index(
-            lambda line: line.startswith("CMD"), "CMD command not found"
-        )
+        cmd_idx = find_command_index(lambda line: line.startswith("CMD"), "CMD command not found")
 
         # Verify order
         assert from_idx < user_create_idx, "User must be created after FROM"
