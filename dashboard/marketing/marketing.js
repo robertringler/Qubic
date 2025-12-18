@@ -327,6 +327,7 @@
         ctx: null,
         particles: [],
         animationId: null,
+        resizeHandler: null,
 
         init: function() {
             const hero = document.querySelector('.hero');
@@ -352,10 +353,12 @@
             this.createParticles();
             this.animate();
 
-            // Handle resize
-            window.addEventListener('resize', utils.debounce(() => {
+            // Handle resize with cleanup reference
+            this.resizeHandler = utils.debounce(() => {
                 this.resize();
-            }, 250));
+                this.createParticles();
+            }, 250);
+            window.addEventListener('resize', this.resizeHandler);
         },
 
         resize: function() {
@@ -364,7 +367,9 @@
         },
 
         createParticles: function() {
-            const count = Math.min(50, Math.floor(this.canvas.width / 30));
+            // Configurable particle density (can be overridden via data attribute)
+            const density = parseInt(this.canvas.dataset?.particleDensity || '30', 10);
+            const count = Math.min(50, Math.floor(this.canvas.width / density));
             this.particles = [];
 
             for (let i = 0; i < count; i++) {
@@ -426,7 +431,18 @@
         destroy: function() {
             if (this.animationId) {
                 cancelAnimationFrame(this.animationId);
+                this.animationId = null;
             }
+            if (this.resizeHandler) {
+                window.removeEventListener('resize', this.resizeHandler);
+                this.resizeHandler = null;
+            }
+            if (this.canvas && this.canvas.parentNode) {
+                this.canvas.parentNode.removeChild(this.canvas);
+            }
+            this.canvas = null;
+            this.ctx = null;
+            this.particles = [];
         }
     };
 

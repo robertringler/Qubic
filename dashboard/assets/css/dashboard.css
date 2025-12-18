@@ -118,10 +118,23 @@ body {
     line-height: 1.5;
     letter-spacing: var(--letter-spacing-tight);
     color: var(--text-primary);
-    background: linear-gradient(135deg, #0a0014 0%, #1a0033 25%, #2d1b69 75%, #5b21b6 100%);
-    background-attachment: fixed;
+    background: #0a0014;
     min-height: 100vh;
     overflow-x: hidden;
+    position: relative;
+}
+
+/* Fixed gradient background for better performance */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #0a0014 0%, #1a0033 25%, #2d1b69 75%, #5b21b6 100%);
+    z-index: -1;
+    pointer-events: none;
 }
 
 /* Focus styles for accessibility */
@@ -246,14 +259,21 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: var(--spacing-md) var(--spacing-xl);
-    background: rgba(26, 0, 51, 0.7);
+    background: rgba(26, 0, 51, 0.95);
     border-bottom: 1px solid var(--border-subtle);
     position: sticky;
     top: 0;
     z-index: var(--z-dropdown);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced backdrop blur for modern browsers */
+@supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
+    .nav-header {
+        background: rgba(26, 0, 51, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
 }
 
 .nav-brand {
@@ -556,14 +576,21 @@ body {
 /* CARDS - Scientific Instrument Style */
 /* ========================================== */
 .card {
-    background: rgba(45, 27, 105, 0.3);
+    background: rgba(45, 27, 105, 0.85);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     overflow: hidden;
     transition: all var(--transition-normal);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced glass effect for modern browsers */
+@supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
+    .card {
+        background: rgba(45, 27, 105, 0.3);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
 }
 
 .card:hover {
