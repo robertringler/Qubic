@@ -3,7 +3,7 @@
 import pytest
 
 try:
-    from quasim.quantum.core import QISKIT_AVAILABLE, QuantumConfig
+    from quasim.quantum.core import QuantumConfig
     from quasim.quantum.vqe_molecule import MolecularVQE, VQEResult
 
     QUANTUM_AVAILABLE = True
