@@ -128,10 +128,13 @@ class MolecularVQE:
         if isinstance(config, QuantumConfig):
             self.config = config
             self.backend = QuantumBackend(config)
-        else:
-            # Assume it's a backend instance
+        elif isinstance(config, AbstractQuantumBackend):
             self.backend = config
             self.config = config.config if hasattr(config, "config") else QuantumConfig()
+        else:
+            raise TypeError(
+                f"config must be a QuantumConfig or AbstractQuantumBackend, got {type(config)!r}"
+            )
 
         # Use Estimator primitive for energy expectation values
         self.estimator = Estimator()
