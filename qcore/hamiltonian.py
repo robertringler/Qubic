@@ -23,10 +23,10 @@ class PauliTerm:
         operators: List of (qubit_index, pauli_operator) tuples
                    where pauli_operator is one of 'I', 'X', 'Y', 'Z'
     """
-    
+
     coefficient: complex
     operators: List[tuple[int, str]]
-    
+
     def __post_init__(self) -> None:
         """Validate Pauli operators after initialization."""
         valid_operators = {'I', 'X', 'Y', 'Z'}
@@ -36,7 +36,7 @@ class PauliTerm:
                     f"Invalid Pauli operator '{operator}'. "
                     f"Must be one of {valid_operators}"
                 )
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation.
         
@@ -50,7 +50,7 @@ class PauliTerm:
             },
             "operators": self.operators,
         }
-    
+
     def __str__(self) -> str:
         """Human-readable representation.
         
@@ -72,7 +72,7 @@ class Hamiltonian:
     - PR-003: energy() method for computing expectation values
     - PR-004: from_semantic_state() method for problem encoding
     """
-    
+
     def __init__(self, terms: List[PauliTerm]) -> None:
         """Initialize Hamiltonian with a list of Pauli terms.
         
@@ -80,7 +80,7 @@ class Hamiltonian:
             terms: List of PauliTerm objects
         """
         self.terms = terms
-    
+
     def encode(self) -> List[dict[str, Any]]:
         """Return list of serialized terms.
         
@@ -88,7 +88,7 @@ class Hamiltonian:
             List of dictionaries representing each term
         """
         return [term.to_dict() for term in self.terms]
-    
+
     def energy(self, state: Any) -> float:
         """Compute energy expectation value for a given state.
         
@@ -107,7 +107,7 @@ class Hamiltonian:
             "energy() computation will be implemented in PR-003. "
             "This is a structural contract establishing the interface."
         )
-    
+
     @classmethod
     def from_semantic_state(cls, semantic_state: Any) -> Hamiltonian:
         """Construct Hamiltonian from semantic problem definition.
@@ -127,7 +127,7 @@ class Hamiltonian:
             "from_semantic_state() encoding will be implemented in PR-004. "
             "This is a structural contract establishing the interface."
         )
-    
+
     def num_qubits(self) -> int:
         """Return number of qubits required for this Hamiltonian.
         
@@ -141,7 +141,7 @@ class Hamiltonian:
             for qubit_idx, _ in term.operators:
                 max_qubit = max(max_qubit, qubit_idx)
         return max_qubit + 1
-    
+
     def __str__(self) -> str:
         """Human-readable representation.
         
@@ -152,7 +152,7 @@ class Hamiltonian:
             return "H = 0"
         terms_str = " + ".join(str(term) for term in self.terms)
         return f"H = {terms_str}"
-    
+
     def to_json(self) -> str:
         """JSON serialization of Hamiltonian.
         

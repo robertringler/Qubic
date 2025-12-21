@@ -10,13 +10,9 @@ Status: Production
 from __future__ import annotations
 
 from qcore.hamiltonian import Hamiltonian, PauliTerm
-from qcore.semantic_state import (
-    ChemistryValidator,
-    DomainValidator,
-    FinanceValidator,
-    OptimizationValidator,
-    SemanticState,
-)
+from qcore.semantic_state import (ChemistryValidator, DomainValidator,
+                                  FinanceValidator, OptimizationValidator,
+                                  SemanticState)
 
 __all__ = [
     "SemanticState",
