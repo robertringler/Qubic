@@ -25,7 +25,7 @@ cd "$WORK_DIR"
 ##############################################################################
 
 echo ""
-echo "📥 Step 1/10: Cloning repositories..."
+echo "📥 Step 1/14: Cloning repositories..."
 git clone "$QRATUM_REPO" qratum
 git clone "$QRADLE_REPO" qradle
 
@@ -41,109 +41,150 @@ git checkout -b "$BRANCH_NAME"
 ##############################################################################
 
 echo ""
-echo "🗑️  Step 2/10: Removing Node.js artifacts..."
-rm -f package.json index.js package-lock.json node_modules 2>/dev/null || true
+echo "🗑️  Step 2/14: Removing Node.js artifacts..."
+rm -f package.json index.js package-lock.json 2>/dev/null || true
+rm -rf node_modules 2>/dev/null || true
 
 ##############################################################################
 # Step 3: Copy core quantum simulation engine
 ##############################################################################
 
 echo ""
-echo "⚛️  Step 3/10: Copying quantum simulation engine (quasim/)..."
-cp -r ../qratum/quasim ./
-echo "   ✅ Copied quasim/ directory"
+echo "⚛️  Step 3/14: Copying quantum simulation engine (quasim/)..."
+if [ -d ../qratum/quasim ]; then
+    cp -r ../qratum/quasim ./
+    echo "   ✅ Copied quasim/ directory"
+else
+    echo "   ⚠️  Warning: quasim/ directory not found in QRATUM"
+fi
 
 ##############################################################################
 # Step 4: Copy bioinformatics platform
 ##############################################################################
 
 echo ""
-echo "🧬 Step 4/10: Copying bioinformatics platform (xenon/)..."
-cp -r ../qratum/xenon ./
-echo "   ✅ Copied xenon/ directory"
+echo "🧬 Step 4/14: Copying bioinformatics platform (xenon/)..."
+if [ -d ../qratum/xenon ]; then
+    cp -r ../qratum/xenon ./
+    echo "   ✅ Copied xenon/ directory"
+else
+    echo "   ⚠️  Warning: xenon/ directory not found in QRATUM"
+fi
 
 ##############################################################################
 # Step 5: Copy visualization suite
 ##############################################################################
 
 echo ""
-echo "📊 Step 5/10: Copying visualization suite (qubic/)..."
-cp -r ../qratum/qubic ./
-echo "   ✅ Copied qubic/ directory"
+echo "📊 Step 5/14: Copying visualization suite (qubic/)..."
+if [ -d ../qratum/qubic ]; then
+    cp -r ../qratum/qubic ./
+    echo "   ✅ Copied qubic/ directory"
+else
+    echo "   ⚠️  Warning: qubic/ directory not found in QRATUM"
+fi
 
 ##############################################################################
 # Step 6: Copy quantum core abstractions
 ##############################################################################
 
 echo ""
-echo "🎯 Step 6/10: Copying quantum core abstractions (qcore/)..."
-cp -r ../qratum/qcore ./
-echo "   ✅ Copied qcore/ directory"
+echo "🎯 Step 6/14: Copying quantum core abstractions (qcore/)..."
+if [ -d ../qratum/qcore ]; then
+    cp -r ../qratum/qcore ./
+    echo "   ✅ Copied qcore/ directory"
+else
+    echo "   ⚠️  Warning: qcore/ directory not found in QRATUM"
+fi
 
 ##############################################################################
 # Step 7: Copy REST API platform
 ##############################################################################
 
 echo ""
-echo "🌐 Step 7/10: Copying REST API platform (api/)..."
-cp -r ../qratum/api ./
-echo "   ✅ Copied api/ directory"
+echo "🌐 Step 7/14: Copying REST API platform (api/)..."
+if [ -d ../qratum/api ]; then
+    cp -r ../qratum/api ./
+    echo "   ✅ Copied api/ directory"
+else
+    echo "   ⚠️  Warning: api/ directory not found in QRATUM"
+fi
 
 ##############################################################################
 # Step 8: Copy platform server and infrastructure
 ##############################################################################
 
 echo ""
-echo "🖥️  Step 8/10: Copying platform server and infrastructure..."
+echo "🖥️  Step 8/14: Copying platform server and infrastructure..."
 
 # Platform server
-cp ../qratum/qratum_platform.py ./
-echo "   ✅ Copied qratum_platform.py"
+if [ -f ../qratum/qratum_platform.py ]; then
+    cp ../qratum/qratum_platform.py ./
+    echo "   ✅ Copied qratum_platform.py"
+else
+    echo "   ⚠️  Warning: qratum_platform.py not found in QRATUM"
+fi
 
 # Infrastructure
 mkdir -p infra
-cp -r ../qratum/infra/terraform ./infra/ 2>/dev/null || true
-cp -r ../qratum/infra/k8s ./infra/ 2>/dev/null || true
-cp -r ../qratum/autonomous_systems_platform/infra/* ./infra/ 2>/dev/null || true
-echo "   ✅ Copied infra/ directory"
+if [ -d ../qratum/infra/terraform ]; then
+    cp -r ../qratum/infra/terraform ./infra/
+    echo "   ✅ Copied infra/terraform/"
+fi
+if [ -d ../qratum/infra/k8s ]; then
+    cp -r ../qratum/infra/k8s ./infra/
+    echo "   ✅ Copied infra/k8s/"
+fi
+if [ -d ../qratum/autonomous_systems_platform/infra ]; then
+    cp -r ../qratum/autonomous_systems_platform/infra/* ./infra/ 2>/dev/null || true
+    echo "   ✅ Copied autonomous_systems_platform/infra/"
+fi
 
 ##############################################################################
 # Step 9: Copy examples, tests, and documentation
 ##############################################################################
 
 echo ""
-echo "📚 Step 9/10: Copying examples, tests, and documentation..."
+echo "📚 Step 9/14: Copying examples, tests, and documentation..."
 
 # Examples
 mkdir -p examples
-cp ../qratum/examples/quantum_h2_vqe.py ./examples/ 2>/dev/null || true
-cp ../qratum/examples/quantum_maxcut_qaoa.py ./examples/ 2>/dev/null || true
-cp ../qratum/run_genome_sequencing.py ./examples/genome_analysis_demo.py 2>/dev/null || true
+[ -f ../qratum/examples/quantum_h2_vqe.py ] && cp ../qratum/examples/quantum_h2_vqe.py ./examples/
+[ -f ../qratum/examples/quantum_maxcut_qaoa.py ] && cp ../qratum/examples/quantum_maxcut_qaoa.py ./examples/
+[ -f ../qratum/run_genome_sequencing.py ] && cp ../qratum/run_genome_sequencing.py ./examples/genome_analysis_demo.py
 echo "   ✅ Copied examples/"
 
 # Tests
 mkdir -p tests/quantum
-cp -r ../qratum/tests/* ./tests/ 2>/dev/null || true
-echo "   ✅ Copied tests/"
+if [ -d ../qratum/tests ]; then
+    cp -r ../qratum/tests/* ./tests/ 2>/dev/null || true
+    echo "   ✅ Copied tests/"
+else
+    echo "   ⚠️  Warning: tests/ directory not found in QRATUM"
+fi
 
 # Documentation
 mkdir -p docs
-cp ../qratum/ARCHITECTURE_FREEZE.md ./docs/ARCHITECTURE.md 2>/dev/null || true
-cp ../qratum/QUANTUM_INTEGRATION_ROADMAP.md ./docs/ 2>/dev/null || true
-cp ../qratum/COMPLIANCE_IMPLEMENTATION_SUMMARY.md ./docs/COMPLIANCE_IMPLEMENTATION.md 2>/dev/null || true
+[ -f ../qratum/ARCHITECTURE_FREEZE.md ] && cp ../qratum/ARCHITECTURE_FREEZE.md ./docs/ARCHITECTURE.md
+[ -f ../qratum/QUANTUM_INTEGRATION_ROADMAP.md ] && cp ../qratum/QUANTUM_INTEGRATION_ROADMAP.md ./docs/
+[ -f ../qratum/COMPLIANCE_IMPLEMENTATION_SUMMARY.md ] && cp ../qratum/COMPLIANCE_IMPLEMENTATION_SUMMARY.md ./docs/COMPLIANCE_IMPLEMENTATION.md
 echo "   ✅ Copied docs/"
 
 # Compliance
 mkdir -p compliance/DO178C compliance/NIST compliance/CMMC
-cp -r ../qratum/compliance/* ./compliance/ 2>/dev/null || true
-echo "   ✅ Copied compliance/"
+if [ -d ../qratum/compliance ]; then
+    cp -r ../qratum/compliance/* ./compliance/ 2>/dev/null || true
+    echo "   ✅ Copied compliance/"
+else
+    echo "   ⚠️  Warning: compliance/ directory not found in QRATUM"
+fi
 
 ##############################################################################
 # Step 10: Create Python configuration files
 ##############################################################################
 
 echo ""
-echo "🐍 Step 10/10: Creating Python configuration files..."
+echo "🐍 Step 10/14: Creating Python configuration files..."
 
 # pyproject.toml
 cat > pyproject.toml << 'EOF'
@@ -417,7 +458,7 @@ echo "   ✅ Created .gitignore"
 ##############################################################################
 
 echo ""
-echo "📄 Creating README.md..."
+echo "📄 Step 11/14: Creating README.md..."
 
 cat > README.md << 'EOF'
 # QRADLE - Quantum-Classical Hybrid Computing Platform
@@ -713,11 +754,11 @@ EOF
 echo "   ✅ Created README.md"
 
 ##############################################################################
-# Step 12: Copy CI/CD workflows
+# Step 12: Create CI/CD workflows
 ##############################################################################
 
 echo ""
-echo "🔧 Copying CI/CD workflows..."
+echo "🔧 Step 12/14: Creating CI/CD workflows..."
 
 mkdir -p .github/workflows
 
@@ -802,7 +843,7 @@ echo "   ✅ Created .github/workflows/security.yml"
 ##############################################################################
 
 echo ""
-echo "📝 Committing changes..."
+echo "📝 Step 13/14: Committing changes..."
 
 git add .
 git commit -m "Transform QRADLE into production quantum computing platform
@@ -836,8 +877,8 @@ git push -u origin "$BRANCH_NAME"
 ##############################################################################
 
 echo ""
+echo "📬 Step 14/14: Creating pull request..."
 if command -v gh &> /dev/null; then
-    echo "📬 Creating pull request with GitHub CLI..."
     gh pr create \
         --title "Transform QRADLE into Production Quantum Computing Platform" \
         --body "## 🚀 QRADLE Transformation
