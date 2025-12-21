@@ -11,7 +11,6 @@ from typing import Any, Dict, List
 from qratum_platform.core import (
     ComputeSubstrate,
     PlatformContract,
-    SafetyViolation,
     VerticalModuleBase,
 )
 from qratum_platform.substrates import get_optimal_substrate, VerticalModule
