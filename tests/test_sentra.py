@@ -1,7 +1,5 @@
 """Tests for SENTRA Aerospace & Defense module."""
 
-import pytest
-
 from qratum_platform.core import PlatformContract, PlatformIntent, VerticalModule, ComputeSubstrate
 from verticals.sentra import SENTRAModule
 
