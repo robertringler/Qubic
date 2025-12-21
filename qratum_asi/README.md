@@ -207,6 +207,17 @@ print(f"System Integrity: {results['integrity']}")
 
 ## Running Demonstrations
 
+### Quick Start (Recommended)
+
+```bash
+# From QRATUM root directory
+
+# Discovery demonstration (Q-FORGE)
+python3 run_discovery_engine.py
+```
+
+### Direct Execution (All Demos)
+
 ```bash
 # Set Python path and run demos
 export PYTHONPATH=/path/to/QRATUM:$PYTHONPATH
