@@ -8,19 +8,23 @@ import streamlit as st
 
 def main():
     """Main dashboard."""
+
     st.set_page_config(page_title="Manufacturing Demo - QuASIM", layout="wide")
 
     st.title("🏭 Predictive Maintenance & Throughput Control")
     st.markdown("**Target Accounts**: Siemens, GE, Bosch, Toyota")
 
-    st.markdown("""
+    st.markdown(
+        """
+
     ## Overview
-    
+
     Minimize downtime, maximize throughput, schedule maintenance
-    
+
     ### Key Performance Indicators (KPIs)
     - MTBF, downtime_pct, throughput_units_hr, false_alarm_rate
-    """)
+    """
+    )
 
     artifacts_dir = Path("artifacts/manufacturing")
 
@@ -54,17 +58,20 @@ def main():
     else:
         st.info("No artifacts directory found. Run the demo to generate data.")
 
-    st.markdown("""
+    st.markdown(
+        """
+
     ## How to Run
-    
+
     ```bash
     # Run planning
     python -m quasim.demos.manufacturing.cli plan --steps 200 --seed 42
-    
+
     # Run simulation with capture
     python -m quasim.demos.manufacturing.cli simulate --seed 42 --capture
     ```
-    """)
+    """
+    )
 
 
 if __name__ == "__main__":
