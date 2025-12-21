@@ -384,7 +384,6 @@ class ECORAModule(VerticalModuleBase):
     def _assess_wind_site(self, area_m2: float, location: str) -> Dict[str, Any]:
         """Assess wind installation potential."""
         # Simplified wind assessment
-        avg_wind_speed = 7.0  # m/s
         turbine_capacity_kw = 2000  # 2 MW turbines
         num_turbines = max(1, int(area_m2 / 50000))  # One turbine per 5 hectares
 
