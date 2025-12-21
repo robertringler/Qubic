@@ -26,17 +26,17 @@ class SemanticState:
         domain: Problem domain (e.g., 'chemistry', 'optimization', 'finance')
         metadata: Additional domain-specific metadata
     """
-    
+
     variables: Dict[str, Any]
     constraints: Dict[str, Any]
     objective: Any
     domain: str
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def __post_init__(self) -> None:
         """Validate the semantic state after initialization."""
         self.validate()
-    
+
     def validate(self) -> None:
         """Validate semantic state constraints.
         
@@ -49,12 +49,12 @@ class SemanticState:
             raise ValueError("objective must be non-empty")
         if not self.domain:
             raise ValueError("domain must be non-empty")
-        
+
         # Apply domain-specific validation
         validator = DomainValidator.get(self.domain)
         if validator is not None:
             validator.validate(self)
-    
+
     def serialize(self) -> Dict[str, Any]:
         """Return deterministic dict representation.
         
@@ -68,7 +68,7 @@ class SemanticState:
             "objective": self.objective,
             "variables": self.variables,
         }
-    
+
     def to_json(self) -> str:
         """Return JSON with sorted keys for deterministic serialization.
         
@@ -76,7 +76,7 @@ class SemanticState:
             JSON string representation with sorted keys
         """
         return json.dumps(self.serialize(), sort_keys=True, default=str)
-    
+
     def compute_hash(self) -> str:
         """Return SHA-256 hash of canonical JSON serialization.
         
@@ -93,9 +93,9 @@ class DomainValidator:
     Validators can be registered for specific domains to enforce
     domain-specific constraints.
     """
-    
+
     _validators: Dict[str, DomainValidator] = {}
-    
+
     @classmethod
     def register(cls, domain: str, validator: DomainValidator) -> None:
         """Register a validator for a specific domain.
@@ -105,7 +105,7 @@ class DomainValidator:
             validator: Validator instance for the domain
         """
         cls._validators[domain] = validator
-    
+
     @classmethod
     def get(cls, domain: str) -> DomainValidator | None:
         """Get validator for a domain.
@@ -117,7 +117,7 @@ class DomainValidator:
             Validator instance or None if not registered
         """
         return cls._validators.get(domain)
-    
+
     def validate(self, state: SemanticState) -> None:
         """Validate a semantic state.
         
@@ -137,7 +137,7 @@ class ChemistryValidator(DomainValidator):
     
     Requires 'molecule' key in metadata.
     """
-    
+
     def validate(self, state: SemanticState) -> None:
         """Validate chemistry domain semantic state.
         
@@ -156,7 +156,7 @@ class OptimizationValidator(DomainValidator):
     
     Requires non-empty constraints.
     """
-    
+
     def validate(self, state: SemanticState) -> None:
         """Validate optimization domain semantic state.
         
@@ -175,7 +175,7 @@ class FinanceValidator(DomainValidator):
     
     Requires 'risk_tolerance' key in metadata.
     """
-    
+
     def validate(self, state: SemanticState) -> None:
         """Validate finance domain semantic state.
         
