@@ -172,6 +172,6 @@ class SummaryWriter:
                 f"{domain}:{domain_counts[label_value][domain]}"
                 for domain in domain_counts[label_value].most_common(3)
             )
-            lines.append(f'{label_value},{count},"{top_domains}"')
+            lines.append(f"{label_value},{count},\"{top_domains}\"")
         summary_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         return summary_path
