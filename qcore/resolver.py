@@ -93,7 +93,12 @@ class CapabilityResolver:
         """
         resolved: List[ResolvedCapability] = []
 
-        for capability in intent.capabilities:
+        # If no capabilities specified, use general_compute
+        capabilities = intent.capabilities if intent.capabilities else [
+            type('Capability', (), {'name': 'general_compute'})()
+        ]
+
+        for capability in capabilities:
             # Get possible cluster types for this capability
             cluster_types = self.capability_map.get(capability.name, [])
 

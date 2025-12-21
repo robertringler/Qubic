@@ -102,7 +102,13 @@ class TemporalContract(BaseContract):
             return False
 
         if current_time is None:
-            current_time = datetime.utcnow()
+            from datetime import timezone
+            current_time = datetime.now(timezone.utc)
+
+        # Ensure current_time is timezone-aware
+        if current_time.tzinfo is None:
+            from datetime import timezone
+            current_time = current_time.replace(tzinfo=timezone.utc)
 
         deadline = self.get_absolute_deadline()
         return current_time > deadline
@@ -120,7 +126,13 @@ class TemporalContract(BaseContract):
             return float("inf")
 
         if current_time is None:
-            current_time = datetime.utcnow()
+            from datetime import timezone
+            current_time = datetime.now(timezone.utc)
+
+        # Ensure current_time is timezone-aware
+        if current_time.tzinfo is None:
+            from datetime import timezone
+            current_time = current_time.replace(tzinfo=timezone.utc)
 
         deadline = self.get_absolute_deadline()
         delta = deadline - current_time
@@ -139,7 +151,13 @@ class TemporalContract(BaseContract):
             return True  # No window constraint
 
         if current_time is None:
-            current_time = datetime.utcnow()
+            from datetime import timezone
+            current_time = datetime.now(timezone.utc)
+
+        # Ensure current_time is timezone-aware
+        if current_time.tzinfo is None:
+            from datetime import timezone
+            current_time = current_time.replace(tzinfo=timezone.utc)
 
         if self.window_start:
             start = datetime.fromisoformat(self.window_start.replace("Z", "+00:00"))

@@ -190,7 +190,7 @@ class ContractIssuer:
                 cluster_type="QPU",
                 node_count=1,
                 accelerators_per_node=requirements.get("qubits", 100),
-                memory_per_node_gb=0,  # Quantum system
+                memory_per_node_gb=1.0,  # Minimal classical control memory
                 interconnect="Quantum",
                 metadata={
                     "qubits": requirements.get("qubits", 100),

@@ -95,7 +95,9 @@ def intent_to_canonical_form(intent: Intent) -> str:
 
     # Time specifications
     for time_spec in intent.time_specs:
-        lines.append(f"    TIME {time_spec.key}: {time_spec.value}{time_spec.unit}")
+        # Format value to avoid unnecessary .0 for integers
+        value_str = str(int(time_spec.value)) if time_spec.value == int(time_spec.value) else str(time_spec.value)
+        lines.append(f"    TIME {time_spec.key}: {value_str}{time_spec.unit}")
 
     # Authorities
     for authority in intent.authorities:
