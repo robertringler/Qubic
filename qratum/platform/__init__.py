@@ -12,6 +12,10 @@ from .core import (
     PlatformIntent,
     PlatformContract,
     Event,
+    EventType,
+    ContractStatus,
+    create_contract_from_intent,
+    create_event,
     FATAL_INVARIANTS,
 )
 from .event_chain import MerkleEventChain
@@ -22,6 +26,10 @@ __all__ = [
     "PlatformIntent",
     "PlatformContract",
     "Event",
+    "EventType",
+    "ContractStatus",
+    "create_contract_from_intent",
+    "create_event",
     "FATAL_INVARIANTS",
     "MerkleEventChain",
     "PlatformOrchestrator",
