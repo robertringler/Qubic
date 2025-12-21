@@ -10,13 +10,13 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 
 @dataclass(frozen=True)
 class LegalAuthority:
     """Represents a legal authority (case, statute, regulation, treaty).
-    
+
     Attributes:
         authority_id: Unique identifier for this authority
         authority_type: Type of authority (case, statute, regulation, treaty)
@@ -26,25 +26,25 @@ class LegalAuthority:
         key_holdings: Tuple of key legal holdings or principles
         status: Current status (good_law, overruled, superseded, questioned)
     """
-    
+
     authority_id: str
     authority_type: str
     jurisdiction: str
     citation: str
     title: str
-    key_holdings: Tuple[str, ...]
+    key_holdings: tuple[str, ...]
     status: str
-    
+
     def __post_init__(self) -> None:
         """Validate legal authority data."""
         valid_types = {"case", "statute", "regulation", "treaty", "constitution"}
         if self.authority_type not in valid_types:
             raise ValueError(f"Invalid authority_type: {self.authority_type}")
-        
+
         valid_statuses = {"good_law", "overruled", "superseded", "questioned", "pending"}
         if self.status not in valid_statuses:
             raise ValueError(f"Invalid status: {self.status}")
-        
+
         if not self.authority_id:
             raise ValueError("authority_id cannot be empty")
         if not self.citation:
@@ -53,16 +53,16 @@ class LegalAuthority:
 
 class LegalKnowledgeBase:
     """Legal knowledge base for searching and retrieving legal authorities.
-    
+
     This is a production-ready stub implementation. In a full deployment,
     this would integrate with legal research databases like Westlaw or LexisNexis.
     """
-    
+
     def __init__(self) -> None:
         """Initialize the legal knowledge base."""
-        self._authorities: Dict[str, LegalAuthority] = {}
+        self._authorities: dict[str, LegalAuthority] = {}
         self._load_sample_authorities()
-    
+
     def _load_sample_authorities(self) -> None:
         """Load sample legal authorities for demonstration."""
         sample_authorities = [
@@ -127,75 +127,75 @@ class LegalKnowledgeBase:
                 status="good_law"
             ),
         ]
-        
+
         for auth in sample_authorities:
             self._authorities[auth.authority_id] = auth
-    
+
     def search(
         self,
         query: str,
         jurisdiction: str = "",
         limit: int = 10
-    ) -> List[LegalAuthority]:
+    ) -> list[LegalAuthority]:
         """Search for legal authorities.
-        
+
         Args:
             query: Search query string
             jurisdiction: Filter by jurisdiction code (empty for all)
             limit: Maximum number of results to return
-            
+
         Returns:
             List of matching legal authorities
         """
         results = []
         query_lower = query.lower()
-        
+
         for authority in self._authorities.values():
             # Simple keyword matching
             if (query_lower in authority.title.lower() or
                 query_lower in authority.citation.lower() or
                 any(query_lower in h.lower() for h in authority.key_holdings)):
-                
+
                 # Filter by jurisdiction if specified
                 if jurisdiction and not authority.jurisdiction.startswith(jurisdiction):
                     continue
-                
+
                 results.append(authority)
-                
+
                 if len(results) >= limit:
                     break
-        
+
         return results
-    
-    def get_citing_authorities(self, authority_id: str) -> List[LegalAuthority]:
+
+    def get_citing_authorities(self, authority_id: str) -> list[LegalAuthority]:
         """Get authorities that cite the specified authority.
-        
+
         Args:
             authority_id: ID of the authority to find citations for
-            
+
         Returns:
             List of citing authorities
         """
         # Production stub - in full implementation, this would query citation database
         return []
-    
-    def check_authority_status(self, authority_id: str) -> Dict[str, Any]:
+
+    def check_authority_status(self, authority_id: str) -> dict[str, Any]:
         """Check the current status of a legal authority.
-        
+
         Args:
             authority_id: ID of the authority to check
-            
+
         Returns:
             Dictionary with status information
         """
         authority = self._authorities.get(authority_id)
-        
+
         if not authority:
             return {
                 "found": False,
                 "error": "Authority not found"
             }
-        
+
         return {
             "found": True,
             "authority_id": authority.authority_id,
@@ -204,21 +204,21 @@ class LegalKnowledgeBase:
             "jurisdiction": authority.jurisdiction,
             "negative_treatment": authority.status != "good_law"
         }
-    
+
     def add_authority(self, authority: LegalAuthority) -> None:
         """Add an authority to the knowledge base.
-        
+
         Args:
             authority: Legal authority to add
         """
         self._authorities[authority.authority_id] = authority
-    
+
     def get_authority(self, authority_id: str) -> LegalAuthority | None:
         """Get a specific authority by ID.
-        
+
         Args:
             authority_id: ID of the authority to retrieve
-            
+
         Returns:
             Legal authority or None if not found
         """

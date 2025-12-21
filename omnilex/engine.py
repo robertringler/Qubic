@@ -12,26 +12,26 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from typing import Any, Dict
+from typing import Any
 
 from omnilex.adversarial import AdversarialSimulator
 from omnilex.conflicts import ConflictOfLawsResolver
 from omnilex.contracts import ContractAnalysisEngine
 from omnilex.knowledge import LegalKnowledgeBase
 from omnilex.prediction import LitigationPredictionEngine
-from omnilex.qil_legal import LegalQILIntent, generate_intent_id
+from omnilex.qil_legal import LegalQILIntent
 from omnilex.reasoning import LegalReasoningEngine
 
 
 class QRATUMOmniLexEngine:
     """Main QRATUM-OMNILEX legal analysis engine.
-    
+
     This engine orchestrates all legal analysis components and ensures
     compliance with QRATUM invariants and UPL requirements.
     """
-    
+
     VERSION = "1.0.0"
-    
+
     # UPL (Unauthorized Practice of Law) Disclaimer
     UPL_DISCLAIMER = """
 ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -55,7 +55,7 @@ class QRATUMOmniLexEngine:
 ║                                                                            ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 """
-    
+
     def __init__(self) -> None:
         """Initialize the OMNILEX engine."""
         # Initialize all sub-engines
@@ -65,16 +65,16 @@ class QRATUMOmniLexEngine:
         self.conflict_resolver = ConflictOfLawsResolver()
         self.prediction_engine = LitigationPredictionEngine()
         self.contract_engine = ContractAnalysisEngine()
-        
+
         # Analysis history for replay and audit
-        self._analysis_history: Dict[str, Dict] = {}
-        
+        self._analysis_history: dict[str, dict] = {}
+
         # QRATUM invariant enforcement
         self._enforce_invariants_enabled = True
-    
-    def submit_legal_intent(self, intent: LegalQILIntent) -> Dict[str, Any]:
+
+    def submit_legal_intent(self, intent: LegalQILIntent) -> dict[str, Any]:
         """Submit legal analysis intent for execution.
-        
+
         This is the main entry point for legal analysis. It ensures:
         1. Contract immutability (frozen dataclasses)
         2. Zero policy logic in adapters
@@ -84,27 +84,27 @@ class QRATUMOmniLexEngine:
         6. Authorized execution only
         7. Deterministic serialization
         8. Temporal constraint enforcement
-        
+
         Args:
             intent: Legal QIL intent to execute
-            
+
         Returns:
             Dictionary with analysis results and metadata
         """
         # Invariant 1: Contract immutability (verified by frozen dataclass)
         self._enforce_contract_immutability(intent)
-        
+
         # Invariant 5: Causal traceability
         intent_hash = intent.compute_hash()
         timestamp = time.time()
-        
+
         # Invariant 3: Mandatory event emission
         self._emit_event("LEGAL_INTENT_SUBMITTED", {
             "intent_id": intent.intent_id,
             "intent_hash": intent_hash,
             "timestamp": timestamp
         })
-        
+
         # Route to appropriate analysis engine
         try:
             if intent.compute_task == "irac_analysis":
@@ -119,10 +119,10 @@ class QRATUMOmniLexEngine:
                 result = self._execute_contract_review(intent)
             else:
                 raise ValueError(f"Unknown compute_task: {intent.compute_task}")
-            
+
             # Invariant 7: Deterministic serialization
             result_hash = self._compute_result_hash(result)
-            
+
             # Build complete response
             response = {
                 "intent_id": intent.intent_id,
@@ -134,19 +134,19 @@ class QRATUMOmniLexEngine:
                 "attorney_supervised": intent.attorney_supervised,
                 "disclaimer": self.UPL_DISCLAIMER,
             }
-            
+
             # Store in history for replay
             self._analysis_history[intent.intent_id] = response
-            
+
             # Invariant 3: Mandatory event emission
             self._emit_event("LEGAL_ANALYSIS_COMPLETED", {
                 "intent_id": intent.intent_id,
                 "result_hash": result_hash,
                 "timestamp": time.time()
             })
-            
+
             return response
-            
+
         except Exception as e:
             # Invariant enforcement: Fatal on errors
             self._emit_event("LEGAL_ANALYSIS_FAILED", {
@@ -155,48 +155,48 @@ class QRATUMOmniLexEngine:
                 "timestamp": time.time()
             })
             raise
-    
-    def replay_analysis(self, intent_id: str) -> Dict[str, Any]:
+
+    def replay_analysis(self, intent_id: str) -> dict[str, Any]:
         """Replay a previous analysis deterministically.
-        
+
         Invariant 4: Hash-chain integrity
         Invariant 5: Causal traceability
-        
+
         Args:
             intent_id: Intent ID to replay
-            
+
         Returns:
             Original analysis results
         """
         if intent_id not in self._analysis_history:
             raise ValueError(f"Intent {intent_id} not found in history")
-        
+
         self._emit_event("LEGAL_ANALYSIS_REPLAYED", {
             "intent_id": intent_id,
             "timestamp": time.time()
         })
-        
+
         return self._analysis_history[intent_id]
-    
-    def audit_analysis(self, intent_id: str) -> Dict[str, Any]:
+
+    def audit_analysis(self, intent_id: str) -> dict[str, Any]:
         """Audit a legal analysis for compliance.
-        
+
         Args:
             intent_id: Intent ID to audit
-            
+
         Returns:
             Audit report
         """
         if intent_id not in self._analysis_history:
             raise ValueError(f"Intent {intent_id} not found in history")
-        
+
         analysis = self._analysis_history[intent_id]
-        
+
         # Verify hash integrity
         stored_hash = analysis["result_hash"]
         recomputed_hash = self._compute_result_hash(analysis["result"])
         hash_valid = stored_hash == recomputed_hash
-        
+
         audit_report = {
             "intent_id": intent_id,
             "hash_integrity": {
@@ -214,21 +214,21 @@ class QRATUMOmniLexEngine:
                 "event_emission": True,  # Events emitted
             }
         }
-        
+
         self._emit_event("LEGAL_ANALYSIS_AUDITED", {
             "intent_id": intent_id,
             "audit_passed": hash_valid,
             "timestamp": time.time()
         })
-        
+
         return audit_report
-    
-    def _execute_irac_analysis(self, intent: LegalQILIntent) -> Dict[str, Any]:
+
+    def _execute_irac_analysis(self, intent: LegalQILIntent) -> dict[str, Any]:
         """Execute IRAC legal reasoning.
-        
+
         Args:
             intent: Legal intent
-            
+
         Returns:
             IRAC analysis results
         """
@@ -238,7 +238,7 @@ class QRATUMOmniLexEngine:
             jurisdiction=intent.jurisdiction_primary,
             domain=intent.legal_domain
         )
-        
+
         return {
             "analysis_type": "irac",
             "issue": analysis.issue,
@@ -249,13 +249,13 @@ class QRATUMOmniLexEngine:
             "confidence": analysis.confidence,
             "caveats": analysis.caveats
         }
-    
-    def _execute_adversarial_simulation(self, intent: LegalQILIntent) -> Dict[str, Any]:
+
+    def _execute_adversarial_simulation(self, intent: LegalQILIntent) -> dict[str, Any]:
         """Execute adversarial debate simulation.
-        
+
         Args:
             intent: Legal intent
-            
+
         Returns:
             Adversarial simulation results
         """
@@ -265,13 +265,13 @@ class QRATUMOmniLexEngine:
             jurisdiction=intent.jurisdiction_primary,
             rounds=3
         )
-    
-    def _execute_conflict_resolution(self, intent: LegalQILIntent) -> Dict[str, Any]:
+
+    def _execute_conflict_resolution(self, intent: LegalQILIntent) -> dict[str, Any]:
         """Execute conflict of laws resolution.
-        
+
         Args:
             intent: Legal intent
-            
+
         Returns:
             Conflict resolution results
         """
@@ -279,40 +279,40 @@ class QRATUMOmniLexEngine:
         connecting_factors = {
             "place_of_contracting": intent.jurisdiction_primary
         }
-        
+
         jurisdictions = [intent.jurisdiction_primary] + list(intent.jurisdictions_secondary)
-        
+
         return self.conflict_resolver.resolve_conflict(
             issue_type=intent.legal_domain,
             jurisdictions=jurisdictions,
             connecting_factors=connecting_factors,
             forum=intent.jurisdiction_primary
         )
-    
-    def _execute_litigation_prediction(self, intent: LegalQILIntent) -> Dict[str, Any]:
+
+    def _execute_litigation_prediction(self, intent: LegalQILIntent) -> dict[str, Any]:
         """Execute litigation outcome prediction.
-        
+
         Args:
             intent: Legal intent
-            
+
         Returns:
             Litigation prediction results
         """
         # Parse claimed damages from facts (simplified)
         key_facts = {"claimed_damages": 100000}  # Default
-        
+
         return self.prediction_engine.predict_outcome(
             case_type=intent.legal_domain,
             jurisdiction=intent.jurisdiction_primary,
             key_facts=key_facts
         )
-    
-    def _execute_contract_review(self, intent: LegalQILIntent) -> Dict[str, Any]:
+
+    def _execute_contract_review(self, intent: LegalQILIntent) -> dict[str, Any]:
         """Execute contract review and analysis.
-        
+
         Args:
             intent: Legal intent
-            
+
         Returns:
             Contract analysis results
         """
@@ -321,7 +321,7 @@ class QRATUMOmniLexEngine:
             contract_type=intent.legal_domain,
             jurisdiction=intent.jurisdiction_primary
         )
-        
+
         return {
             "analysis_type": "contract_review",
             "contract_type": analysis.contract_type,
@@ -340,19 +340,19 @@ class QRATUMOmniLexEngine:
             "missing_provisions": analysis.missing_provisions,
             "recommendations": analysis.recommendations
         }
-    
+
     def _enforce_contract_immutability(self, intent: LegalQILIntent) -> None:
         """Enforce QRATUM invariant: Contract immutability.
-        
+
         Args:
             intent: Intent to validate
-            
+
         Raises:
             TypeError: If intent is not immutable
         """
         if not hasattr(intent, "__dataclass_fields__"):
             raise TypeError("Intent must be a dataclass")
-        
+
         if not intent.__dataclass_fields__["intent_id"].metadata.get("frozen", False):
             # Check if the dataclass itself is frozen
             try:
@@ -361,30 +361,30 @@ class QRATUMOmniLexEngine:
             except AttributeError:
                 # Good - frozen dataclass raises AttributeError
                 pass
-    
-    def _compute_result_hash(self, result: Dict) -> str:
+
+    def _compute_result_hash(self, result: dict) -> str:
         """Compute deterministic hash of result.
-        
+
         Args:
             result: Result dictionary
-            
+
         Returns:
             SHA-256 hash of result
         """
         # Sort keys for deterministic serialization
         json_str = json.dumps(result, sort_keys=True, default=str)
         return hashlib.sha256(json_str.encode("utf-8")).hexdigest()
-    
-    def _emit_event(self, event_type: str, data: Dict) -> None:
+
+    def _emit_event(self, event_type: str, data: dict) -> None:
         """Emit QRATUM event (Invariant 3: Mandatory event emission).
-        
+
         Args:
             event_type: Type of event
             data: Event data
         """
         # In production, this would emit to QRATUM event bus
         # For now, log to console
-        event = {
+        {
             "event_type": event_type,
             "data": data,
             "timestamp": time.time()

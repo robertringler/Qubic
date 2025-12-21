@@ -11,12 +11,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Tuple
 
 
 class LegalTradition(Enum):
     """Major legal traditions recognized by OMNILEX."""
-    
+
     COMMON_LAW = "common_law"
     CIVIL_LAW = "civil_law"
     RELIGIOUS_ISLAMIC = "religious_islamic"
@@ -31,7 +30,7 @@ class LegalTradition(Enum):
 
 class LegalDomain(Enum):
     """Legal domains supported by OMNILEX."""
-    
+
     CONSTITUTIONAL = "constitutional"
     CRIMINAL = "criminal"
     CONTRACT = "contract"
@@ -54,7 +53,7 @@ class LegalDomain(Enum):
 
 class ReasoningFramework(Enum):
     """Legal reasoning frameworks supported by OMNILEX."""
-    
+
     IRAC = "irac"  # Issue, Rule, Application, Conclusion
     CRAC = "crac"  # Conclusion, Rule, Application, Conclusion
     CREAC = "creac"  # Conclusion, Rule, Explanation, Application, Conclusion
@@ -65,7 +64,7 @@ class ReasoningFramework(Enum):
 
 class InterpretiveCanon(Enum):
     """Interpretive canons used in legal analysis."""
-    
+
     PLAIN_MEANING = "plain_meaning"
     EJUSDEM_GENERIS = "ejusdem_generis"
     EXPRESSIO_UNIUS = "expressio_unius"
@@ -81,19 +80,19 @@ class InterpretiveCanon(Enum):
 @dataclass(frozen=True)
 class Jurisdiction:
     """Represents a legal jurisdiction.
-    
+
     Attributes:
         code: ISO 3166-1 + subdivision code (e.g., 'US-CA' for California)
         name: Human-readable jurisdiction name
         tradition: Primary legal tradition of the jurisdiction
         court_hierarchy: Tuple of court names from lowest to highest
     """
-    
+
     code: str
     name: str
     tradition: LegalTradition
-    court_hierarchy: Tuple[str, ...]
-    
+    court_hierarchy: tuple[str, ...]
+
     def __post_init__(self) -> None:
         """Validate jurisdiction data."""
         if not self.code:
