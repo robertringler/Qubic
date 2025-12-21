@@ -14,6 +14,7 @@ from qratum_platform.core import (
     VerticalModuleBase,
 )
 from qratum_platform.substrates import get_optimal_substrate, VerticalModule
+from qratum_platform.utils import compute_deterministic_seed
 
 
 class FLUXAModule(VerticalModuleBase):
@@ -96,8 +97,11 @@ class FLUXAModule(VerticalModuleBase):
         num_vehicles = parameters.get("num_vehicles", 2)
         vehicle_capacity = parameters.get("vehicle_capacity", 30)
 
+        # Derive seed from parameters for input-dependent determinism
+        seed = compute_deterministic_seed(parameters)
+
         # Simplified nearest neighbor heuristic
-        routes = self._greedy_route_assignment(depot, locations, num_vehicles, vehicle_capacity)
+        routes = self._greedy_route_assignment(depot, locations, num_vehicles, vehicle_capacity, seed)
 
         total_distance = sum(r["distance_km"] for r in routes)
         total_time = sum(r["time_hours"] for r in routes)
@@ -115,12 +119,12 @@ class FLUXAModule(VerticalModuleBase):
         }
 
     def _greedy_route_assignment(
-        self, depot: Dict, locations: List[Dict], num_vehicles: int, capacity: float
+        self, depot: Dict, locations: List[Dict], num_vehicles: int, capacity: float, seed: int
     ) -> List[Dict[str, Any]]:
         """Greedy route assignment."""
         routes = []
         remaining = locations.copy()
-        random.seed(42)
+        random.seed(seed)
 
         for v in range(num_vehicles):
             route = []
@@ -350,7 +354,9 @@ class FLUXAModule(VerticalModuleBase):
         arrival_rate = parameters.get("arrival_rate_per_day", 50)
         service_rate = parameters.get("service_rate_per_day", 60)
 
-        random.seed(42)
+        # Derive seed from parameters for input-dependent determinism
+        seed = compute_deterministic_seed(parameters)
+        random.seed(seed)
 
         # Simplified discrete event simulation
         total_arrivals = 0

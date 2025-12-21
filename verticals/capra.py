@@ -14,6 +14,7 @@ from qratum_platform.core import (
     VerticalModuleBase,
 )
 from qratum_platform.substrates import get_optimal_substrate, VerticalModule
+from qratum_platform.utils import compute_deterministic_seed
 
 
 class CAPRAModule(VerticalModuleBase):
@@ -141,7 +142,9 @@ class CAPRAModule(VerticalModuleBase):
         n_sims = parameters.get("num_simulations", 10000)
         steps = parameters.get("time_steps", 252)
 
-        random.seed(42)  # For determinism
+        # Derive seed from parameters for input-dependent determinism
+        seed = compute_deterministic_seed(parameters)
+        random.seed(seed)
         dt = T / steps
         paths = []
 
@@ -175,8 +178,9 @@ class CAPRAModule(VerticalModuleBase):
         portfolio_value = parameters.get("portfolio_value", 1000000.0)
 
         if not returns:
-            # Generate sample returns
-            random.seed(42)
+            # Generate sample returns with seed from parameters
+            seed = compute_deterministic_seed(parameters)
+            random.seed(seed)
             returns = [random.gauss(0.0005, 0.02) for _ in range(1000)]
 
         sorted_returns = sorted(returns)
@@ -201,9 +205,8 @@ class CAPRAModule(VerticalModuleBase):
         """Optimize portfolio allocation."""
         assets = parameters.get("assets", ["AAPL", "GOOGL", "MSFT", "AMZN"])
         expected_returns = parameters.get("expected_returns", [0.12, 0.15, 0.10, 0.14])
-        risk_tolerance = parameters.get("risk_tolerance", "moderate")
 
-        # Simple equal weight for moderate risk
+        # Simple equal weight allocation
         n = len(assets)
         weights = [1.0 / n] * n
 

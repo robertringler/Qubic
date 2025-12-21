@@ -13,6 +13,7 @@ from qratum_platform.core import (
     VerticalModuleBase,
 )
 from qratum_platform.substrates import get_optimal_substrate, VerticalModule
+from qratum_platform.utils import compute_deterministic_seed
 
 
 class NEURAModule(VerticalModuleBase):
@@ -96,7 +97,9 @@ class NEURAModule(VerticalModuleBase):
         duration_ms = parameters.get("duration_ms", 1000)
         connectivity = parameters.get("connectivity", 0.1)
 
-        random.seed(42)  # For determinism
+        # Derive seed from parameters for input-dependent determinism
+        seed = compute_deterministic_seed(parameters)
+        random.seed(seed)
 
         # Generate spike trains
         spike_trains = []
@@ -130,6 +133,10 @@ class NEURAModule(VerticalModuleBase):
         channels = parameters.get("channels", ["Fp1", "Fp2", "F3", "F4", "C3", "C4"])
         duration_s = parameters.get("duration_s", 60)
 
+        # Derive seed from parameters for input-dependent determinism
+        seed = compute_deterministic_seed(parameters)
+        random.seed(seed)
+
         # Frequency band analysis
         band_power = {}
         for band, (low, high) in self.FREQUENCY_BANDS.items():
@@ -138,10 +145,10 @@ class NEURAModule(VerticalModuleBase):
             band_power[band] = power
 
         # Artifact detection (simplified)
-        artifacts = self._detect_artifacts(duration_s)
+        artifacts = self._detect_artifacts(duration_s, seed)
 
         # Event detection
-        events = self._detect_neural_events(duration_s)
+        events = self._detect_neural_events(duration_s, seed)
 
         return {
             "analysis_type": "eeg_spectral",
@@ -156,9 +163,9 @@ class NEURAModule(VerticalModuleBase):
             "disclaimer": self.SAFETY_DISCLAIMER,
         }
 
-    def _detect_artifacts(self, duration_s: float) -> List[Dict[str, Any]]:
+    def _detect_artifacts(self, duration_s: float, seed: int) -> List[Dict[str, Any]]:
         """Detect artifacts in EEG signal."""
-        random.seed(42)
+        random.seed(seed)
         num_artifacts = random.randint(0, 5)
         artifacts = []
         for i in range(num_artifacts):
@@ -171,9 +178,9 @@ class NEURAModule(VerticalModuleBase):
             )
         return artifacts
 
-    def _detect_neural_events(self, duration_s: float) -> List[Dict[str, Any]]:
+    def _detect_neural_events(self, duration_s: float, seed: int) -> List[Dict[str, Any]]:
         """Detect neural events."""
-        random.seed(42)
+        random.seed(seed + 1)  # Use different seed than artifacts
         events = []
         for i in range(random.randint(2, 8)):
             events.append(

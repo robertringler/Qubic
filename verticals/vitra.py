@@ -5,16 +5,15 @@ drug candidate screening, molecular dynamics, and pharmacokinetics modeling.
 """
 
 import math
-import re
 from typing import Any, Dict, List, Tuple
 
 from qratum_platform.core import (
     ComputeSubstrate,
     PlatformContract,
-    SafetyViolation,
     VerticalModuleBase,
 )
 from qratum_platform.substrates import get_optimal_substrate, VerticalModule
+from qratum_platform.utils import compute_deterministic_float
 
 
 class VITRAModule(VerticalModuleBase):
@@ -360,8 +359,8 @@ class VITRAModule(VerticalModuleBase):
 
     def _estimate_binding_affinity(self, compound: str, target: str) -> float:
         """Estimate binding affinity (simplified)."""
-        # Simple hash-based scoring for determinism
-        score = (hash(compound + target) % 1000) / 100.0
+        # Use deterministic SHA-256 hash for reproducible scoring
+        score = compute_deterministic_float(compound + target)
         return score
 
     def _assess_druglikeness(self, compound: str) -> float:

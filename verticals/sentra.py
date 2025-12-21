@@ -10,7 +10,6 @@ from typing import Any, Dict, List, Tuple
 from qratum_platform.core import (
     ComputeSubstrate,
     PlatformContract,
-    SafetyViolation,
     VerticalModuleBase,
 )
 from qratum_platform.substrates import get_optimal_substrate, VerticalModule
@@ -138,7 +137,6 @@ class SENTRAModule(VerticalModuleBase):
         """
         object_type = parameters.get("object_type", "sphere")
         frequency_ghz = parameters.get("frequency_ghz", 10.0)
-        aspect_angle = parameters.get("aspect_angle_deg", 0.0)
 
         wavelength_m = 0.3 / frequency_ghz  # c/f
 
