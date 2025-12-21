@@ -1,7 +1,5 @@
 """Tests for NEURA Neuroscience & BCI module."""
 
-import pytest
-
 from qratum_platform.core import PlatformContract, PlatformIntent, VerticalModule, ComputeSubstrate
 from verticals.neura import NEURAModule
 
