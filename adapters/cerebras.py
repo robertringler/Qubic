@@ -39,7 +39,6 @@ class CerebrasAdapter(BaseAdapter):
         self.validate_contract(contract_bundle)
 
         intent_contract = contract_bundle.intent_contract
-        capability_contract = contract_bundle.capability_contract
 
         self.log_execution_event(
             contract_id=intent_contract.contract_id,
