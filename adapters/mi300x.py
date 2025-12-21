@@ -9,8 +9,6 @@ Status: Production
 
 from __future__ import annotations
 
-from typing import Any, Dict
-
 from adapters.base import AdapterError, BaseAdapter
 from qcore.issuer import ContractBundle
 from spine.executor import ExecutionResult

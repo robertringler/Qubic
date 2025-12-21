@@ -13,7 +13,7 @@ import hashlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from qcore.issuer import ContractBundle
 
@@ -44,7 +44,7 @@ class ExecutionProof:
     timestamp: str
     execution_hash: str
     deterministic: bool
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 class BaseAdapter(ABC):
@@ -120,7 +120,7 @@ class BaseAdapter(ABC):
         contract_id: str,
         execution_result: Any,
         deterministic: bool = True,
-        metadata: Dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> ExecutionProof:
         """Create execution proof with cryptographic verification.
 
@@ -155,7 +155,7 @@ class BaseAdapter(ABC):
         )
 
     def log_execution_event(
-        self, contract_id: str, event_type: str, payload: Dict[str, Any]
+        self, contract_id: str, event_type: str, payload: dict[str, Any]
     ) -> None:
         """Log execution event (adapter-specific).
 
@@ -194,7 +194,7 @@ class BaseAdapter(ABC):
         """
         return self._execution_count
 
-    def get_cluster_info(self) -> Dict[str, Any]:
+    def get_cluster_info(self) -> dict[str, Any]:
         """Get cluster information.
 
         Returns:

@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any
 
 from contracts import (
     CapabilityContract,
@@ -51,7 +51,7 @@ class ContractIssuer:
     def __init__(
         self,
         resolver: CapabilityResolver | None = None,
-        cluster_registry: Dict[str, Any] | None = None,
+        cluster_registry: dict[str, Any] | None = None,
     ) -> None:
         """Initialize contract issuer.
 
@@ -113,7 +113,7 @@ class ContractIssuer:
     def _create_capability_contract(
         self,
         intent_contract: IntentContract,
-        resolved_capabilities: List[ResolvedCapability],
+        resolved_capabilities: list[ResolvedCapability],
     ) -> CapabilityContract:
         """Create CapabilityContract from resolved capabilities.
 
@@ -157,7 +157,7 @@ class ContractIssuer:
         )
 
     def _create_cluster_topology(
-        self, cluster_type: str, requirements: Dict[str, Any]
+        self, cluster_type: str, requirements: dict[str, Any]
     ) -> ClusterTopology:
         """Create ClusterTopology for a cluster type.
 

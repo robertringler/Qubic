@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any
 
 from contracts.base import (
     BaseContract,
@@ -40,12 +40,12 @@ class IntentContract(BaseContract):
     intent_name: str = ""
     intent_hash: str = ""
     objective: str = ""
-    constraints: List[Dict[str, Any]] = field(default_factory=list)
-    capabilities: List[str] = field(default_factory=list)
-    time_specs: List[Dict[str, Any]] = field(default_factory=list)
-    authorities: List[Dict[str, Any]] = field(default_factory=list)
+    constraints: list[dict[str, Any]] = field(default_factory=list)
+    capabilities: list[str] = field(default_factory=list)
+    time_specs: list[dict[str, Any]] = field(default_factory=list)
+    authorities: list[dict[str, Any]] = field(default_factory=list)
     trust_level: str = ""
-    hardware_spec: Dict[str, List[str]] = field(default_factory=dict)
+    hardware_spec: dict[str, list[str]] = field(default_factory=dict)
     authorization_proof: str = ""
 
     def __post_init__(self) -> None:
@@ -60,7 +60,7 @@ class IntentContract(BaseContract):
         if not self.authorization_proof:
             raise ValueError("authorization_proof cannot be empty")
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize intent contract to dictionary."""
         base = super().serialize()
         base.update(
@@ -122,7 +122,7 @@ class IntentContract(BaseContract):
 def create_intent_contract(
     intent: Intent,
     authorization_proof: str,
-    resolved_capabilities: List[str] | None = None,
+    resolved_capabilities: list[str] | None = None,
 ) -> IntentContract:
     """Create an IntentContract from a validated Intent.
 

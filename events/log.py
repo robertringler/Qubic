@@ -13,7 +13,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -35,8 +35,8 @@ class Event:
     timestamp: str
     contract_id: str
     previous_event_hash: str
-    payload: Dict[str, Any]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    payload: dict[str, Any]
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate event after initialization."""
@@ -49,7 +49,7 @@ class Event:
         if not self.contract_id:
             raise ValueError("contract_id cannot be empty")
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize event to deterministic dictionary.
 
         Returns:
@@ -99,16 +99,16 @@ class EventLog:
 
     def __init__(self) -> None:
         """Initialize empty event log."""
-        self._events: List[Event] = []
-        self._event_index: Dict[str, Event] = {}
-        self._contract_events: Dict[str, List[Event]] = {}
+        self._events: list[Event] = []
+        self._event_index: dict[str, Event] = {}
+        self._contract_events: dict[str, list[Event]] = {}
 
     def append_event(
         self,
         event_type: str,
         contract_id: str,
-        payload: Dict[str, Any],
-        metadata: Dict[str, Any] | None = None,
+        payload: dict[str, Any],
+        metadata: dict[str, Any] | None = None,
     ) -> Event:
         """Append a new event to the log.
 
@@ -165,7 +165,7 @@ class EventLog:
 
         return event
 
-    def get_event(self, event_id: str) -> Optional[Event]:
+    def get_event(self, event_id: str) -> Event | None:
         """Get event by ID.
 
         Args:
@@ -176,7 +176,7 @@ class EventLog:
         """
         return self._event_index.get(event_id)
 
-    def get_contract_events(self, contract_id: str) -> List[Event]:
+    def get_contract_events(self, contract_id: str) -> list[Event]:
         """Get all events for a contract.
 
         Args:
@@ -187,7 +187,7 @@ class EventLog:
         """
         return self._contract_events.get(contract_id, [])
 
-    def get_all_events(self) -> List[Event]:
+    def get_all_events(self) -> list[Event]:
         """Get all events in chronological order.
 
         Returns:
@@ -227,7 +227,7 @@ class EventLog:
 
         return True
 
-    def get_event_sequence(self, contract_id: str) -> List[str]:
+    def get_event_sequence(self, contract_id: str) -> list[str]:
         """Get event type sequence for a contract.
 
         Args:
@@ -266,7 +266,7 @@ class EventLog:
             return len(self._events)
         return sum(1 for e in self._events if e.event_type == event_type)
 
-    def export_log(self) -> List[Dict[str, Any]]:
+    def export_log(self) -> list[dict[str, Any]]:
         """Export entire log as JSON-serializable list.
 
         Returns:
@@ -291,8 +291,8 @@ def get_global_event_log() -> EventLog:
 def log_event(
     event_type: str,
     contract_id: str,
-    payload: Dict[str, Any],
-    metadata: Dict[str, Any] | None = None,
+    payload: dict[str, Any],
+    metadata: dict[str, Any] | None = None,
 ) -> Event:
     """Log an event to the global event log.
 

@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 import re
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 from qil.ast import (
     Authority,
@@ -74,13 +74,13 @@ class QILParser:
             )
 
         # Parse intent body
-        objective: Optional[Objective] = None
-        constraints: List[Constraint] = []
-        capabilities: List[Capability] = []
-        time_specs: List[TimeSpec] = []
-        authorities: List[Authority] = []
-        trust: Optional[Trust] = None
-        hardware: Optional[HardwareSpec] = None
+        objective: Objective | None = None
+        constraints: list[Constraint] = []
+        capabilities: list[Capability] = []
+        time_specs: list[TimeSpec] = []
+        authorities: list[Authority] = []
+        trust: Trust | None = None
+        hardware: HardwareSpec | None = None
 
         while True:
             self._skip_whitespace()
@@ -268,8 +268,8 @@ class QILParser:
         self._consume_keyword("HARDWARE")
         self._skip_whitespace()
 
-        only_clusters: List[str] = []
-        not_clusters: List[str] = []
+        only_clusters: list[str] = []
+        not_clusters: list[str] = []
 
         # Parse ONLY clause if present
         if self._peek_keyword("ONLY"):
@@ -286,7 +286,7 @@ class QILParser:
 
         return HardwareSpec(only_clusters=only_clusters, not_clusters=not_clusters)
 
-    def _parse_cluster_list(self) -> List[str]:
+    def _parse_cluster_list(self) -> list[str]:
         """Parse cluster type list (cluster1 AND cluster2 AND ...)."""
         clusters = []
 
@@ -314,14 +314,14 @@ class QILParser:
 
         return clusters
 
-    def _parse_cluster_type(self) -> Optional[str]:
+    def _parse_cluster_type(self) -> str | None:
         """Parse cluster type identifier."""
         cluster = self._parse_identifier()
         if cluster and cluster in GrammarConstants.CLUSTER_TYPES:
             return cluster
         return None
 
-    def _parse_comparison_op(self) -> Optional[str]:
+    def _parse_comparison_op(self) -> str | None:
         """Parse comparison operator."""
         for op in [">=", "<=", "==", "!=", ">", "<"]:
             if self._peek_text(len(op)) == op:
@@ -330,7 +330,7 @@ class QILParser:
                 return op
         return None
 
-    def _parse_identifier(self) -> Optional[str]:
+    def _parse_identifier(self) -> str | None:
         """Parse identifier (alphanumeric + underscore, starting with letter or _)."""
         match = re.match(r"[a-zA-Z_][a-zA-Z0-9_]*", self.text[self.pos :])
         if match:
@@ -340,7 +340,7 @@ class QILParser:
             return identifier
         return None
 
-    def _parse_number(self) -> Optional[str]:
+    def _parse_number(self) -> str | None:
         """Parse number (integer or float)."""
         match = re.match(r"[0-9]+(\.[0-9]+)?", self.text[self.pos :])
         if match:

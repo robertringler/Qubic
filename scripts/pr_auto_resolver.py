@@ -573,7 +573,7 @@ class PRAutoResolver:
 
 def main():
     """Main entry point"""
-    
+
     if not PYGITHUB_AVAILABLE:
         print("ERROR: PyGithub not installed. Run: pip install PyGithub")
         sys.exit(1)

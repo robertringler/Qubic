@@ -13,7 +13,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -35,7 +35,7 @@ class BaseContract:
     contract_type: str
     created_at: str
     version: str = "1.0.0"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate contract after initialization."""
@@ -52,7 +52,7 @@ class BaseContract:
         except (ValueError, AttributeError) as e:
             raise ValueError(f"Invalid ISO 8601 timestamp: {self.created_at}") from e
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize contract to deterministic dictionary.
 
         Returns:
@@ -94,7 +94,7 @@ class BaseContract:
         return computed_hash == self.contract_id
 
 
-def compute_contract_hash(content: Dict[str, Any]) -> str:
+def compute_contract_hash(content: dict[str, Any]) -> str:
     """Compute SHA-256 hash of contract content.
 
     Args:
@@ -107,7 +107,7 @@ def compute_contract_hash(content: Dict[str, Any]) -> str:
     return hashlib.sha256(json_str.encode("utf-8")).hexdigest()
 
 
-def generate_contract_id(contract_type: str, content: Dict[str, Any]) -> str:
+def generate_contract_id(contract_type: str, content: dict[str, Any]) -> str:
     """Generate deterministic contract ID from content.
 
     Args:

@@ -9,8 +9,6 @@ Status: Production
 
 from __future__ import annotations
 
-from typing import Dict, Type
-
 from adapters.base import BaseAdapter
 from adapters.cerebras import CerebrasAdapter
 from adapters.cpu import CPUAdapter
@@ -26,8 +24,8 @@ class AdapterRegistry:
 
     def __init__(self) -> None:
         """Initialize adapter registry with default adapters."""
-        self._adapters: Dict[str, BaseAdapter] = {}
-        self._adapter_classes: Dict[str, Type[BaseAdapter]] = {}
+        self._adapters: dict[str, BaseAdapter] = {}
+        self._adapter_classes: dict[str, type[BaseAdapter]] = {}
 
         # Register default adapters
         self._register_defaults()
@@ -43,7 +41,7 @@ class AdapterRegistry:
         self.register_adapter_class("CPU", CPUAdapter)
 
     def register_adapter_class(
-        self, cluster_type: str, adapter_class: Type[BaseAdapter]
+        self, cluster_type: str, adapter_class: type[BaseAdapter]
     ) -> None:
         """Register an adapter class for a cluster type.
 
@@ -106,7 +104,7 @@ class AdapterRegistry:
         """
         return sorted(set(self._adapters.keys()) | set(self._adapter_classes.keys()))
 
-    def get_cluster_info(self) -> Dict[str, Dict]:
+    def get_cluster_info(self) -> dict[str, dict]:
         """Get information about all registered clusters.
 
         Returns:

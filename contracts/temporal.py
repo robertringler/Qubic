@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any
 
 from contracts.base import (
     BaseContract,
@@ -64,7 +64,7 @@ class TemporalContract(BaseContract):
             except (ValueError, AttributeError) as e:
                 raise ValueError(f"Invalid window_end timestamp: {self.window_end}") from e
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize temporal contract to dictionary."""
         base = super().serialize()
         base.update(

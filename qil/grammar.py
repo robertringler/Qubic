@@ -93,18 +93,15 @@ def validate_grammar_token(token_type: str, value: str) -> bool:
     Returns:
         True if token is valid, False otherwise
     """
-    if token_type == "keyword":
-        return value in GrammarConstants.KEYWORDS
-    elif token_type == "cluster_type":
-        return value in GrammarConstants.CLUSTER_TYPES
-    elif token_type == "comparison_op":
-        return value in GrammarConstants.COMPARISON_OPS
-    elif token_type == "time_key":
-        return value in GrammarConstants.TIME_KEYS
-    elif token_type == "time_unit":
-        return value in GrammarConstants.TIME_UNITS
-    elif token_type == "auth_key":
-        return value in GrammarConstants.AUTH_KEYS
-    elif token_type == "trust_level":
-        return value in GrammarConstants.TRUST_LEVELS
+    token_validators = {
+        "keyword": GrammarConstants.KEYWORDS,
+        "cluster_type": GrammarConstants.CLUSTER_TYPES,
+        "comparison_op": GrammarConstants.COMPARISON_OPS,
+        "time_key": GrammarConstants.TIME_KEYS,
+        "time_unit": GrammarConstants.TIME_UNITS,
+        "auth_key": GrammarConstants.AUTH_KEYS,
+        "trust_level": GrammarConstants.TRUST_LEVELS,
+    }
+    if token_type in token_validators:
+        return value in token_validators[token_type]
     return False

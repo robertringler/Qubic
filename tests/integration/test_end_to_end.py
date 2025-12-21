@@ -83,7 +83,7 @@ class TestEndToEndFlow:
         # 7. Verify Event Log
         event_log = get_global_event_log()
         events = event_log.get_contract_events(intent_id)
-        
+
         assert len(events) > 0
         event_types = [e.event_type for e in events]
         assert "ExecutionStarted" in event_types
@@ -178,14 +178,13 @@ class TestEndToEndFlow:
         intent = parse_intent(qil_text)
 
         auth_engine = AuthorizationEngine()
-        
+
         # Should raise AuthorizationError (FATAL)
         with pytest.raises(AuthorizationError):
             auth_engine.authorize_intent(intent)
 
     def test_temporal_contract_expiration(self):
         """Test temporal contract expiration handling."""
-        from datetime import datetime, timedelta
 
         qil_text = """
         INTENT expired_intent {
@@ -246,7 +245,7 @@ class TestEndToEndFlow:
         # Check that execution events are in the sequence
         assert "ExecutionStarted" in observed_events
         assert "ExecutionCompleted" in observed_events
-        
+
         # ExecutionStarted should come before ExecutionCompleted
         start_idx = observed_events.index("ExecutionStarted")
         complete_idx = observed_events.index("ExecutionCompleted")
@@ -254,7 +253,6 @@ class TestEndToEndFlow:
 
     def test_adapter_validation(self):
         """Test adapter contract validation."""
-        from adapters import AdapterError
 
         qil_text = """
         INTENT valid_intent {
@@ -291,7 +289,7 @@ class TestEndToEndFlow:
             TRUST level: verified
         }
         """
-        
+
         qil_text2 = """
         INTENT intent2 {
             OBJECTIVE task2
@@ -330,7 +328,7 @@ class TestEndToEndFlow:
 
         assert len(events1) > 0
         assert len(events2) > 0
-        
+
         # Verify causal chains are separate and valid
         assert event_log.verify_causal_chain(bundle1.intent_contract.contract_id)
         assert event_log.verify_causal_chain(bundle2.intent_contract.contract_id)

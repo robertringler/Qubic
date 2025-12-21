@@ -3,8 +3,9 @@
 Tests all contract types (Intent, Capability, Temporal, Event) and base contract.
 """
 
-import pytest
 from datetime import datetime, timedelta
+
+import pytest
 
 from contracts import (
     BaseContract,
@@ -57,7 +58,7 @@ class TestBaseContract:
             created_at=timestamp,
         )
 
-        with pytest.raises(Exception):  # FrozenInstanceError
+        with pytest.raises(AttributeError):  # FrozenInstanceError from dataclasses
             contract.contract_id = "new_id"
 
 

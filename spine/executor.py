@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any
 
 from events import log_event
 from qcore.issuer import ContractBundle
@@ -34,7 +34,7 @@ class ExecutionResult:
     cluster_type: str
     execution_time_seconds: float
     proof: str
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 class ContractExecutor:
@@ -47,7 +47,7 @@ class ContractExecutor:
             adapter_registry: Optional adapter registry
         """
         self.adapter_registry = adapter_registry
-        self._execution_history: Dict[str, ExecutionResult] = {}
+        self._execution_history: dict[str, ExecutionResult] = {}
 
     def execute(self, contract_bundle: ContractBundle) -> ExecutionResult:
         """Execute a contract bundle.
@@ -163,7 +163,4 @@ class ContractExecutor:
             return False
 
         # Verify temporal contract is not expired
-        if contract_bundle.temporal_contract.is_expired():
-            return False
-
-        return True
+        return not contract_bundle.temporal_contract.is_expired()

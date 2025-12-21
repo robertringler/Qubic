@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any
 
 from qil.ast import Intent
 
@@ -35,20 +35,20 @@ class AuthorizationResult:
     authorized: bool
     reason: str
     proof: str
-    violations: List[str]
+    violations: list[str]
 
 
 class AuthorizationEngine:
     """Sovereign authorization engine (NEVER executes)."""
 
-    def __init__(self, policies: Dict[str, Any] | None = None) -> None:
+    def __init__(self, policies: dict[str, Any] | None = None) -> None:
         """Initialize authorization engine.
 
         Args:
             policies: Optional policy configuration
         """
         self.policies = policies or {}
-        self._authorized_intents: Dict[str, AuthorizationResult] = {}
+        self._authorized_intents: dict[str, AuthorizationResult] = {}
 
     def authorize_intent(self, intent: Intent) -> AuthorizationResult:
         """Authorize an intent against policies.
@@ -64,21 +64,19 @@ class AuthorizationEngine:
         Raises:
             AuthorizationError: If authorization fails fatally
         """
-        violations: List[str] = []
+        violations: list[str] = []
 
         # Check authority requirements
         if not intent.authorities:
             violations.append("No authority specified in intent")
 
         # Validate trust level
-        if intent.trust:
-            if intent.trust.level == "untrusted":
-                violations.append("Untrusted intent cannot be authorized")
+        if intent.trust and intent.trust.level == "untrusted":
+            violations.append("Untrusted intent cannot be authorized")
 
         # Check hardware requirements
-        if intent.hardware:
-            if not intent.hardware.only_clusters and not intent.hardware.not_clusters:
-                violations.append("Hardware specification is empty")
+        if intent.hardware and not intent.hardware.only_clusters and not intent.hardware.not_clusters:
+            violations.append("Hardware specification is empty")
 
         # Check for conflicting constraints
         constraint_names = [c.name for c in intent.constraints]
@@ -157,7 +155,7 @@ class AuthorizationEngine:
         """
         return self._authorized_intents.get(intent_name)
 
-    def list_authorized_intents(self) -> List[str]:
+    def list_authorized_intents(self) -> list[str]:
         """List all authorized intent names.
 
         Returns:
@@ -170,7 +168,7 @@ class AuthorizationEngine:
         ]
 
 
-def check_authority_constraints(intent: Intent) -> List[str]:
+def check_authority_constraints(intent: Intent) -> list[str]:
     """Check authority constraints for an intent.
 
     Args:
@@ -179,7 +177,7 @@ def check_authority_constraints(intent: Intent) -> List[str]:
     Returns:
         List of constraint violations (empty if all pass)
     """
-    violations: List[str] = []
+    violations: list[str] = []
 
     # Check for required authority
     if not intent.authorities:

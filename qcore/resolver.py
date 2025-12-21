@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from qil.ast import Capability, Intent
 
@@ -28,8 +28,8 @@ class ResolvedCapability:
 
     name: str
     cluster_type: str
-    resource_requirements: Dict[str, Any]
-    metadata: Dict[str, Any]
+    resource_requirements: dict[str, Any]
+    metadata: dict[str, Any]
 
 
 class CapabilityResolutionError(Exception):
@@ -41,7 +41,7 @@ class CapabilityResolutionError(Exception):
 class CapabilityResolver:
     """Resolves capabilities to hardware bindings."""
 
-    def __init__(self, capability_map: Optional[Dict[str, List[str]]] = None) -> None:
+    def __init__(self, capability_map: dict[str, list[str]] | None = None) -> None:
         """Initialize capability resolver.
 
         Args:
@@ -49,7 +49,7 @@ class CapabilityResolver:
         """
         self.capability_map = capability_map or self._default_capability_map()
 
-    def _default_capability_map(self) -> Dict[str, List[str]]:
+    def _default_capability_map(self) -> dict[str, list[str]]:
         """Get default capability to cluster type mapping.
 
         Returns:
@@ -79,7 +79,7 @@ class CapabilityResolver:
             "general_compute": ["CPU", "GB200", "MI300X"],
         }
 
-    def resolve_capabilities(self, intent: Intent) -> List[ResolvedCapability]:
+    def resolve_capabilities(self, intent: Intent) -> list[ResolvedCapability]:
         """Resolve capabilities for an intent.
 
         Args:
@@ -91,7 +91,7 @@ class CapabilityResolver:
         Raises:
             CapabilityResolutionError: If resolution fails
         """
-        resolved: List[ResolvedCapability] = []
+        resolved: list[ResolvedCapability] = []
 
         # If no capabilities specified, use general_compute
         if not intent.capabilities:
@@ -142,8 +142,8 @@ class CapabilityResolver:
         return resolved
 
     def _filter_by_hardware_spec(
-        self, cluster_types: List[str], hardware_spec: Any
-    ) -> List[str]:
+        self, cluster_types: list[str], hardware_spec: Any
+    ) -> list[str]:
         """Filter cluster types by hardware specification.
 
         Args:
@@ -167,7 +167,7 @@ class CapabilityResolver:
 
     def _compute_resource_requirements(
         self, capability_name: str, cluster_type: str, intent: Intent
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Compute resource requirements for a capability.
 
         Args:
@@ -178,7 +178,7 @@ class CapabilityResolver:
         Returns:
             Dictionary of resource requirements
         """
-        requirements: Dict[str, Any] = {
+        requirements: dict[str, Any] = {
             "capability": capability_name,
             "cluster_type": cluster_type,
         }
@@ -215,7 +215,7 @@ class CapabilityResolver:
 
         return requirements
 
-    def add_capability_mapping(self, capability: str, cluster_types: List[str]) -> None:
+    def add_capability_mapping(self, capability: str, cluster_types: list[str]) -> None:
         """Add or update a capability mapping.
 
         Args:
@@ -224,7 +224,7 @@ class CapabilityResolver:
         """
         self.capability_map[capability] = cluster_types
 
-    def get_supported_clusters(self, capability: str) -> List[str]:
+    def get_supported_clusters(self, capability: str) -> list[str]:
         """Get supported cluster types for a capability.
 
         Args:

@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -112,8 +112,8 @@ class HardwareSpec:
         not_clusters: List of clusters to exclude (NOT clause)
     """
 
-    only_clusters: List[str] = field(default_factory=list)
-    not_clusters: List[str] = field(default_factory=list)
+    only_clusters: list[str] = field(default_factory=list)
+    not_clusters: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """Validate hardware specification after initialization."""
@@ -146,13 +146,13 @@ class Intent:
 
     name: str
     objective: Objective
-    constraints: List[Constraint] = field(default_factory=list)
-    capabilities: List[Capability] = field(default_factory=list)
-    time_specs: List[TimeSpec] = field(default_factory=list)
-    authorities: List[Authority] = field(default_factory=list)
-    trust: Optional[Trust] = None
-    hardware: Optional[HardwareSpec] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    constraints: list[Constraint] = field(default_factory=list)
+    capabilities: list[Capability] = field(default_factory=list)
+    time_specs: list[TimeSpec] = field(default_factory=list)
+    authorities: list[Authority] = field(default_factory=list)
+    trust: Trust | None = None
+    hardware: HardwareSpec | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate intent after initialization."""
@@ -161,13 +161,13 @@ class Intent:
         if not self.objective:
             raise ValueError("Intent must have an objective")
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize intent to dictionary representation.
 
         Returns:
             Dictionary representation of intent
         """
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "name": self.name,
             "objective": self.objective.name,
             "constraints": [
@@ -210,7 +210,7 @@ class Intent:
 
         return result
 
-    def get_deadline_seconds(self) -> Optional[float]:
+    def get_deadline_seconds(self) -> float | None:
         """Get deadline time specification in seconds.
 
         Returns:
@@ -221,7 +221,7 @@ class Intent:
                 return time_spec.to_seconds()
         return None
 
-    def get_authority_user(self) -> Optional[str]:
+    def get_authority_user(self) -> str | None:
         """Get user authority if specified.
 
         Returns:
@@ -271,7 +271,4 @@ class Intent:
             return True
 
         # Excluded if ONLY clause exists and cluster not in it
-        if self.hardware.only_clusters and cluster_type not in self.hardware.only_clusters:
-            return True
-
-        return False
+        return bool(self.hardware.only_clusters and cluster_type not in self.hardware.only_clusters)

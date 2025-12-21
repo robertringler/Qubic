@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable
 
 from qil.ast import Intent
 
@@ -44,9 +44,9 @@ class PolicyEvaluationResult:
     """
 
     passed: bool
-    violations: List[str]
-    warnings: List[str]
-    info: List[str]
+    violations: list[str]
+    warnings: list[str]
+    info: list[str]
 
 
 class PolicyEngine:
@@ -54,7 +54,7 @@ class PolicyEngine:
 
     def __init__(self) -> None:
         """Initialize policy engine with default rules."""
-        self.rules: List[PolicyRule] = []
+        self.rules: list[PolicyRule] = []
         self._register_default_rules()
 
     def _register_default_rules(self) -> None:
@@ -130,9 +130,9 @@ class PolicyEngine:
         Returns:
             PolicyEvaluationResult with evaluation outcome
         """
-        violations: List[str] = []
-        warnings: List[str] = []
-        info: List[str] = []
+        violations: list[str] = []
+        warnings: list[str] = []
+        info: list[str] = []
 
         for rule in self.rules:
             try:
@@ -200,7 +200,7 @@ def create_custom_policy_rule(
 
 
 def evaluate_hardware_policy(
-    intent: Intent, available_clusters: List[str]
+    intent: Intent, available_clusters: list[str]
 ) -> PolicyEvaluationResult:
     """Evaluate hardware policy for an intent.
 
@@ -211,7 +211,7 @@ def evaluate_hardware_policy(
     Returns:
         PolicyEvaluationResult
     """
-    violations: List[str] = []
+    violations: list[str] = []
 
     if not intent.hardware:
         # No hardware requirements specified

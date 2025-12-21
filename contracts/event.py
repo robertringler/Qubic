@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any
 
 from contracts.base import (
     BaseContract,
@@ -32,9 +32,9 @@ class EventContract(BaseContract):
     """
 
     intent_contract_id: str = ""
-    expected_events: List[str] = field(default_factory=list)
-    causal_chains: List[Dict[str, Any]] = field(default_factory=list)
-    event_constraints: Dict[str, Any] = field(default_factory=dict)
+    expected_events: list[str] = field(default_factory=list)
+    causal_chains: list[dict[str, Any]] = field(default_factory=list)
+    event_constraints: dict[str, Any] = field(default_factory=dict)
     event_proof: str = ""
 
     def __post_init__(self) -> None:
@@ -47,7 +47,7 @@ class EventContract(BaseContract):
         if not self.event_proof:
             raise ValueError("event_proof cannot be empty")
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize event contract to dictionary."""
         base = super().serialize()
         base.update(
@@ -86,7 +86,7 @@ class EventContract(BaseContract):
         except ValueError:
             return -1
 
-    def is_ordered_correctly(self, event_sequence: List[str]) -> bool:
+    def is_ordered_correctly(self, event_sequence: list[str]) -> bool:
         """Check if event sequence matches expected order.
 
         Args:
@@ -110,7 +110,7 @@ class EventContract(BaseContract):
 
         return True
 
-    def get_next_expected_event(self, observed_events: List[str]) -> str | None:
+    def get_next_expected_event(self, observed_events: list[str]) -> str | None:
         """Get next expected event given observed sequence.
 
         Args:
@@ -134,9 +134,9 @@ class EventContract(BaseContract):
 
 def create_event_contract(
     intent_contract_id: str,
-    expected_events: List[str],
-    causal_chains: List[Dict[str, Any]] | None = None,
-    event_constraints: Dict[str, Any] | None = None,
+    expected_events: list[str],
+    causal_chains: list[dict[str, Any]] | None = None,
+    event_constraints: dict[str, Any] | None = None,
     event_proof: str = "event_authorized",
 ) -> EventContract:
     """Create an EventContract for event sequence definition.

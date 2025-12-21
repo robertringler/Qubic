@@ -19,7 +19,7 @@ from qil.ast import (
     TimeSpec,
     Trust,
 )
-from qil.grammar import GrammarConstants, QIL_GRAMMAR, validate_grammar_token
+from qil.grammar import QIL_GRAMMAR, GrammarConstants, validate_grammar_token
 from qil.parser import ParseError, QILParser, parse_intent
 from qil.serializer import (
     compute_hash,

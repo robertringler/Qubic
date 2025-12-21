@@ -11,12 +11,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import Any, Dict
+from typing import Any
 
 from qil.ast import Intent
 
 
-def serialize_intent(intent: Intent) -> Dict[str, Any]:
+def serialize_intent(intent: Intent) -> dict[str, Any]:
     """Serialize intent to deterministic dictionary.
 
     Args:

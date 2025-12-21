@@ -10,7 +10,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any
 
 from contracts.base import (
     BaseContract,
@@ -37,7 +37,7 @@ class ClusterTopology:
     accelerators_per_node: int
     memory_per_node_gb: float
     interconnect: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate cluster topology after initialization."""
@@ -66,7 +66,7 @@ class ClusterTopology:
         """
         return self.node_count * self.memory_per_node_gb
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize topology to dictionary."""
         return {
             "cluster_type": self.cluster_type,
@@ -91,8 +91,8 @@ class CapabilityContract(BaseContract):
     """
 
     intent_contract_id: str = ""
-    cluster_topology: Dict[str, Any] = field(default_factory=dict)
-    allocated_resources: Dict[str, Any] = field(default_factory=dict)
+    cluster_topology: dict[str, Any] = field(default_factory=dict)
+    allocated_resources: dict[str, Any] = field(default_factory=dict)
     resource_reservation_id: str = ""
     capability_proof: str = ""
 
@@ -106,7 +106,7 @@ class CapabilityContract(BaseContract):
         if not self.capability_proof:
             raise ValueError("capability_proof cannot be empty")
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize capability contract to dictionary."""
         base = super().serialize()
         base.update(
@@ -142,7 +142,7 @@ class CapabilityContract(BaseContract):
 def create_capability_contract(
     intent_contract_id: str,
     topology: ClusterTopology,
-    allocated_resources: Dict[str, Any],
+    allocated_resources: dict[str, Any],
     capability_proof: str,
     resource_reservation_id: str = "",
 ) -> CapabilityContract:
