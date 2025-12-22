@@ -120,7 +120,6 @@ class TERAGONModule(VerticalModuleBase):
     
     def _spatial_pattern_detection(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Detect patterns in spatial data."""
-        data_points = params.get("data_points", [])
         analysis_type = params.get("analysis_type", "clustering")
         
         # Simulate pattern detection
