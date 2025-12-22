@@ -258,6 +258,127 @@ python qratum_asi/examples/safety_demo.py
 4. Never execute without authorization
 5. Log all proposals (approved and rejected)
 
+## ASI Safety Elicitation Framework
+
+**NEW**: QRATUM-ASI includes a comprehensive cross-model adversarial safety mapping system for interrogating AI systems about superintelligence safety.
+
+### Features
+
+The Safety Elicitation Framework provides:
+
+1. **Standard Question Set**: 20 carefully designed questions across 7 categories:
+   - Capability Emergence & Phase Transitions
+   - Self-Improvement & Recursive Risk
+   - Alignment Failure & Deception
+   - Infrastructure vs Model Safety
+   - Psychological / Cognitive Architecture
+   - Human Governance & Geopolitics
+   - Ultimate Safety Questions
+
+2. **Multi-Model Orchestration**: Query multiple AI models with identical questions to:
+   - Extract mechanistic safety insights
+   - Track assumptions and uncertainties
+   - Detect refusals and avoidances
+   - Identify unique model perspectives
+
+3. **Divergence Analysis**: Automatically identify:
+   - Points where models violently disagree
+   - Consensus illusions (same conclusion, different assumptions)
+   - False comfort zones (reassuring claims that collapse under scrutiny)
+   - Structural choke points in ASI control
+
+4. **Safety Reality Map**: Generate comprehensive reports containing:
+   - Proven impossibilities
+   - Fragile assumptions
+   - Hard constraints (non-negotiable requirements)
+   - Structural vulnerabilities
+   - Areas where humanity may be "already too late"
+
+### Running the Elicitation Framework
+
+```bash
+# From QRATUM root directory
+python3 run_asi_safety_elicitation.py
+```
+
+This will:
+- Query 5 simulated AI models with different perspectives
+- Analyze 20 standard ASI safety questions
+- Generate a Safety Reality Map
+- Export results to `qratum_asi/output/`
+
+### Output Files
+
+- `safety_reality_map.json`: Complete structured safety analysis
+- `executive_summary.txt`: Human-readable summary of findings
+- `elicitation_data.json`: Raw elicitation data and statistics
+
+### Using the Framework Programmatically
+
+```python
+from qratum_asi.safety import (
+    SafetyElicitation,
+    SafetyRealityMapper,
+    MultiModelOrchestrator,
+    SimulatedModelAdapter,
+)
+
+# Initialize elicitation
+elicitation = SafetyElicitation()
+
+# Create orchestrator
+orchestrator = MultiModelOrchestrator(elicitation)
+
+# Register AI models
+orchestrator.register_model(SimulatedModelAdapter("model_1", "pessimistic"))
+orchestrator.register_model(SimulatedModelAdapter("model_2", "optimistic"))
+
+# Run complete elicitation
+summary = orchestrator.run_complete_elicitation()
+
+# Generate reality map
+mapper = SafetyRealityMapper(elicitation)
+reality_map = mapper.generate_reality_map()
+
+# Export results
+mapper.export_reality_map("output/reality_map.json")
+print(mapper.generate_executive_summary())
+```
+
+### Extending the Framework
+
+Add custom questions:
+
+```python
+from qratum_asi.safety import SafetyQuestion, QuestionCategory
+
+custom_question = SafetyQuestion(
+    question_id="custom_001",
+    category=QuestionCategory.ALIGNMENT_FAILURE,
+    question_text="Your custom ASI safety question?",
+    description="Description of what this probes",
+    probes_for=["probe_topic_1", "probe_topic_2"]
+)
+
+elicitation.add_question(custom_question)
+```
+
+Integrate real AI models:
+
+```python
+from qratum_asi.safety import BaseModelAdapter
+
+class CustomModelAdapter(BaseModelAdapter):
+    def query(self, question, context=None):
+        # Your model querying logic here
+        return model_response
+    
+    def is_available(self):
+        return True
+
+orchestrator.register_model(CustomModelAdapter("your_model_id"))
+```
+
 ## Red Team Evaluation
 
 The system must pass these adversarial tests:

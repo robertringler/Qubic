@@ -121,3 +121,4 @@ package-lock.json
 
 # Build logs
 build_*.log
+qratum_asi/output/
