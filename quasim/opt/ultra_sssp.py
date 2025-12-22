@@ -195,12 +195,18 @@ class UltraSSSP:
             iter_start = time.time()
             
             # Extract batch from frontier
-            batch = self._extract_batch(frontier, distances)
+            # For correctness, we need to only process nodes with the minimum distance
+            # or within a small epsilon of it to maintain optimality
+            batch = self._extract_batch(frontier, distances, visited)
             metrics.frontier_sizes.append(len(frontier))
             
-            # Process batch
-            for node in batch.nodes:
+            # Process batch - all nodes in batch have similar distances
+            for node_dist, node in batch:
                 if node in visited:
+                    continue
+                
+                # Double-check: Skip if distance has been updated since extraction
+                if node_dist > distances[node]:
                     continue
                 
                 visited.add(node)
@@ -229,32 +235,65 @@ class UltraSSSP:
     def _extract_batch(
         self,
         frontier: list[tuple[float, int]],
-        distances: list[float]
-    ) -> FrontierBatch:
+        distances: list[float],
+        visited: set[int]
+    ) -> list[tuple[float, int]]:
         """Extract batch of nodes from frontier using adaptive clustering.
+        
+        To maintain correctness, we extract nodes with distances within a small
+        epsilon of the minimum distance. This ensures we process nodes in
+        approximately the right order while still enabling batching.
         
         Args:
             frontier: Priority queue of (distance, node) tuples
             distances: Current distance array
+            visited: Set of already visited nodes
             
         Returns:
-            FrontierBatch with selected nodes
+            List of (distance, node) tuples to process
         """
-        batch = FrontierBatch()
+        batch = []
         
-        # Extract up to batch_size nodes from frontier
-        extracted = []
-        for _ in range(min(self.batch_size, len(frontier))):
-            if frontier:
-                dist, node = heapq.heappop(frontier)
-                extracted.append((dist, node))
-                batch.add_node(node, dist)
+        if not frontier:
+            return batch
         
-        # Put back remaining extracted nodes (if not processed)
-        # This is a simplified approach; production version would use
-        # more sophisticated frontier management
+        # Find minimum distance in frontier (peek at top)
+        # We need to find the actual minimum among non-stale entries
+        min_dist = float('inf')
+        temp_extracted = []
         
-        return batch
+        # Extract entries until we find batch_size valid nodes or run out
+        while frontier and len(batch) < self.batch_size:
+            dist, node = heapq.heappop(frontier)
+            temp_extracted.append((dist, node))
+            
+            # Skip if already visited or stale
+            if node in visited or dist > distances[node]:
+                continue
+            
+            # Track minimum distance
+            if dist < min_dist:
+                min_dist = dist
+            
+            batch.append((dist, node))
+        
+        # Put back extracted nodes that we're not processing
+        # (they were stale or already visited)
+        for dist, node in temp_extracted:
+            if (dist, node) not in batch and node not in visited:
+                heapq.heappush(frontier, (dist, node))
+        
+        # For correctness: only return nodes within epsilon of min_dist
+        # This maintains approximate optimality while enabling batching
+        epsilon = 0.0  # Set to 0 for exact Dijkstra behavior
+        filtered_batch = [(d, n) for d, n in batch if d <= min_dist + epsilon]
+        
+        # Put back nodes that are too far from minimum
+        for dist, node in batch:
+            if dist > min_dist + epsilon:
+                heapq.heappush(frontier, (dist, node))
+        
+        return filtered_batch
     
     def _estimate_memory(self, distances: list[float]) -> int:
         """Estimate memory usage in bytes.
