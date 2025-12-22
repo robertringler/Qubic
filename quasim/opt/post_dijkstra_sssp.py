@@ -282,7 +282,18 @@ class LowerBoundPruner:
         self._precompute_landmark_distances()
     
     def _select_landmarks(self) -> None:
-        """Select landmark nodes using farthest-point sampling."""
+        """Select landmark nodes using farthest-point sampling.
+        
+        Note: Current implementation uses node ID difference as distance proxy
+        for efficiency. This is a simplification that works reasonably well for
+        random graphs but should be replaced with proper distance estimation
+        (e.g., BFS) for production use.
+        
+        TODO: Replace with proper distance-based landmark selection:
+        - Option 1: Run BFS from each landmark to find farthest node
+        - Option 2: Use degree centrality as proxy
+        - Option 3: Random sampling (fast but lower quality)
+        """
         if self.graph.num_nodes == 0:
             return
         
@@ -303,8 +314,10 @@ class LowerBoundPruner:
                 # Find minimum distance to any landmark
                 min_dist = float('inf')
                 for landmark in self.landmarks:
-                    # Use simple BFS distance estimate
-                    dist = abs(node - landmark)  # Placeholder
+                    # SIMPLIFICATION: Use node ID difference as distance proxy
+                    # This is efficient but not accurate for non-random graphs
+                    # Production code should use BFS or degree-based estimation
+                    dist = abs(node - landmark)
                     min_dist = min(min_dist, dist)
                 
                 if min_dist > max_min_dist:
@@ -669,20 +682,20 @@ class PostDijkstraSSSP:
                     
                     # Process batch when full
                     if len(batch) >= self.batch_size:
-                        new_nodes = self._relax_batch_correctness(
+                        nodes_to_reprocess = self._relax_batch_correctness(
                             batch, distances, frontier, metrics, finalized
                         )
-                        # Add any nodes that fell back into current bucket
-                        bucket_nodes.update(new_nodes)
+                        # Add any nodes that need reprocessing in current bucket
+                        bucket_nodes.update(nodes_to_reprocess)
                         metrics.parallel_batches += 1
                         batch = []
                 
                 # Process remaining batch
                 if batch:
-                    new_nodes = self._relax_batch_correctness(
+                    nodes_to_reprocess = self._relax_batch_correctness(
                         batch, distances, frontier, metrics, finalized
                     )
-                    bucket_nodes.update(new_nodes)
+                    bucket_nodes.update(nodes_to_reprocess)
                     metrics.parallel_batches += 1
         
         return distances
