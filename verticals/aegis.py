@@ -101,7 +101,6 @@ class AEGISModule(VerticalModuleBase):
     
     def _threat_detection(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Detect and analyze threats."""
-        log_data = params.get("log_data", [])
         
         # Simulate threat detection
         threats = [
