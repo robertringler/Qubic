@@ -31,10 +31,10 @@ jobs:
           pip install -r requirements.txt
       
       - name: Run ruff
-        run: ruff check qradle/ qratum_platform/ qratum_asi/ verticals/ || true
+        run: ruff check qradle/ qratum_platform/ qratum_asi/ verticals/
       
       - name: Run mypy
-        run: mypy qradle/ --ignore-missing-imports || true
+        run: mypy qradle/ --ignore-missing-imports
 
   # Job 2: Unit Tests
   test-unit:
@@ -59,7 +59,7 @@ jobs:
       
       - name: Run unit tests
         run: |
-          pytest tests/test_${{ matrix.component }}.py -v --cov || true
+          pytest tests/test_${{ matrix.component }}.py -v --cov
       
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -89,7 +89,7 @@ jobs:
       
       - name: Run integration tests
         run: |
-          pytest tests/test_integration.py -v || true
+          pytest tests/test_integration.py -v
 
   # Job 4: Security Scan
   security:
@@ -179,7 +179,7 @@ jobs:
       
       - name: Run determinism tests
         run: |
-          python tests/test_determinism.py || true
+          python tests/test_determinism.py
 
   # Job 7: Deploy to Staging (on main branch)
   deploy-staging:

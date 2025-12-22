@@ -58,7 +58,7 @@ QRATUM_VERSION=1.0.0
 QRATUM_ENV=production
 QRATUM_LOG_LEVEL=INFO
 
-# Security
+# Security - REQUIRED: Set a strong password for Grafana
 GRAFANA_PASSWORD=<secure-password>
 
 # Persistence
@@ -68,6 +68,8 @@ MERKLE_CHAIN_PERSISTENCE=true
 ASI_MODE=simulation
 CRSI_ENABLED=false
 ```
+
+**Important:** The `GRAFANA_PASSWORD` is required and must be a strong password. Never use default passwords in production.
 
 ### 3. Start Services
 
@@ -326,7 +328,9 @@ services:
 
 ### Grafana Dashboards
 
-Access Grafana at http://localhost:3000 (admin/admin by default).
+Access Grafana at http://localhost:3000 using username `admin` and the password you set in the `GRAFANA_PASSWORD` environment variable.
+
+**Security Note:** Never run Grafana with default credentials. Always set a strong password via the `GRAFANA_PASSWORD` environment variable before starting the services.
 
 **Import dashboards:**
 1. QRADLE Operations Dashboard

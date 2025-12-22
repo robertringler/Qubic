@@ -18,7 +18,7 @@ curl http://localhost:8002/health  # Platform (14 verticals)
 curl http://localhost:8003/health  # ASI
 
 # Access dashboards
-open http://localhost:3000  # Grafana (admin/admin)
+open http://localhost:3000  # Grafana (use GRAFANA_PASSWORD from .env)
 open http://localhost:9090  # Prometheus
 ```
 
@@ -199,7 +199,9 @@ open http://localhost:3000
 
 ## 📊 Monitoring Dashboards
 
-Access Grafana at http://localhost:3000 (default: admin/admin)
+Access Grafana at http://localhost:3000 using username `admin` and the password set in your `GRAFANA_PASSWORD` environment variable.
+
+**Security Warning:** The `GRAFANA_PASSWORD` environment variable must be set before starting services. Never use default credentials in production.
 
 Pre-configured dashboards:
 1. **System Health** - Overall status

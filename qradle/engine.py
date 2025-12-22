@@ -5,7 +5,6 @@ Orchestrates contract execution with Merkle-chained audit trails,
 rollback capability, and invariant enforcement.
 """
 
-import hashlib
 import time
 import uuid
 from typing import Any, Callable, Dict, Optional

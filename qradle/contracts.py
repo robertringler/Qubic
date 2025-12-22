@@ -36,7 +36,7 @@ class Contract:
     inputs: Dict[str, Any]
     expected_outputs: Optional[Dict[str, Any]] = None
     user_id: str = ""
-    timestamp: float = field(default_factory=time.time)
+    timestamp: float = field(default_factory=lambda: time.time())
     metadata: Dict[str, Any] = field(default_factory=dict)
     
     def to_dict(self) -> Dict[str, Any]:

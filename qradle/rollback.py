@@ -16,7 +16,7 @@ class Checkpoint:
     """Snapshot of system state at a specific point in time."""
     
     checkpoint_id: str
-    timestamp: float = field(default_factory=time.time)
+    timestamp: float = field(default_factory=lambda: time.time())
     state: Dict[str, Any] = field(default_factory=dict)
     merkle_proof: str = ""
     description: str = ""

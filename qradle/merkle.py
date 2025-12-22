@@ -18,7 +18,7 @@ class MerkleNode:
     
     event_type: str
     data: Dict[str, Any]
-    timestamp: float = field(default_factory=time.time)
+    timestamp: float = field(default_factory=lambda: time.time())
     previous_hash: str = "0" * 64  # Genesis node
     
     def compute_hash(self) -> str:

@@ -19,9 +19,9 @@ services:
       - QRATUM_LOG_LEVEL=INFO
       - MERKLE_CHAIN_PERSISTENCE=true
     volumes:
-      - qradle-data:/app/data
-      - qradle-logs:/app/logs
-      - qradle-audit:/app/audit
+      - qradle-data:/app/data:rw
+      - qradle-logs:/app/logs:rw
+      - qradle-audit:/app/audit:rw
     networks:
       - qratum-network
     healthcheck:
@@ -32,7 +32,7 @@ services:
       start_period: 40s
     security_opt:
       - no-new-privileges:true
-    read_only: true
+    read_only: false
     tmpfs:
       - /tmp:noexec,nosuid,size=100m
 
@@ -51,8 +51,8 @@ services:
       - QRATUM_LOG_LEVEL=INFO
       - QRADLE_ENDPOINT=http://qradle:8000
     volumes:
-      - platform-data:/app/data
-      - platform-logs:/app/logs
+      - platform-data:/app/data:rw
+      - platform-logs:/app/logs:rw
     networks:
       - qratum-network
     depends_on:
@@ -65,7 +65,7 @@ services:
       retries: 3
     security_opt:
       - no-new-privileges:true
-    read_only: true
+    read_only: false
     tmpfs:
       - /tmp:noexec,nosuid,size=100m
 
@@ -87,9 +87,9 @@ services:
       - ASI_MODE=simulation
       - CRSI_ENABLED=false
     volumes:
-      - asi-data:/app/data
-      - asi-logs:/app/logs
-      - asi-checkpoints:/app/checkpoints
+      - asi-data:/app/data:rw
+      - asi-logs:/app/logs:rw
+      - asi-checkpoints:/app/checkpoints:rw
     networks:
       - qratum-network
     depends_on:
@@ -104,7 +104,7 @@ services:
       retries: 3
     security_opt:
       - no-new-privileges:true
-    read_only: true
+    read_only: false
     tmpfs:
       - /tmp:noexec,nosuid,size=100m
 
@@ -154,7 +154,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?GRAFANA_PASSWORD must be set in .env file}
       - GF_INSTALL_PLUGINS=
     networks:
       - qratum-network
