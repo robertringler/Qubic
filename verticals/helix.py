@@ -65,7 +65,6 @@ class HELIXModule(VerticalModuleBase):
     
     def _variant_analysis(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze genetic variants."""
-        variants = params.get("variants", [])
         gene = params.get("gene", "BRCA1")
         
         # Simulate variant analysis
