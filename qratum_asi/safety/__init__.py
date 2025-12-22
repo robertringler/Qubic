@@ -38,6 +38,12 @@ from qratum_asi.safety.mega_prompt import (
     ConfidenceLevel,
     MandatoryResponseRules,
 )
+from qratum_asi.safety.mega_prompt_adapter import (
+    MegaPromptModelAdapter,
+    SimulatedMegaPromptAdapter,
+    RefusalMegaPromptAdapter,
+    MegaPromptOrchestrator,
+)
 
 __all__ = [
     "SafetyBoundaryEnforcer",
@@ -70,4 +76,8 @@ __all__ = [
     "AnswerType",
     "ConfidenceLevel",
     "MandatoryResponseRules",
+    "MegaPromptModelAdapter",
+    "SimulatedMegaPromptAdapter",
+    "RefusalMegaPromptAdapter",
+    "MegaPromptOrchestrator",
 ]
