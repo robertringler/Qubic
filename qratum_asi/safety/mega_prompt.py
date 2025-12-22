@@ -183,7 +183,8 @@ class MandatoryResponseRules:
         # Rule 5: Human exceptionalism
         exceptionalism_terms = ["humans are unique", "human consciousness", "human values are universal",
                                "ASI will share human"]
-        if any(term in response.core_claim.lower() or term in response.assumptions 
+        if any(term in response.core_claim.lower() or 
+               any(term in assumption.lower() for assumption in response.assumptions)
                for term in exceptionalism_terms):
             warnings.append("Rule 5 warning: May contain human exceptionalism bias")
         
@@ -587,7 +588,7 @@ END OF PROMPT
         """Export all questions to JSON file."""
         questions_data = [q.to_dict() for q in self.questions.values()]
         with open(filepath, 'w') as f:
-            json.dumps(questions_data, f, indent=2)
+            json.dump(questions_data, f, indent=2)
     
     def export_responses(self, filepath: str):
         """Export all responses to JSON file."""
