@@ -64,13 +64,14 @@ class NEXUSModule(VerticalModuleBase):
     
     def _multi_domain_synthesis(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Synthesize insights across multiple domains."""
-        domains = params.get("domains", [])
+        default_domains = ["VITRA", "ECORA", "FLUXA"]
+        domains = params.get("domains") or default_domains
         query = params.get("query", "")
         
         # Example: Drug discovery (VITRA) + Climate impact (ECORA) + Supply chain (FLUXA)
         synthesis = {
             "query": query or "Sustainable pharmaceutical manufacturing",
-            "domains_integrated": ["VITRA", "ECORA", "FLUXA"],
+            "domains_integrated": domains,
             "cross_domain_insights": [
                 {
                     "insight": "Green chemistry synthesis reduces carbon footprint by 40%",
