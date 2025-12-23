@@ -22,18 +22,13 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-import numpy as np
-
 # Add xenon to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from xenon.bioinformatics.full_genome_sequencing import (
-    FullGenomeSequencingPipeline,
-    GenomeSequencingConfig,
-)
-
 # Import the new Genomic Rarity & Lineage Engine
 from genomic_rarity_engine import GenomicRarityAndLineageSystem
+from xenon.bioinformatics.full_genome_sequencing import (
+    FullGenomeSequencingPipeline, GenomeSequencingConfig)
 
 # Constants
 EXPECTED_SNP_COLUMNS = 5  # Number of expected columns in SNP data: rsid, chromosome, position, allele1, allele2
@@ -64,7 +59,7 @@ class AncestryDNAParser:
         """Parse the AncestryDNA.txt file and organize SNPs by chromosome."""
         logger.info(f"Parsing AncestryDNA file: {self.filepath}")
 
-        with open(self.filepath, "r") as f:
+        with open(self.filepath) as f:
             # Skip header lines (starting with #)
             lines = f.readlines()
             header_line = None
@@ -103,7 +98,7 @@ class AncestryDNAParser:
                         continue
 
         logger.info(f"Parsed {len(self.snps)} SNPs across {len(self.chromosomes)} chromosomes")
-        
+
         # Log chromosome distribution
         for chrom in sorted(self.chromosomes.keys(), key=lambda x: (len(x), x)):
             count = len(self.chromosomes[chrom])
@@ -192,7 +187,7 @@ class AncestryDNASequencingPipeline(FullGenomeSequencingPipeline):
         """
         super().__init__(config)
         self.ancestrydna_parser = ancestrydna_parser
-        
+
         # Initialize Genomic Rarity & Lineage System
         self.rarity_system = GenomicRarityAndLineageSystem()
         logger.info("Genomic Rarity & Lineage System initialized")
@@ -227,13 +222,13 @@ class AncestryDNASequencingPipeline(FullGenomeSequencingPipeline):
         logger.info("=" * 60)
         logger.info("Tier-VI Genomic Rarity & Royal Lineage Analysis")
         logger.info("=" * 60)
-        
+
         # Perform comprehensive rarity and lineage analysis
         rarity_lineage_results = self.rarity_system.analyze_genome(self.ancestrydna_parser.snps)
-        
+
         # Save rarity & lineage report
         rarity_report_path = self.rarity_system.generate_report(
-            rarity_lineage_results, 
+            rarity_lineage_results,
             self.config.output_dir
         )
         logger.info(f"✓ Rarity & Lineage analysis saved to {rarity_report_path}")
