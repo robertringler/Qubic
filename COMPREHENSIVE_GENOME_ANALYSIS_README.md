@@ -107,7 +107,8 @@ QRANTUM/QRADLES Comprehensive Analysis (8 Phases)
   "assembly_method": "hybrid_reference_free",
   "total_contigs": 202,
   "genome_completeness": 0.968,
-  "haplotypes_phased": 10,
+  "haplotypes_phased": 2,
+  "chromosomes_phased": 20,
   "mosaicism_detected": false,
   "structural_integrity_score": 0.95
 }
@@ -247,9 +248,11 @@ QRANTUM/QRADLES Comprehensive Analysis (8 Phases)
 ```json
 {
   "ancestry_components": {
-    "European": 0.45,
-    "African": 0.30,
-    "East_Asian": 0.25
+    "European": 0.452,
+    "African": 0.298,
+    "East_Asian": 0.152,
+    "Native_American": 0.065,
+    "South_Asian": 0.033
   },
   "admixture_detected": true,
   "selection_pressure_regions": 78,
@@ -257,6 +260,8 @@ QRANTUM/QRADLES Comprehensive Analysis (8 Phases)
   "evolutionary_constrained_regions": 3500
 }
 ```
+
+*Note: Ancestry components always sum to 1.0 (100%)*
 
 ### Phase VI: Systems Biology Integration
 

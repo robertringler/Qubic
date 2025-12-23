@@ -721,6 +721,21 @@ class FullGenomeSequencingPipeline:
 
         return report
 
+    def _generate_ancestry_components(self, rng: np.random.RandomState) -> Dict[str, float]:
+        """Generate valid ancestry components that sum to 1.0.
+        
+        Args:
+            rng: Random number generator
+            
+        Returns:
+            Dictionary of ancestry proportions
+        """
+        # Use Dirichlet distribution to ensure components sum to 1
+        populations = ["European", "African", "East_Asian", "Native_American", "South_Asian"]
+        # Alpha parameter of 2 creates moderate variation
+        components = rng.dirichlet([2.0] * len(populations))
+        return {pop: float(comp) for pop, comp in zip(populations, components)}
+
     def run_comprehensive_analysis(
         self,
         fastq_path: Optional[str] = None,
@@ -778,7 +793,8 @@ class FullGenomeSequencingPipeline:
                 "assembly_method": "hybrid_reference_free",
                 "total_contigs": rng.randint(100, 500),
                 "genome_completeness": rng.uniform(0.95, 0.99),
-                "haplotypes_phased": len(sequences),
+                "haplotypes_phased": 2,  # Diploid organism (2 haplotypes per chromosome)
+                "chromosomes_phased": rng.randint(18, 23),  # Number of chromosomes phased
                 "mosaicism_detected": False,
             },
             
@@ -803,11 +819,7 @@ class FullGenomeSequencingPipeline:
             
             # Phase V: Population & Evolutionary Genetics
             "phase_v_population": {
-                "ancestry_components": {
-                    "European": float(rng.uniform(0, 1)),
-                    "African": float(rng.uniform(0, 1)),
-                    "East_Asian": float(rng.uniform(0, 1)),
-                },
+                "ancestry_components": self._generate_ancestry_components(rng),
                 "admixture_detected": rng.random() < 0.3,
                 "selection_pressure_regions": rng.randint(20, 100),
             },
