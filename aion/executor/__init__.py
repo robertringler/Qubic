@@ -280,7 +280,8 @@ class HardwareDetector:
         try:
             import resource
             soft, hard = resource.getrlimit(resource.RLIMIT_AS)
-            profile.total_memory_gb = (hard if hard > 0 else 16 * 1024**3) / 1024**3
+            # Convert bytes to GB, with 16 GB fallback
+            profile.total_memory_gb = hard / 1024**3 if hard > 0 else 16.0
         except Exception:
             pass
         
@@ -968,7 +969,9 @@ class QRATUMASIExecutor:
         
         # Scheduler metrics
         metrics.scheduler_efficiency = sum(utilization.values()) / len(utilization) if utilization else 0
-        metrics.tasks_completed = len([t for t in schedule.tasks if t.status.name == "COMPLETED"])
+        # Import TaskStatus from the scheduler module for comparison
+        from aion.optimization.scheduler import TaskStatus
+        metrics.tasks_completed = len([t for t in schedule.tasks if t.status == TaskStatus.COMPLETED])
         metrics.tasks_migrated = schedule.migrations
         
         # Latency
