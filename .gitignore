@@ -6,6 +6,11 @@ __pycache__/
 *.pyc
 *.so
 
+# Rust build artifacts
+**/target/
+**/*.rs.bk
+Cargo.lock
+
 # Artifacts
 artifacts/real_world_sim_2025/
 artifacts/*.jsonl
