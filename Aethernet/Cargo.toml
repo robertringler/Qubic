@@ -50,7 +50,7 @@ ctap-types = { version = "0.2", default-features = false, optional = true }
 criterion = "0.5"
 
 [features]
-default = ["std"]
+default = ["std", "json"]  # json feature for development/debugging - disable in production
 
 # Standard library support
 std = [
@@ -80,10 +80,7 @@ compliance = []
 # Air-gapped deployment
 airgap = []
 
-[[bench]]
-name = "txo_performance"
-harness = false
-required-features = ["std"]
+
 
 [package.metadata.docs.rs]
 all-features = true
