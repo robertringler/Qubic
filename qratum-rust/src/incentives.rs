@@ -336,6 +336,7 @@ impl Default for ValidatorIncentives {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
     
     #[test]
     fn test_stake_deposit_and_withdrawal() {

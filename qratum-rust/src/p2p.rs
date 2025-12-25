@@ -382,6 +382,7 @@ impl P2PNetwork {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
     use crate::txo::TxoType;
     
     #[test]
