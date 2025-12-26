@@ -26,6 +26,16 @@ from numpy.typing import NDArray
 
 Array = NDArray[np.complex128]
 
+# Numerical thresholds for stability
+_EIGENVALUE_THRESHOLD = 1e-14  # Filter eigenvalues below this to avoid log(0)
+_NORMALIZATION_THRESHOLD = 1e-14  # Minimum norm for valid quantum states
+_TOPOLOGY_MI_THRESHOLD = 0.1  # Mutual information threshold for topology connections
+
+# Partitioning strategy parameters
+_MIN_PARTITION_SIZE = 1  # Minimum qubits in left partition
+_MAX_PARTITION_SIZE = 2  # Maximum qubits in left partition
+_PARTITION_DIVISOR = 3  # Divisor for automatic partition sizing
+
 
 def compute_mutual_information(tensor: Array) -> NDArray[np.float64]:
     """Compute mutual information matrix for tensor subsystems.
@@ -59,13 +69,16 @@ def compute_mutual_information(tensor: Array) -> NDArray[np.float64]:
         """Compute S(ρ) = -Tr(ρ log ρ) = -Σ λ_i log(λ_i)."""
         eigenvalues = np.linalg.eigvalsh(rho)
         # Filter out near-zero eigenvalues to avoid log(0)
-        eigenvalues = eigenvalues[eigenvalues > 1e-14]
+        eigenvalues = eigenvalues[eigenvalues > _EIGENVALUE_THRESHOLD]
         if len(eigenvalues) == 0:
             return 0.0
         # S(ρ) = -Σ λ_i log_2(λ_i)
         return float(-np.sum(eigenvalues * np.log2(eigenvalues)))
     
     # Helper function to compute partial trace (simplified approach)
+    # Note: This implementation has O(2^n) complexity which limits scalability.
+    # For production use with large systems (>20 qubits), consider using
+    # optimized libraries like opt_einsum or specialized quantum frameworks.
     def partial_trace_single_qubit(rho: NDArray, keep_qubit: int, n_qubits: int) -> NDArray:
         """Get reduced density matrix for a single qubit."""
         dim = 2 ** n_qubits
@@ -173,9 +186,10 @@ def hierarchical_decompose(tensor: Array, mutual_info: NDArray[np.float64]) -> d
     n_qubits = int(np.log2(len(tensor)))
     
     # Build topology from mutual information (simple graph of strong connections)
+    # Connections are considered strong if MI > threshold
     topology = {}
     for i in range(n_qubits):
-        topology[i] = [j for j in range(n_qubits) if mutual_info[i, j] > 0.1 and i != j]
+        topology[i] = [j for j in range(n_qubits) if mutual_info[i, j] > _TOPOLOGY_MI_THRESHOLD and i != j]
     
     # Use hierarchical bipartition based on entanglement structure
     # Find optimal bipartition by maximizing inter-partition mutual info
@@ -191,7 +205,7 @@ def hierarchical_decompose(tensor: Array, mutual_info: NDArray[np.float64]) -> d
     # Strategy: Use unbalanced partition for better compression
     # Keep 1-2 qubits on left, rest on right
     # This makes dim_left small, increasing chance of low rank
-    partition_size = min(2, max(1, n_qubits // 3))  # 1-2 qubits on left
+    partition_size = min(_MAX_PARTITION_SIZE, max(_MIN_PARTITION_SIZE, n_qubits // _PARTITION_DIVISOR))
     left_qubits = list(range(partition_size))
     right_qubits = list(range(partition_size, n_qubits))
     
@@ -316,7 +330,7 @@ def reconstruct(truncated: dict[str, Any]) -> Array:
     
     # Normalize the reconstructed state
     norm = np.linalg.norm(result)
-    if norm > 1e-14:
+    if norm > _NORMALIZATION_THRESHOLD:
         result = result / norm
     
     return result
@@ -398,7 +412,7 @@ def compress(
         raise ValueError(msg)
 
     norm = np.linalg.norm(tensor)
-    if norm < 1e-14:
+    if norm < _NORMALIZATION_THRESHOLD:
         msg = "Tensor must be non-zero"
         raise ValueError(msg)
 
