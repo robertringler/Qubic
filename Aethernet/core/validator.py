@@ -138,13 +138,17 @@ class ValidatorStake:
         Returns:
             Amount slashed
         """
-        slash_amount = int(self.total_stake * percentage)
+        original_stake = self.total_stake
+        slash_amount = int(original_stake * percentage)
         self.total_stake -= slash_amount
-        # Proportionally reduce self and delegated
-        if self.total_stake > 0:
-            ratio = (self.total_stake) / (self.total_stake + slash_amount)
-            self.self_stake = int(self.self_stake * ratio)
-            self.delegated_stake = int(self.delegated_stake * ratio)
+        # Proportionally reduce self and delegated based on remaining ratio
+        if original_stake > 0 and self.total_stake > 0:
+            remaining_ratio = self.total_stake / original_stake
+            self.self_stake = int(self.self_stake * remaining_ratio)
+            self.delegated_stake = int(self.delegated_stake * remaining_ratio)
+        elif self.total_stake == 0:
+            self.self_stake = 0
+            self.delegated_stake = 0
         return slash_amount
 
 
