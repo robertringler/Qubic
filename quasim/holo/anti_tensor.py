@@ -147,14 +147,18 @@ def compute_mutual_information(tensor_a: Array, tensor_b: Optional[Array] = None
         _, entropy_b = compute_entropy_spectrum(tensor_b)
     
     # Compute joint entropy H(A,B)
-    # NOTE: This is a simplified approximation using concatenation.
-    # A rigorous implementation would construct the joint probability distribution.
-    # For tensor compression purposes, this approximation provides a reasonable
-    # estimate of correlation between tensors.
+    # LIMITATION: This is a simplified approximation using concatenation.
+    # This does NOT compute true joint entropy H(A,B) from joint probability distribution.
+    # True MI requires: H(A,B) = -Σ p(a,b) log p(a,b)
+    # This approximation may give incorrect MI values but provides a heuristic
+    # correlation estimate for tensor compression decisions.
+    # For production use with strict MI requirements, replace with proper
+    # joint distribution construction (e.g., via tensor product or correlation matrix).
     joint_tensor = np.concatenate([tensor_a.flatten(), tensor_b.flatten()])
     _, entropy_joint = compute_entropy_spectrum(joint_tensor)
     
     # Mutual information: I(A;B) = H(A) + H(B) - H(A,B)
+    # Note: Due to the approximation above, this is a heuristic estimate only
     mi = entropy_a + entropy_b - entropy_joint
     
     # MI should be non-negative
@@ -162,7 +166,7 @@ def compute_mutual_information(tensor_a: Array, tensor_b: Optional[Array] = None
 
 
 def hierarchical_decompose(
-    tensor: Array, max_rank: Optional[int | float | NDArray] = None
+    tensor: Array, max_rank: Optional[int] = None
 ) -> Dict[str, Any]:
     """Perform hierarchical tensor decomposition using truncated SVD.
 
@@ -171,8 +175,7 @@ def hierarchical_decompose(
 
     Args:
         tensor: Input quantum state tensor
-        max_rank: Optional upper bound for decomposition rank (int), or
-                  mutual information matrix (ndarray) for backward compatibility
+        max_rank: Optional upper bound for decomposition rank (int)
 
     Returns:
         Dictionary containing decomposition with keys:
@@ -180,22 +183,30 @@ def hierarchical_decompose(
             - 'ranks': Bond dimensions
             - 'original_shape': Input tensor shape
             - 'method': Decomposition method used ('SVD')
-            OR for backward compatibility:
-            - 'weights': singular values
-            - 'basis_left': U matrix columns
-            - 'basis_right': Vh matrix rows
-            - 'topology': empty dict
+            - 'weights': singular values (for backward compatibility)
+            - 'basis_left': U matrix columns (for backward compatibility)
+            - 'basis_right': Vh matrix rows (for backward compatibility)
+            - 'topology': empty dict (for backward compatibility)
 
     Example:
         >>> state = np.random.randn(16) + 1j * np.random.randn(16)
         >>> state /= np.linalg.norm(state)
         >>> decomp = hierarchical_decompose(state, max_rank=8)
+        
+    Note:
+        Legacy code may pass non-int values for max_rank. These are handled
+        internally for backward compatibility but should not be used in new code.
     """
-    # Backward compatibility: if max_rank is an array (mutual info matrix), ignore it
-    if isinstance(max_rank, np.ndarray):
-        max_rank = None
-    elif isinstance(max_rank, float):
-        # If it's a float from MI computation, ignore it
+    # Backward compatibility: handle non-int max_rank values
+    # (old code may pass mutual info matrix or float)
+    if max_rank is not None and not isinstance(max_rank, int):
+        import warnings
+        warnings.warn(
+            f"max_rank should be an int, got {type(max_rank).__name__}. "
+            "Ignoring this value. This usage is deprecated.",
+            DeprecationWarning,
+            stacklevel=2
+        )
         max_rank = None
     
     original_shape = tensor.shape
@@ -254,12 +265,16 @@ def adaptive_truncate(
 ) -> Dict[str, Any]:
     """Adaptively truncate tensor components with fidelity constraint.
 
-    Uses binary search to find optimal rank reduction that preserves fidelity:
-    ||T - T_truncated||_F / ||T||_F ≤ 1 - fidelity_target
+    Uses dual criteria (threshold-based + energy-based) to find optimal rank 
+    reduction that preserves fidelity: ||T - T_truncated||_F / ||T||_F ≤ 1 - fidelity_target
+    
+    The truncation keeps singular values that meet either:
+    1. Threshold criterion: |s_i| >= epsilon * max(|s|)
+    2. Energy criterion: cumulative energy up to required fidelity level
 
     Args:
         decomposition: Tensor decomposition from hierarchical_decompose
-        epsilon: Truncation threshold for singular values
+        epsilon: Truncation threshold for singular values (relative to max)
         fidelity_target: Minimum fidelity to maintain (default: 0.995)
 
     Returns:
@@ -500,16 +515,33 @@ def compress(
     # Stage 5: Fidelity Verification
     fidelity_score = compute_fidelity(tensor_normalized, reconstructed)
 
-    # If fidelity not met, try with less aggressive truncation
+    # Fallback strategy: if fidelity not met, try with less aggressive truncation
+    # Note: This may result in lower compression ratios than expected
     if fidelity_score < fidelity:
-        # Retry with smaller epsilon
+        import warnings
+        warnings.warn(
+            f"Initial compression achieved fidelity {fidelity_score:.6f}, "
+            f"below target {fidelity}. Retrying with adjusted parameters.",
+            RuntimeWarning,
+            stacklevel=2
+        )
+        
+        # Retry with smaller epsilon (less aggressive truncation)
         epsilon_adjusted = epsilon * 0.1
         truncated = adaptive_truncate(decomposition, epsilon_adjusted, fidelity_target=fidelity)
         reconstructed = reconstruct(truncated)
         fidelity_score = compute_fidelity(tensor_normalized, reconstructed)
         
-        # If still not met, use original decomposition
+        # If still not met, use original untruncated decomposition
         if fidelity_score < fidelity:
+            warnings.warn(
+                f"Adjusted compression achieved fidelity {fidelity_score:.6f}, "
+                f"still below target {fidelity}. Using untruncated decomposition "
+                f"(no compression). This may indicate the tensor is incompressible "
+                f"at the requested fidelity level.",
+                RuntimeWarning,
+                stacklevel=2
+            )
             truncated = decomposition
             reconstructed = reconstruct(truncated)
             fidelity_score = compute_fidelity(tensor_normalized, reconstructed)
