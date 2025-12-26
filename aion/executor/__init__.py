@@ -24,19 +24,22 @@ from pathlib import Path
 from typing import Any, Callable
 from uuid import uuid4
 
-from aion.sir.vertices import (
-    Vertex, VertexType, AIONType, HardwareAffinity, EffectKind, Provenance
-)
-from aion.sir.edges import HyperEdge, EdgeType, ParallelismKind
-from aion.sir.hypergraph import HyperGraph, GraphBuilder, merge_graphs
-from aion.memory.regions import Region, RegionManager, RegionKind
-from aion.concurrency.lattice import EffectLattice, ConcurrencyEffect, EffectChecker
-from aion.proof.verifier import ProofVerifier, ProofTerm, ProofKind
-from aion.proof.synthesis import ProofSynthesizer
+from aion.concurrency.lattice import ConcurrencyEffect, EffectChecker, EffectLattice
+from aion.memory.regions import Region, RegionKind, RegionManager
+from aion.optimization.fusion import CrossLanguageFuser, KernelFusion, detect_fusion_patterns
 from aion.optimization.scheduler import (
-    AdaptiveScheduler, CausalScheduler, Device, DeviceKind, Task, ScheduleResult
+    AdaptiveScheduler,
+    CausalScheduler,
+    Device,
+    DeviceKind,
+    ScheduleResult,
+    Task,
 )
-from aion.optimization.fusion import KernelFusion, CrossLanguageFuser, detect_fusion_patterns
+from aion.proof.synthesis import ProofSynthesizer
+from aion.proof.verifier import ProofKind, ProofTerm, ProofVerifier
+from aion.sir.edges import EdgeType, HyperEdge, ParallelismKind
+from aion.sir.hypergraph import GraphBuilder, HyperGraph, merge_graphs
+from aion.sir.vertices import AIONType, EffectKind, HardwareAffinity, Provenance, Vertex, VertexType
 
 
 class ExecutionPhase(Enum):
@@ -67,7 +70,7 @@ class HardwareProfile:
     fpga_dsp_count: int = 0
     wasm_runtime: bool = True
     total_memory_gb: float = 16.0
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -117,7 +120,7 @@ class VerificationResult:
     lifetime_validity: bool = False
     verification_time: float = 0.0
     errors: list[str] = field(default_factory=list)
-    
+
     def summary(self) -> dict[str, Any]:
         """Generate verification summary."""
         return {
@@ -166,7 +169,7 @@ class ExecutionMetrics:
     tasks_completed: int = 0
     tasks_migrated: int = 0
     proofs_verified: int = 0
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -207,7 +210,7 @@ class HypergraphTrace:
     provenance: dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass 
+@dataclass
 class ExecutionResult:
     """Complete result of QRATUM ASI execution on AION."""
     success: bool = False
@@ -221,7 +224,7 @@ class ExecutionResult:
     traces: list[HypergraphTrace] = field(default_factory=list)
     total_execution_time: float = 0.0
     errors: list[str] = field(default_factory=list)
-    
+
     def generate_report(self) -> dict[str, Any]:
         """Generate comprehensive execution report."""
         return {
@@ -250,32 +253,32 @@ class ExecutionResult:
 
 class HardwareDetector:
     """Detects available hardware for AION execution."""
-    
+
     def __init__(self) -> None:
         """Initialize hardware detector."""
         self._profile: HardwareProfile | None = None
-    
+
     def detect(self) -> HardwareProfile:
         """Detect available hardware and return profile."""
         import os
         import platform
-        
+
         profile = HardwareProfile()
-        
+
         # Detect CPU
         profile.cpu_cores = os.cpu_count() or 1
-        
+
         # Try to get CPU frequency
         try:
             if platform.system() == "Linux":
-                with open("/proc/cpuinfo", "r") as f:
+                with open("/proc/cpuinfo") as f:
                     for line in f:
                         if "cpu MHz" in line:
                             profile.cpu_frequency_mhz = float(line.split(":")[1].strip())
                             break
         except Exception:
             pass
-        
+
         # Detect memory
         try:
             import resource
@@ -284,24 +287,24 @@ class HardwareDetector:
             profile.total_memory_gb = hard / 1024**3 if hard > 0 else 16.0
         except Exception:
             pass
-        
+
         # Check for GPU (simplified - would use CUDA/OpenCL in production)
         profile.gpu_count = 0  # Emulated in this environment
-        
+
         # WASM always available
         profile.wasm_runtime = True
-        
+
         self._profile = profile
         return profile
-    
+
     def get_devices(self) -> list[Device]:
         """Get list of execution devices."""
         if not self._profile:
             self.detect()
-        
+
         profile = self._profile or HardwareProfile()
         devices = []
-        
+
         # Add CPU devices
         for i in range(min(profile.cpu_cores, 4)):  # Limit to 4 for simulation
             devices.append(Device(
@@ -312,7 +315,7 @@ class HardwareDetector:
                 memory_available=int(profile.total_memory_gb * 1024**3 / 4),
                 memory_total=int(profile.total_memory_gb * 1024**3 / 4),
             ))
-        
+
         # Add GPU device (emulated)
         if profile.gpu_count > 0 or True:  # Always add emulated GPU
             devices.append(Device(
@@ -324,7 +327,7 @@ class HardwareDetector:
                 memory_total=int(8 * 1024**3),
                 features={"cuda", "warp_sync"},
             ))
-        
+
         # Add FPGA device (emulated)
         devices.append(Device(
             id="fpga0",
@@ -335,7 +338,7 @@ class HardwareDetector:
             memory_total=36 * 1024,
             features={"hls", "lut", "dsp"},
         ))
-        
+
         # Add WASM device
         devices.append(Device(
             id="wasm0",
@@ -345,18 +348,18 @@ class HardwareDetector:
             memory_available=256 * 1024**2,  # 256MB
             memory_total=256 * 1024**2,
         ))
-        
+
         return devices
 
 
 class QRATUMASICompiler:
     """Compiles QRATUM ASI modules to AION-SIR hypergraph representation."""
-    
+
     def __init__(self) -> None:
         """Initialize compiler."""
         self.region_manager = RegionManager()
         self.synthesizer = ProofSynthesizer()
-    
+
     def compile(self, asi_modules: dict[str, Any]) -> CompilationResult:
         """Compile QRATUM ASI modules to AION-SIR.
         
@@ -367,30 +370,30 @@ class QRATUMASICompiler:
             CompilationResult with hypergraph and proofs
         """
         start_time = time.time()
-        
+
         try:
             # Build hypergraph for each module
             module_graphs = []
-            
+
             for module_name, module_config in asi_modules.items():
                 graph = self._compile_module(module_name, module_config)
                 module_graphs.append(graph)
-            
+
             # Merge all module graphs
             if module_graphs:
                 merged_graph = merge_graphs(module_graphs, name="qratum_asi")
             else:
                 merged_graph = HyperGraph(name="qratum_asi_empty")
-            
+
             # Synthesize proofs
             proofs = self.synthesizer.synthesize(merged_graph)
-            
+
             # Generate capability map
             verifier = ProofVerifier()
             cap_map = verifier.generate_capability_bitmap(proofs)
-            
+
             compilation_time = time.time() - start_time
-            
+
             return CompilationResult(
                 success=True,
                 hypergraph=merged_graph,
@@ -401,21 +404,21 @@ class QRATUMASICompiler:
                 region_count=len(self.region_manager.regions),
                 compilation_time=compilation_time,
             )
-            
+
         except Exception as e:
             return CompilationResult(
                 success=False,
                 errors=[str(e)],
                 compilation_time=time.time() - start_time,
             )
-    
+
     def _compile_module(self, name: str, config: dict[str, Any]) -> HyperGraph:
         """Compile a single ASI module to hypergraph."""
         builder = GraphBuilder(name=name)
-        
+
         module_type = config.get("type", "compute")
         hardware = config.get("hardware", "any")
-        
+
         # Map hardware to affinity
         affinity_map = {
             "cpu": HardwareAffinity.CPU,
@@ -425,7 +428,7 @@ class QRATUMASICompiler:
             "any": HardwareAffinity.ANY,
         }
         affinity = affinity_map.get(hardware, HardwareAffinity.ANY)
-        
+
         # Create input parameter
         builder.param(
             f"{name}_input",
@@ -433,7 +436,7 @@ class QRATUMASICompiler:
             index=0,
         )
         input_v = builder.current()
-        
+
         # Allocate working memory
         work_size = config.get("work_size", 1024 * 1024)
         builder.alloc(
@@ -443,7 +446,7 @@ class QRATUMASICompiler:
             affinity=affinity,
         )
         work_mem = builder.current()
-        
+
         # Create computation vertices based on module type
         if module_type == "neural":
             self._build_neural_subgraph(builder, input_v, work_mem, config, affinity)
@@ -455,13 +458,13 @@ class QRATUMASICompiler:
             self._build_multiagent_subgraph(builder, input_v, work_mem, config, affinity)
         else:
             self._build_generic_compute_subgraph(builder, input_v, work_mem, config, affinity)
-        
+
         # Create return
         output_v = builder.current()
         builder.ret(output_v, AIONType.tensor(AIONType.float(64), config.get("output_shape", [1024])))
-        
+
         return builder.build()
-    
+
     def _get_region_for_hardware(self, hardware: str) -> str:
         """Get memory region name for hardware target."""
         region_map = {
@@ -472,7 +475,7 @@ class QRATUMASICompiler:
             "any": "heap",
         }
         return region_map.get(hardware, "heap")
-    
+
     def _build_neural_subgraph(
         self, builder: GraphBuilder, input_v: Vertex, work_mem: Vertex,
         config: dict[str, Any], affinity: HardwareAffinity
@@ -480,7 +483,7 @@ class QRATUMASICompiler:
         """Build neural network computation subgraph."""
         layers = config.get("layers", 4)
         hidden_size = config.get("hidden_size", 1024)
-        
+
         current = input_v
         for i in range(layers):
             # Matrix multiply (weights)
@@ -493,7 +496,7 @@ class QRATUMASICompiler:
                 affinity=affinity,
             )
             current = builder.current()
-            
+
             # Activation function
             builder.apply(
                 f"relu_{i}",
@@ -502,7 +505,7 @@ class QRATUMASICompiler:
                 effects={EffectKind.PURE},
             )
             current = builder.current()
-    
+
     def _build_quantum_subgraph(
         self, builder: GraphBuilder, input_v: Vertex, work_mem: Vertex,
         config: dict[str, Any], affinity: HardwareAffinity
@@ -510,7 +513,7 @@ class QRATUMASICompiler:
         """Build quantum emulation subgraph."""
         qubits = config.get("qubits", 8)
         gates = config.get("gates", ["H", "CNOT", "RZ"])
-        
+
         # Initialize quantum state
         builder.apply(
             "init_quantum_state",
@@ -519,7 +522,7 @@ class QRATUMASICompiler:
             effects={EffectKind.ALLOC},
         )
         state = builder.current()
-        
+
         # Apply gates
         for gate in gates:
             builder.apply(
@@ -529,7 +532,7 @@ class QRATUMASICompiler:
                 effects={EffectKind.PURE},
             )
             state = builder.current()
-        
+
         # Measurement
         builder.apply(
             "measure",
@@ -537,7 +540,7 @@ class QRATUMASICompiler:
             AIONType.array(AIONType.float(64), qubits),
             effects={EffectKind.IO},
         )
-    
+
     def _build_symbolic_subgraph(
         self, builder: GraphBuilder, input_v: Vertex, work_mem: Vertex,
         config: dict[str, Any], affinity: HardwareAffinity
@@ -551,7 +554,7 @@ class QRATUMASICompiler:
             effects={EffectKind.READ},
         )
         kg = builder.current()
-        
+
         # Inference engine
         builder.apply(
             "run_inference",
@@ -560,7 +563,7 @@ class QRATUMASICompiler:
             effects={EffectKind.PURE},
         )
         inference = builder.current()
-        
+
         # Generate conclusions
         builder.apply(
             "generate_conclusions",
@@ -568,14 +571,14 @@ class QRATUMASICompiler:
             AIONType.array(AIONType(kind="conclusion"), config.get("max_conclusions", 100)),
             effects={EffectKind.ALLOC},
         )
-    
+
     def _build_multiagent_subgraph(
         self, builder: GraphBuilder, input_v: Vertex, work_mem: Vertex,
         config: dict[str, Any], affinity: HardwareAffinity
     ) -> None:
         """Build multi-agent controller subgraph."""
         num_agents = config.get("num_agents", 4)
-        
+
         # Create agent vertices that can run in parallel
         agent_outputs = []
         for i in range(num_agents):
@@ -586,10 +589,10 @@ class QRATUMASICompiler:
                 effects={EffectKind.PURE},
             )
             agent_outputs.append(builder.current())
-        
+
         # Mark as parallel
         builder.parallel(agent_outputs, ParallelismKind.TASK_LEVEL, affinity)
-        
+
         # Aggregate results
         builder.apply(
             "aggregate_agent_outputs",
@@ -597,14 +600,14 @@ class QRATUMASICompiler:
             AIONType(kind="aggregated_output"),
             effects={EffectKind.PURE},
         )
-    
+
     def _build_generic_compute_subgraph(
         self, builder: GraphBuilder, input_v: Vertex, work_mem: Vertex,
         config: dict[str, Any], affinity: HardwareAffinity
     ) -> None:
         """Build generic computation subgraph."""
         operations = config.get("operations", ["transform", "reduce"])
-        
+
         current = input_v
         for op in operations:
             builder.apply(
@@ -618,12 +621,12 @@ class QRATUMASICompiler:
 
 class ProofPreservingVerifier:
     """Verifies proofs and generates capability maps."""
-    
+
     def __init__(self) -> None:
         """Initialize verifier."""
         self.verifier = ProofVerifier()
         self.effect_checker = EffectChecker()
-    
+
     def verify(
         self, graph: HyperGraph, proofs: list[ProofTerm]
     ) -> VerificationResult:
@@ -638,11 +641,11 @@ class ProofPreservingVerifier:
         """
         start_time = time.time()
         result = VerificationResult()
-        
+
         # Verify each proof
         for proof in proofs:
             is_valid = self.verifier.verify(proof)
-            
+
             if proof.kind == ProofKind.MEMORY_SAFETY:
                 result.memory_safety = is_valid
             elif proof.kind == ProofKind.RACE_FREEDOM:
@@ -659,14 +662,14 @@ class ProofPreservingVerifier:
                 result.region_validity = is_valid
             elif proof.kind == ProofKind.LIFETIME_VALIDITY:
                 result.lifetime_validity = is_valid
-            
+
             if not is_valid:
                 result.errors.extend(self.verifier.errors)
-        
+
         # Run effect checking
         effect_errors, effect_warnings = self.effect_checker.check(graph)
         result.errors.extend(effect_errors)
-        
+
         # Determine overall validity
         result.all_verified = (
             result.memory_safety and
@@ -675,19 +678,19 @@ class ProofPreservingVerifier:
             result.bounded_resources and
             len(result.errors) == 0
         )
-        
+
         result.verification_time = time.time() - start_time
         return result
 
 
 class CrossLanguageOptimizer:
     """Applies cross-language kernel fusion and optimization passes."""
-    
+
     def __init__(self) -> None:
         """Initialize optimizer."""
         self.kernel_fusion = KernelFusion()
         self.cross_fuser = CrossLanguageFuser()
-    
+
     def optimize(
         self, graph: HyperGraph, proofs: list[ProofTerm]
     ) -> OptimizationResult:
@@ -702,14 +705,14 @@ class CrossLanguageOptimizer:
         """
         start_time = time.time()
         result = OptimizationResult()
-        
+
         # Detect fusion patterns
         patterns = detect_fusion_patterns(graph)
         result.fusion_patterns_detected = len(patterns)
-        
+
         # Apply kernel fusion
         fusion_result = self.kernel_fusion.optimize(graph, proofs)
-        
+
         if fusion_result.success:
             result.optimized_graph = fusion_result.fused_graph
             result.fused_kernels = len(fusion_result.fused_vertices)
@@ -718,28 +721,28 @@ class CrossLanguageOptimizer:
             result.passes_applied.append("kernel_fusion")
         else:
             result.optimized_graph = graph
-        
+
         # Apply zero-copy optimization
         if result.optimized_graph:
             result.optimized_graph = self.cross_fuser.fuse_with_zero_copy(
                 result.optimized_graph
             )
             result.passes_applied.append("zero_copy_optimization")
-        
+
         # Apply dead region elimination
         if result.optimized_graph:
             result.optimized_graph = self._eliminate_dead_regions(result.optimized_graph)
             result.passes_applied.append("dead_region_elimination")
-        
+
         # Apply pointer canonicalization
         if result.optimized_graph:
             result.optimized_graph = self._canonicalize_pointers(result.optimized_graph)
             result.passes_applied.append("pointer_canonicalization")
-        
+
         result.optimization_time = time.time() - start_time
         result.success = True
         return result
-    
+
     def _eliminate_dead_regions(self, graph: HyperGraph) -> HyperGraph:
         """Eliminate dead (unused) regions from the graph."""
         # Find all regions referenced
@@ -747,11 +750,11 @@ class CrossLanguageOptimizer:
         for v in graph.vertices:
             if v.metadata.region:
                 used_regions.add(v.metadata.region)
-        
+
         # Remove unreferenced vertices
         # (simplified - would do full liveness analysis)
         return graph
-    
+
     def _canonicalize_pointers(self, graph: HyperGraph) -> HyperGraph:
         """Canonicalize pointer operations for better optimization."""
         # Simplified implementation
@@ -760,12 +763,12 @@ class CrossLanguageOptimizer:
 
 class AdaptiveRuntimeScheduler:
     """Adaptive runtime scheduler with workload migration."""
-    
+
     def __init__(self, devices: list[Device]) -> None:
         """Initialize scheduler with available devices."""
         self.scheduler = AdaptiveScheduler(devices)
         self.devices = devices
-    
+
     def schedule(self, graph: HyperGraph) -> ScheduleResult:
         """Schedule hypergraph for execution.
         
@@ -776,11 +779,11 @@ class AdaptiveRuntimeScheduler:
             ScheduleResult with task assignments
         """
         return self.scheduler.schedule(graph)
-    
+
     def record_execution(self, task_id: str, actual_time: float, device_id: str) -> None:
         """Record actual execution time for profiling."""
         self.scheduler.record_execution(task_id, actual_time, device_id)
-    
+
     def predict_throughput(self, graph: HyperGraph) -> float:
         """Predict throughput for the graph."""
         return self.scheduler.predict_throughput(graph)
@@ -798,7 +801,7 @@ class QRATUMASIExecutor:
     6. Benchmarking and metrics collection
     7. Visualization and reporting
     """
-    
+
     def __init__(self) -> None:
         """Initialize the executor."""
         self.hardware_detector = HardwareDetector()
@@ -806,12 +809,12 @@ class QRATUMASIExecutor:
         self.verifier = ProofPreservingVerifier()
         self.optimizer = CrossLanguageOptimizer()
         self.scheduler: AdaptiveRuntimeScheduler | None = None
-        
+
         # Execution state
         self.hardware_profile: HardwareProfile | None = None
         self.devices: list[Device] = []
         self.traces: list[HypergraphTrace] = []
-    
+
     def execute(self, asi_config: dict[str, Any]) -> ExecutionResult:
         """Execute QRATUM ASI on AION.
         
@@ -823,7 +826,7 @@ class QRATUMASIExecutor:
         """
         start_time = time.time()
         result = ExecutionResult()
-        
+
         try:
             # Phase 1: Hardware Detection
             self._record_trace(ExecutionPhase.HARDWARE_DETECTION)
@@ -831,64 +834,64 @@ class QRATUMASIExecutor:
             self.devices = self.hardware_detector.get_devices()
             self.scheduler = AdaptiveRuntimeScheduler(self.devices)
             result.hardware_profile = self.hardware_profile
-            
+
             # Phase 2: Compilation
             self._record_trace(ExecutionPhase.COMPILATION)
             modules = asi_config.get("modules", {})
             compilation_result = self.compiler.compile(modules)
             result.compilation_result = compilation_result
-            
+
             if not compilation_result.success:
                 result.errors.extend(compilation_result.errors)
                 return result
-            
+
             graph = compilation_result.hypergraph
             proofs = compilation_result.proofs
-            
+
             # Phase 3: Verification
             self._record_trace(ExecutionPhase.VERIFICATION)
             verification_result = self.verifier.verify(graph, proofs)
             result.verification_result = verification_result
-            
+
             if not verification_result.all_verified:
                 # Log warnings but continue (proofs may still be useful)
                 result.errors.extend(verification_result.errors)
-            
+
             # Phase 4: Optimization
             self._record_trace(ExecutionPhase.OPTIMIZATION)
             optimization_result = self.optimizer.optimize(graph, proofs)
             result.optimization_result = optimization_result
-            
+
             optimized_graph = optimization_result.optimized_graph or graph
-            
+
             # Phase 5: Scheduling
             self._record_trace(ExecutionPhase.SCHEDULING)
             schedule_result = self.scheduler.schedule(optimized_graph)
             result.schedule_result = schedule_result
-            
+
             # Phase 6: Execution
             self._record_trace(ExecutionPhase.EXECUTION)
             execution_output = self._execute_scheduled(schedule_result, optimized_graph)
             result.output = execution_output
-            
+
             # Phase 7: Metrics Collection
             self._record_trace(ExecutionPhase.BENCHMARKING)
             metrics = self._collect_metrics(schedule_result, optimization_result)
             result.metrics = metrics
-            
+
             # Phase 8: Reporting
             self._record_trace(ExecutionPhase.REPORTING)
             result.traces = self.traces.copy()
-            
+
             result.success = True
-            
+
         except Exception as e:
             result.errors.append(str(e))
             result.success = False
-        
+
         result.total_execution_time = time.time() - start_time
         return result
-    
+
     def _record_trace(self, phase: ExecutionPhase) -> None:
         """Record execution trace for current phase."""
         trace = HypergraphTrace(
@@ -900,7 +903,7 @@ class QRATUMASIExecutor:
             }
         )
         self.traces.append(trace)
-    
+
     def _execute_scheduled(
         self, schedule: ScheduleResult, graph: HyperGraph
     ) -> Any:
@@ -914,24 +917,24 @@ class QRATUMASIExecutor:
             Execution output
         """
         from aion.runtime import AIONRuntime
-        
+
         runtime = AIONRuntime()
-        
+
         # Add detected devices
         for device in self.devices:
             runtime.add_device(device)
-        
+
         # Execute the graph
         result = runtime.execute(graph)
-        
+
         # Record actual execution times for profiling
         for task in schedule.tasks:
             if task.assigned_device:
                 actual_time = task.end_time - task.start_time
                 self.scheduler.record_execution(task.id, actual_time, task.assigned_device.id)
-        
+
         return result.value if result.success else None
-    
+
     def _collect_metrics(
         self, schedule: ScheduleResult, optimization: OptimizationResult
     ) -> ExecutionMetrics:
@@ -945,38 +948,38 @@ class QRATUMASIExecutor:
             ExecutionMetrics with collected data
         """
         metrics = ExecutionMetrics()
-        
+
         # Calculate throughput
         if schedule.makespan > 0:
             metrics.throughput_ops_per_sec = len(schedule.tasks) / schedule.makespan
-        
+
         # Calculate memory usage
         total_memory = sum(
             t.memory_required for t in schedule.tasks
         )
         metrics.memory_used_mb = total_memory / (1024 * 1024)
         metrics.memory_peak_mb = metrics.memory_used_mb * 1.2  # Estimate
-        
+
         # Calculate utilization per device type
         utilization = schedule.device_utilization
         cpu_utils = [v for k, v in utilization.items() if k.startswith("cpu")]
         gpu_utils = [v for k, v in utilization.items() if k.startswith("gpu")]
         fpga_utils = [v for k, v in utilization.items() if k.startswith("fpga")]
-        
+
         metrics.cpu_utilization = sum(cpu_utils) / len(cpu_utils) if cpu_utils else 0
         metrics.gpu_utilization = sum(gpu_utils) / len(gpu_utils) if gpu_utils else 0
         metrics.fpga_utilization = sum(fpga_utils) / len(fpga_utils) if fpga_utils else 0
-        
+
         # Scheduler metrics
         metrics.scheduler_efficiency = sum(utilization.values()) / len(utilization) if utilization else 0
         # Import TaskStatus from the scheduler module for comparison
         from aion.optimization.scheduler import TaskStatus
         metrics.tasks_completed = len([t for t in schedule.tasks if t.status == TaskStatus.COMPLETED])
         metrics.tasks_migrated = schedule.migrations
-        
+
         # Latency
         metrics.latency_ms = schedule.makespan * 1000
-        
+
         return metrics
 
 
@@ -1075,21 +1078,21 @@ def run_full_qratum_asi_on_aion(
     # Use default config if not provided
     if config is None:
         config = create_default_asi_config()
-    
+
     # Create executor and run
     executor = QRATUMASIExecutor()
     result = executor.execute(config)
-    
+
     # Save artifacts if output directory provided
     if output_dir and result.success:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
-        
+
         # Save execution report
         report = result.generate_report()
         with open(output_path / "execution_report.json", "w") as f:
             json.dump(report, f, indent=2, default=str)
-        
+
         # Save traces
         traces_data = [
             {
@@ -1106,12 +1109,12 @@ def run_full_qratum_asi_on_aion(
         ]
         with open(output_path / "hypergraph_traces.json", "w") as f:
             json.dump(traces_data, f, indent=2)
-        
+
         # Save hypergraph if available
         if result.compilation_result and result.compilation_result.hypergraph:
             with open(output_path / "aion_sir.json", "w") as f:
                 f.write(result.compilation_result.hypergraph.to_json())
-    
+
     return result
 
 
@@ -1129,13 +1132,13 @@ def generate_ascii_report(result: ExecutionResult) -> str:
     lines.append("  QRATUM ASI on AION - Execution Report")
     lines.append("=" * 70)
     lines.append("")
-    
+
     # Overall status
     status = "✓ SUCCESS" if result.success else "✗ FAILED"
     lines.append(f"Status: {status}")
     lines.append(f"Total Execution Time: {result.total_execution_time:.3f}s")
     lines.append("")
-    
+
     # Hardware Profile
     if result.hardware_profile:
         lines.append("─" * 70)
@@ -1148,7 +1151,7 @@ def generate_ascii_report(result: ExecutionResult) -> str:
         lines.append(f"  FPGA Available: {'Yes' if hp.fpga_available else 'Emulated'}")
         lines.append(f"  WASM Runtime: {'Yes' if hp.wasm_runtime else 'No'}")
         lines.append("")
-    
+
     # Compilation Results
     if result.compilation_result:
         lines.append("─" * 70)
@@ -1161,16 +1164,16 @@ def generate_ascii_report(result: ExecutionResult) -> str:
         lines.append(f"  Regions: {cr.region_count}")
         lines.append(f"  Time: {cr.compilation_time:.3f}s")
         lines.append("")
-    
+
     # Verification Results
     if result.verification_result:
         lines.append("─" * 70)
         lines.append("Verification:")
         vr = result.verification_result
-        
+
         def check(b: bool) -> str:
             return "✓" if b else "✗"
-        
+
         lines.append(f"  Memory Safety:      {check(vr.memory_safety)}")
         lines.append(f"  Race Freedom:       {check(vr.race_freedom)}")
         lines.append(f"  Deadlock Freedom:   {check(vr.deadlock_freedom)}")
@@ -1179,7 +1182,7 @@ def generate_ascii_report(result: ExecutionResult) -> str:
         lines.append(f"  Effect Conformance: {check(vr.effect_conformance)}")
         lines.append(f"  Time: {vr.verification_time:.3f}s")
         lines.append("")
-    
+
     # Optimization Results
     if result.optimization_result:
         lines.append("─" * 70)
@@ -1192,7 +1195,7 @@ def generate_ascii_report(result: ExecutionResult) -> str:
         lines.append(f"  Passes Applied: {', '.join(opt.passes_applied)}")
         lines.append(f"  Time: {opt.optimization_time:.3f}s")
         lines.append("")
-    
+
     # Metrics
     if result.metrics:
         lines.append("─" * 70)
@@ -1212,7 +1215,7 @@ def generate_ascii_report(result: ExecutionResult) -> str:
         lines.append(f"  Tasks Completed: {m.tasks_completed}")
         lines.append(f"  Tasks Migrated: {m.tasks_migrated}")
         lines.append("")
-    
+
     # Throughput visualization
     if result.metrics:
         lines.append("─" * 70)
@@ -1222,7 +1225,7 @@ def generate_ascii_report(result: ExecutionResult) -> str:
         bar = "█" * bar_len + "░" * (50 - bar_len)
         lines.append(f"  |{bar}| {m.throughput_ops_per_sec:.2e} ops/s")
         lines.append("")
-    
+
     # Errors
     if result.errors:
         lines.append("─" * 70)
@@ -1230,11 +1233,11 @@ def generate_ascii_report(result: ExecutionResult) -> str:
         for error in result.errors:
             lines.append(f"  ⚠ {error}")
         lines.append("")
-    
+
     lines.append("=" * 70)
     lines.append("  End of Report")
     lines.append("=" * 70)
-    
+
     return "\n".join(lines)
 
 

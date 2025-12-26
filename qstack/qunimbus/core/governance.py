@@ -8,8 +8,8 @@ time-locked execution, and Merkle-logged votes.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
 from enum import Enum
+from typing import Dict, List
 
 
 class VoteDecision(Enum):
@@ -103,7 +103,7 @@ class GovernanceProtocol:
     - Time-locked execution prevents rushed changes
     - All actions auditable via Merkle logs
     """
-    
+
     def __init__(self):
         """Initialize governance protocol."""
         self.proposals: Dict[str, PolicyProposal] = {}
@@ -114,7 +114,7 @@ class GovernanceProtocol:
         self.current_epoch: int = 0
         self.total_voting_weight: int = 0
         self.authorities: Dict[str, Authority] = {}
-    
+
     def propose_policy_change(self, proposal: PolicyProposal) -> str:
         """Submit a new governance proposal.
         
@@ -132,12 +132,12 @@ class GovernanceProtocol:
         self.proposals[proposal_id] = proposal
         self.votes[proposal_id] = []
         self.proposal_status[proposal_id] = ProposalStatus.ACTIVE
-        
+
         # TODO: Emit audit TXO for proposal submission
         # TODO: Add to Merkle tree
-        
+
         return proposal_id
-    
+
     def vote(self, proposal_id: str, voter: str, vote: Vote) -> bool:
         """Cast a vote on a proposal.
         
@@ -158,31 +158,31 @@ class GovernanceProtocol:
         # Check if proposal exists
         if proposal_id not in self.proposals:
             return False
-        
+
         proposal = self.proposals[proposal_id]
-        
+
         # Check if voting is still active
         if self.current_epoch >= proposal.creation_epoch + proposal.voting_period:
             return False
-        
+
         # Check if proposal is still active
         if self.proposal_status[proposal_id] != ProposalStatus.ACTIVE:
             return False
-        
+
         # Check for duplicate votes
         if any(v.voter == voter for v in self.votes[proposal_id]):
             return False
-        
+
         # TODO: Verify vote signature
-        
+
         # Record vote
         self.votes[proposal_id].append(vote)
-        
+
         # TODO: Add vote to Merkle tree
         # TODO: Emit audit TXO for vote
-        
+
         return True
-    
+
     def tally_votes(self, proposal_id: str) -> Dict[str, int]:
         """Calculate vote tally for a proposal.
         
@@ -194,9 +194,9 @@ class GovernanceProtocol:
         """
         if proposal_id not in self.votes:
             return {"approve": 0, "reject": 0, "abstain": 0}
-        
+
         tally = {"approve": 0, "reject": 0, "abstain": 0}
-        
+
         for vote in self.votes[proposal_id]:
             if vote.decision == VoteDecision.APPROVE:
                 tally["approve"] += vote.weight
@@ -204,9 +204,9 @@ class GovernanceProtocol:
                 tally["reject"] += vote.weight
             elif vote.decision == VoteDecision.ABSTAIN:
                 tally["abstain"] += vote.weight
-        
+
         return tally
-    
+
     def is_approved(self, proposal_id: str) -> bool:
         """Check if proposal has reached approval threshold.
         
@@ -218,16 +218,16 @@ class GovernanceProtocol:
         """
         if proposal_id not in self.proposals:
             return False
-        
+
         proposal = self.proposals[proposal_id]
         tally = self.tally_votes(proposal_id)
-        
+
         if self.total_voting_weight == 0:
             return False
-        
+
         approval_percentage = (tally["approve"] * 100) // self.total_voting_weight
         return approval_percentage >= proposal.threshold
-    
+
     def can_execute(self, proposal_id: str) -> bool:
         """Check if proposal can be executed.
         
@@ -245,27 +245,27 @@ class GovernanceProtocol:
         """
         if proposal_id not in self.proposals:
             return False
-        
+
         proposal = self.proposals[proposal_id]
-        
+
         # Check if approved
         if not self.is_approved(proposal_id):
             return False
-        
+
         # Check if voting period is over
         if self.current_epoch < proposal.creation_epoch + proposal.voting_period:
             return False
-        
+
         # Check if timelock has elapsed
         if self.current_epoch < proposal.creation_epoch + proposal.voting_period + proposal.timelock:
             return False
-        
+
         # Check if already executed or vetoed
         if proposal_id in self.executed_proposals or proposal_id in self.vetoed_proposals:
             return False
-        
+
         return True
-    
+
     def execute_approved_proposal(self, proposal_id: str) -> bool:
         """Execute an approved proposal.
         
@@ -283,17 +283,17 @@ class GovernanceProtocol:
         """
         if not self.can_execute(proposal_id):
             return False
-        
+
         # Mark as executed
         self.executed_proposals.append(proposal_id)
         self.proposal_status[proposal_id] = ProposalStatus.EXECUTED
-        
+
         # TODO: Execute proposal payload
         # TODO: Emit audit TXO for execution
         # TODO: Add to Merkle tree
-        
+
         return True
-    
+
     def veto(self, proposal_id: str, authority: Authority) -> bool:
         """Veto a proposal (emergency stop mechanism).
         
@@ -312,34 +312,34 @@ class GovernanceProtocol:
         # Check if proposal exists
         if proposal_id not in self.proposals:
             return False
-        
+
         # Check if already executed
         if proposal_id in self.executed_proposals:
             return False
-        
+
         # Check if already vetoed
         if proposal_id in self.vetoed_proposals:
             return False
-        
+
         # Verify authority has veto power
         if not authority.veto_power:
             return False
-        
+
         # TODO: Verify authority signature
-        
+
         # Mark as vetoed
         self.vetoed_proposals.append(proposal_id)
         self.proposal_status[proposal_id] = ProposalStatus.VETOED
-        
+
         # TODO: Emit audit TXO for veto
         # TODO: Add to Merkle tree
-        
+
         return True
-    
+
     def advance_epoch(self):
         """Advance to next epoch."""
         self.current_epoch += 1
-    
+
     def set_total_voting_weight(self, weight: int):
         """Set total voting weight (typically total stake).
         
@@ -347,7 +347,7 @@ class GovernanceProtocol:
             weight: Total voting weight
         """
         self.total_voting_weight = weight
-    
+
     def register_authority(self, authority: Authority):
         """Register an authority with veto power.
         

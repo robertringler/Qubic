@@ -18,7 +18,7 @@ Status: Production
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import Enum
 from typing import Any, FrozenSet
 
 
@@ -82,17 +82,17 @@ class EffectLattice:
     - Meet (⊓): Greatest lower bound
     - Order (⊑): Effect ordering
     """
-    
+
     @staticmethod
     def bottom() -> ConcurrencyEffect:
         """Return the bottom element (Pure)."""
         return ConcurrencyEffect.PURE
-    
+
     @staticmethod
     def top() -> ConcurrencyEffect:
         """Return the top element (Arbitrary)."""
         return ConcurrencyEffect.ARBITRARY
-    
+
     @staticmethod
     def leq(a: ConcurrencyEffect, b: ConcurrencyEffect) -> bool:
         """Check if a ⊑ b (a is less than or equal to b in the lattice).
@@ -110,25 +110,25 @@ class EffectLattice:
             return True
         if a == ConcurrencyEffect.PURE:
             return True
-        
+
         # Check transitive ordering via BFS - can we reach b from a going upward?
         visited = set()
         queue = [a]
-        
+
         while queue:
             current = queue.pop(0)
             if current in visited:
                 continue
             visited.add(current)
-            
+
             for higher in EFFECT_ORDERING.get(current, set()):
                 if higher == b:
                     return True  # Found path from a to b going upward, so a ⊑ b
                 queue.append(higher)
-        
+
         # Use value comparison as fallback
         return a.value <= b.value
-    
+
     @staticmethod
     def join(a: ConcurrencyEffect, b: ConcurrencyEffect) -> ConcurrencyEffect:
         """Compute a ⊔ b (least upper bound).
@@ -144,11 +144,11 @@ class EffectLattice:
             return b
         if EffectLattice.leq(b, a):
             return a
-        
+
         # Find minimal common upper bound
         # For simplicity, use max by value
         return a if a.value > b.value else b
-    
+
     @staticmethod
     def meet(a: ConcurrencyEffect, b: ConcurrencyEffect) -> ConcurrencyEffect:
         """Compute a ⊓ b (greatest lower bound).
@@ -164,16 +164,16 @@ class EffectLattice:
             return a
         if EffectLattice.leq(b, a):
             return b
-        
+
         # Find maximal common lower bound
         return a if a.value < b.value else b
-    
+
     @staticmethod
     def join_all(effects: set[ConcurrencyEffect]) -> ConcurrencyEffect:
         """Compute join of all effects in a set."""
         if not effects:
             return EffectLattice.bottom()
-        
+
         result = EffectLattice.bottom()
         for e in effects:
             result = EffectLattice.join(result, e)
@@ -195,12 +195,12 @@ class EffectCapability:
     effect: ConcurrencyEffect
     region: str | None = None
     exclusive: bool = False
-    
+
     def can_perform(self, effect: ConcurrencyEffect) -> bool:
         """Check if this capability allows performing an effect."""
         return EffectLattice.leq(effect, self.effect)
-    
-    def combine(self, other: "EffectCapability") -> "EffectCapability":
+
+    def combine(self, other: EffectCapability) -> EffectCapability:
         """Combine two capabilities."""
         return EffectCapability(
             effect=EffectLattice.join(self.effect, other.effect),
@@ -225,7 +225,7 @@ class FunctionEffect:
     required_caps: FrozenSet[EffectCapability] = field(default_factory=frozenset)
     granted_caps: FrozenSet[EffectCapability] = field(default_factory=frozenset)
     pure: bool = False
-    
+
     def __post_init__(self) -> None:
         """Initialize pure flag based on effects."""
         object.__setattr__(
@@ -233,39 +233,39 @@ class FunctionEffect:
             'pure',
             len(self.effects) == 0 or self.effects == frozenset({ConcurrencyEffect.PURE})
         )
-    
+
     @staticmethod
-    def pure_fn() -> "FunctionEffect":
+    def pure_fn() -> FunctionEffect:
         """Create a pure function effect."""
         return FunctionEffect(
             effects=frozenset({ConcurrencyEffect.PURE}),
             pure=True,
         )
-    
+
     @staticmethod
-    def io_fn() -> "FunctionEffect":
+    def io_fn() -> FunctionEffect:
         """Create an I/O function effect."""
         return FunctionEffect(
             effects=frozenset({ConcurrencyEffect.IO}),
         )
-    
+
     @staticmethod
-    def concurrent_fn(effects: set[ConcurrencyEffect]) -> "FunctionEffect":
+    def concurrent_fn(effects: set[ConcurrencyEffect]) -> FunctionEffect:
         """Create a function with concurrent effects."""
         return FunctionEffect(effects=frozenset(effects))
-    
-    def join(self, other: "FunctionEffect") -> "FunctionEffect":
+
+    def join(self, other: FunctionEffect) -> FunctionEffect:
         """Join two function effects (for composition)."""
         return FunctionEffect(
             effects=self.effects | other.effects,
             required_caps=self.required_caps | other.required_caps,
             granted_caps=self.granted_caps & other.granted_caps,
         )
-    
+
     def can_call_with(self, caps: set[EffectCapability]) -> bool:
         """Check if function can be called with given capabilities."""
         return all(any(c.can_perform(req.effect) for c in caps) for req in self.required_caps)
-    
+
     def serialize(self) -> dict[str, Any]:
         """Serialize to dictionary."""
         return {
@@ -285,12 +285,12 @@ class EffectChecker:
     - Effect ordering constraints are satisfied
     - Race conditions are prevented
     """
-    
+
     def __init__(self) -> None:
         """Initialize the effect checker."""
         self.errors: list[str] = []
         self.warnings: list[str] = []
-    
+
     def check(self, graph: Any) -> tuple[list[str], list[str]]:
         """Run effect checking on a graph.
         
@@ -302,56 +302,56 @@ class EffectChecker:
         """
         self.errors = []
         self.warnings = []
-        
+
         # Collect vertex effects
         self._check_effect_annotations(graph)
-        
+
         # Check effect ordering
         self._check_effect_ordering(graph)
-        
+
         # Check for races
         self._check_race_conditions(graph)
-        
+
         # Check capability flow
         self._check_capability_flow(graph)
-        
+
         return self.errors, self.warnings
-    
+
     def _check_effect_annotations(self, graph: Any) -> None:
         """Verify all vertices have valid effect annotations."""
         for v in graph.vertices:
             effects = v.metadata.effects
             if not effects:
                 self.warnings.append(f"Vertex {v.id} has no effect annotation")
-    
+
     def _check_effect_ordering(self, graph: Any) -> None:
         """Check that effect edges enforce correct ordering."""
         effect_edges = graph.get_effect_edges()
-        
+
         for edge in effect_edges:
             for src in edge.sources:
                 for tgt in edge.targets:
                     src_effects = src.metadata.effects
                     tgt_effects = tgt.metadata.effects
-                    
+
                     # Effects with side effects must be ordered
                     if ConcurrencyEffect.WRITE in src_effects and ConcurrencyEffect.WRITE in tgt_effects:
                         if edge.attributes.get("ordering") != "seq":
                             self.warnings.append(
                                 f"Write-write conflict between {src.id} and {tgt.id} may need ordering"
                             )
-    
+
     def _check_race_conditions(self, graph: Any) -> None:
         """Check for potential data races."""
         # Find parallel regions
         parallel_edges = graph.get_parallel_edges()
-        
+
         for edge in parallel_edges:
             vertices = edge.targets
-            
+
             # Check for conflicting memory accesses
             writers = [v for v in vertices if ConcurrencyEffect.WRITE in v.metadata.effects]
-            
+
             if len(writers) > 1:
                 # Check if they access the same region
                 regions = {v.metadata.region for v in writers}
@@ -360,19 +360,19 @@ class EffectChecker:
                         f"Potential race: multiple writers to region {regions.pop()} "
                         f"in parallel region"
                     )
-    
+
     def _check_capability_flow(self, graph: Any) -> None:
         """Check that capabilities flow correctly through the graph."""
         # Track available capabilities at each vertex
         available_caps: dict[str, set[EffectCapability]] = {}
-        
+
         for v in graph.topological_order():
             # Get capabilities from predecessors
             preds = graph.get_predecessors(v)
             caps = set()
             for p in preds:
                 caps.update(available_caps.get(p.id, set()))
-            
+
             # Check if vertex effects are allowed
             for effect in v.metadata.effects:
                 if effect not in (ConcurrencyEffect.PURE, ConcurrencyEffect.READ):
@@ -383,7 +383,7 @@ class EffectChecker:
                             self.warnings.append(
                                 f"Vertex {v.id} performs {effect.name} without capability"
                             )
-            
+
             # Grant capabilities from this vertex
             available_caps[v.id] = caps
 
@@ -406,38 +406,38 @@ def analyze_races(graph: Any) -> RaceAnalysis:
         RaceAnalysis with race information
     """
     analysis = RaceAnalysis()
-    
+
     # Find all memory accesses
     reads: dict[str, list[Any]] = {}  # region -> vertices
     writes: dict[str, list[Any]] = {}
-    
+
     from ..sir.vertices import EffectKind
-    
+
     for v in graph.vertices:
         region = v.metadata.region or "heap"
-        
+
         if EffectKind.READ in v.metadata.effects:
             reads.setdefault(region, []).append(v)
         if EffectKind.WRITE in v.metadata.effects:
             writes.setdefault(region, []).append(v)
-    
+
     # Check for conflicts in parallel regions
     parallel_edges = graph.get_parallel_edges()
-    
+
     for edge in parallel_edges:
         parallel_vertices = set(v.id for v in edge.targets)
-        
+
         for region in writes:
             region_writes = [v for v in writes[region] if v.id in parallel_vertices]
             region_reads = [v for v in reads.get(region, []) if v.id in parallel_vertices]
-            
+
             # Write-write conflicts
             if len(region_writes) > 1:
                 analysis.has_races = True
                 for i, w1 in enumerate(region_writes):
                     for w2 in region_writes[i+1:]:
                         analysis.race_pairs.append((w1.id, w2.id))
-            
+
             # Write-read conflicts
             for w in region_writes:
                 for r in region_reads:
@@ -451,7 +451,7 @@ def analyze_races(graph: Any) -> RaceAnalysis:
                         if not has_ordering:
                             analysis.has_races = True
                             analysis.race_pairs.append((w.id, r.id))
-    
+
     return analysis
 
 
@@ -472,11 +472,11 @@ def analyze_deadlocks(graph: Any) -> DeadlockAnalysis:
         DeadlockAnalysis with deadlock information
     """
     analysis = DeadlockAnalysis()
-    
+
     # Build lock ordering graph
     # Edges go from lock A to lock B if A is held while acquiring B
     lock_graph: dict[str, set[str]] = {}
-    
+
     # Find synchronization vertices
     sync_vertices = [
         v for v in graph.vertices
@@ -487,49 +487,49 @@ def analyze_deadlocks(graph: Any) -> DeadlockAnalysis:
             ConcurrencyEffect.ATOMIC_RMW,
         ))
     ]
-    
+
     # Build dependency graph based on control flow
     for v in sync_vertices:
         v_id = v.id
         lock_graph[v_id] = set()
-        
+
         # Find other sync operations reachable from this one
         visited = set()
         queue = [s for s in graph.get_successors(v)]
-        
+
         while queue:
             current = queue.pop(0)
             if current.id in visited:
                 continue
             visited.add(current.id)
-            
+
             if current in sync_vertices and current.id != v_id:
                 lock_graph[v_id].add(current.id)
-            
+
             queue.extend(graph.get_successors(current))
-    
+
     # Detect cycles using DFS
     def find_cycle(start: str, path: list[str], visited: set[str]) -> list[str] | None:
         if start in path:
             return path[path.index(start):]
         if start in visited:
             return None
-        
+
         visited.add(start)
         path.append(start)
-        
+
         for neighbor in lock_graph.get(start, set()):
             cycle = find_cycle(neighbor, path.copy(), visited)
             if cycle:
                 return cycle
-        
+
         return None
-    
+
     visited: set[str] = set()
     for v_id in lock_graph:
         cycle = find_cycle(v_id, [], visited)
         if cycle:
             analysis.has_deadlock = True
             analysis.cycles.append(cycle)
-    
+
     return analysis

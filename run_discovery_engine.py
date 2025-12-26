@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 def main():
     """Run the appropriate discovery engine based on command-line argument."""
     mode = sys.argv[1] if len(sys.argv) > 1 else "vulnerability"
-    
+
     if mode == "vulnerability":
         from qratum_asi.examples.vulnerability_discovery_demo import main as vuln_main
         vuln_main()
