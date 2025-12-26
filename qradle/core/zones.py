@@ -164,12 +164,17 @@ class ZoneContext:
     def has_dual_control(self) -> bool:
         """Check if dual-control is satisfied.
 
+        Dual-control requires two distinct individuals to authorize an operation:
+        1. The actor performing the operation
+        2. At least one additional approver who is not the actor
+
         Returns:
-            True if at least two different approvers exist
+            True if the actor plus at least one distinct approver exist
         """
         unique_approvers = set(self.approvers)
         unique_approvers.discard(self.actor_id)  # Actor cannot self-approve
-        return len(unique_approvers) >= 1  # Actor + 1 approver = dual control
+        # Dual control: actor (1) + at least one distinct approver (1) = 2 people
+        return len(unique_approvers) >= 1
 
     def get_elapsed_seconds(self) -> float:
         """Get elapsed time since operation start.

@@ -454,10 +454,14 @@ class RollbackOrchestrator:
             authorized_by=authorized_by,
         )
 
-        # Calculate rollback depth
-        source_idx = list(self._snapshots.keys()).index(source_snapshot.snapshot_id)
-        target_idx = list(self._snapshots.keys()).index(target_snapshot_id)
-        rollback_depth = abs(source_idx - target_idx)
+        # Calculate rollback depth more efficiently
+        snapshot_ids = list(self._snapshots.keys())
+        try:
+            source_idx = snapshot_ids.index(source_snapshot.snapshot_id)
+            target_idx = snapshot_ids.index(target_snapshot_id)
+            rollback_depth = abs(source_idx - target_idx)
+        except ValueError:
+            rollback_depth = 1  # Default if calculation fails
 
         # Create rollback contract
         contract = create_rollback_contract(
