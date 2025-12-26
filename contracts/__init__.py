@@ -1,7 +1,8 @@
 """Contracts - Immutable Contract System for QRATUM.
 
 This module provides immutable, hash-addressed contracts for intent authorization,
-capability binding, temporal management, and event sequencing.
+capability binding, temporal management, event sequencing, provenance tracking,
+and rollback operations with cryptographic proofs.
 
 Version: 1.0.0
 Status: Production
@@ -23,6 +24,25 @@ from contracts.capability import (
 from contracts.event import EventContract, create_event_contract
 from contracts.intent import IntentContract, create_intent_contract
 from contracts.temporal import TemporalContract, create_temporal_contract
+from contracts.provenance import (
+    ProvenanceContract,
+    ProvenanceChainBuilder,
+    ProvenanceEntry,
+    ProvenanceType,
+    ComplianceArtifact,
+    ComplianceStandard,
+    create_21cfr11_provenance,
+    create_do178c_provenance,
+)
+from contracts.rollback_proof import (
+    RollbackContract,
+    RollbackProof,
+    RollbackProofGenerator,
+    RollbackOrchestrator,
+    RollbackReason,
+    StateSnapshot,
+    create_rollback_contract,
+)
 
 __all__ = [
     # Base
@@ -43,6 +63,23 @@ __all__ = [
     # Event
     "EventContract",
     "create_event_contract",
+    # Provenance
+    "ProvenanceContract",
+    "ProvenanceChainBuilder",
+    "ProvenanceEntry",
+    "ProvenanceType",
+    "ComplianceArtifact",
+    "ComplianceStandard",
+    "create_21cfr11_provenance",
+    "create_do178c_provenance",
+    # Rollback
+    "RollbackContract",
+    "RollbackProof",
+    "RollbackProofGenerator",
+    "RollbackOrchestrator",
+    "RollbackReason",
+    "StateSnapshot",
+    "create_rollback_contract",
 ]
 
 __version__ = "1.0.0"
