@@ -11,10 +11,14 @@ Version: 1.0.0
 import asyncio
 import hashlib
 import json
+import random
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Any, Optional
+
+# Constants
+CONSENSUS_PHASES = ["PROPOSE", "PREVOTE", "PRECOMMIT", "COMMIT", "FINALIZED"]
 
 try:
     from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -145,9 +149,7 @@ class SOITelemetryServer:
                 await asyncio.sleep(5)
 
                 # Broadcast consensus update
-                phases = ["PROPOSE", "PREVOTE", "PRECOMMIT", "COMMIT", "FINALIZED"]
-                import random
-                self.state["consensus"]["phase"] = random.choice(phases)
+                self.state["consensus"]["phase"] = random.choice(CONSENSUS_PHASES)
                 
                 event = self.create_event("aethernet:consensus", 
                     self.state["consensus"].copy())
@@ -164,7 +166,6 @@ class SOITelemetryServer:
                 await asyncio.sleep(4)
 
                 # Broadcast quorum update
-                import random
                 self.state["consensus"]["quorum_power"] = 85000000 + random.randint(0, 10000000)
                 percentage = (self.state["consensus"]["quorum_power"] / 
                             self.state["consensus"]["total_power"] * 100)

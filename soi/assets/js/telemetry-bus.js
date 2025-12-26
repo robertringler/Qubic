@@ -12,6 +12,9 @@
 const SOITelemetryBus = (function() {
     'use strict';
 
+    // Constants
+    const CONSENSUS_PHASES = ['PROPOSE', 'PREVOTE', 'PRECOMMIT', 'COMMIT', 'FINALIZED'];
+
     // Configuration
     const config = {
         wsUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -489,8 +492,7 @@ const SOITelemetryBus = (function() {
         
         // Simulate consensus updates
         demoIntervals.push(setInterval(() => {
-            const phases = ['PROPOSE', 'PREVOTE', 'PRECOMMIT', 'COMMIT', 'FINALIZED'];
-            systemState.consensus.phase = phases[Math.floor(Math.random() * phases.length)];
+            systemState.consensus.phase = CONSENSUS_PHASES[Math.floor(Math.random() * CONSENSUS_PHASES.length)];
             
             const event = {
                 type: 'aethernet:consensus',
