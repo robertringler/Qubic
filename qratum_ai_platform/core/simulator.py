@@ -248,5 +248,50 @@ class Simulator:
 
         return f"Simulator(backend={self.backend}, precision={self.precision})"
 
+    def run_with_compression(
+        self, circuit: Circuit, compression_fidelity: float = 0.995
+    ) -> Result:
+        """Run with intermediate state compression for memory efficiency.
+
+        Args:
+            circuit: Circuit to simulate
+            compression_fidelity: Target compression fidelity (default: 0.995)
+
+        Returns:
+            Measurement result
+
+        Example:
+            >>> sim = Simulator()
+            >>> circuit = Circuit(10)
+            >>> result = sim.run_with_compression(circuit, compression_fidelity=0.99)
+        """
+        from quasim.holo.anti_tensor import compress, decompress
+
+        # Select backend based on circuit size
+        self._selected_backend = self._auto_select_backend(circuit.num_qubits)
+
+        # Initialize state
+        state = StateVector.zero_state(circuit.num_qubits)
+
+        # Apply gates with periodic compression
+        compression_interval = max(10, len(circuit.instructions) // 10)
+
+        for i, (gate_name, qubits, matrix, params) in enumerate(circuit.instructions):
+            state = self._apply_gate(state, gate_name, qubits, matrix, params)
+
+            # Periodically compress state to save memory
+            if (i + 1) % compression_interval == 0:
+                compressed_data, fidelity, metadata = compress(
+                    state.data, fidelity=compression_fidelity
+                )
+                state.data = decompress(compressed_data)
+                state.normalize()
+
+        # Measure
+        result = Measurement.measure_statevector(
+            state.data, shots=1024, seed=self.seed
+        )
+        return result
+
 
 __all__ = ["Simulator"]

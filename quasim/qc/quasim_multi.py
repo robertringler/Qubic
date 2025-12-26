@@ -627,6 +627,88 @@ class MultiQubitSimulator:
         overlap = np.abs(np.vdot(target_state, self.state))
         return float(overlap**2)
 
+    def checkpoint_state(self, path: str, compress: bool = True) -> dict[str, Any]:
+        """Save state with optional AHTC compression.
+
+        Args:
+            path: File path for checkpoint
+            compress: Whether to use AHTC compression (default: True)
+
+        Returns:
+            Dictionary with checkpoint metadata
+
+        Example:
+            >>> sim = MultiQubitSimulator(num_qubits=10)
+            >>> sim.initialize_state()
+            >>> metadata = sim.checkpoint_state('checkpoint.npz', compress=True)
+        """
+        import json
+
+        if self.state is None:
+            raise RuntimeError("State not initialized")
+
+        checkpoint_data = {
+            "num_qubits": self.num_qubits,
+            "seed": self.seed,
+            "compressed": compress,
+        }
+
+        if compress:
+            from quasim.holo.anti_tensor import compress as ahtc_compress
+
+            compressed_state, fidelity, metadata = ahtc_compress(self.state, fidelity=0.995)
+            checkpoint_data["compressed_state"] = compressed_state
+            checkpoint_data["fidelity"] = fidelity
+            checkpoint_data["compression_metadata"] = metadata
+        else:
+            checkpoint_data["state"] = self.state
+
+        # Save to file
+        np.savez_compressed(path, **checkpoint_data)
+
+        # Also save JSON metadata
+        metadata_path = path.replace('.npz', '_metadata.json')
+        with open(metadata_path, 'w') as f:
+            # Convert numpy types to python types for JSON
+            json_metadata = {
+                "num_qubits": int(self.num_qubits),
+                "compressed": bool(compress),
+            }
+            if compress:
+                json_metadata["fidelity"] = float(checkpoint_data["fidelity"])
+                json_metadata["compression_ratio"] = float(
+                    checkpoint_data["compression_metadata"]["compression_ratio"]
+                )
+            json.dump(json_metadata, f, indent=2)
+
+        return checkpoint_data
+
+    def restore_checkpoint(self, path: str) -> None:
+        """Restore from AHTC-compressed checkpoint.
+
+        Args:
+            path: File path to checkpoint
+
+        Example:
+            >>> sim = MultiQubitSimulator(num_qubits=10)
+            >>> sim.restore_checkpoint('checkpoint.npz')
+        """
+        checkpoint = np.load(path, allow_pickle=True)
+
+        self.num_qubits = int(checkpoint["num_qubits"])
+        self.seed = int(checkpoint.get("seed", 42))
+
+        if checkpoint["compressed"]:
+            from quasim.holo.anti_tensor import decompress
+
+            compressed_state = checkpoint["compressed_state"].item()
+            self.state = decompress(compressed_state)
+        else:
+            self.state = checkpoint["state"]
+
+        # Normalize
+        self.state = self.state / np.linalg.norm(self.state)
+
 
 def create_bell_plus() -> NDArray[np.complex128]:
     """Create Bell state |Φ+⟩ = (|00⟩ + |11⟩)/√2."""
