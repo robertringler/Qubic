@@ -307,7 +307,7 @@ def adaptive_truncate(
     # Fidelity approximately equals: sum(kept_sv^2) / sum(all_sv^2)
     total_energy = np.sum(S ** 2)
     cumulative_energy = np.cumsum(S ** 2)
-    required_energy = fidelity_target ** 2 * total_energy
+    required_energy = fidelity_target * total_energy
     
     # Find first index where cumulative energy exceeds required
     # (we want to KEEP all singular values up to this point)
