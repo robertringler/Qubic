@@ -8,52 +8,48 @@ The foundational execution layer for QRATUM platform providing:
 - 8 Fatal Invariants enforcement
 """
 
-from .engine import QRADLEEngine
-from .contracts import Contract, ContractStatus
-from .merkle import MerkleChain, MerkleNode
-from .invariants import FatalInvariants
-from .rollback import RollbackManager, Checkpoint
+__version__ = "1.0.0"
 
+# Legacy module imports (from standalone files)
+from qradle.engine import QRADLEEngine
+from qradle.contract_types import Contract, ContractStatus, ContractExecution
+from qradle.merkle import MerkleChain, MerkleNode
+from qradle.invariants import FatalInvariants
+from qradle.rollback import RollbackManager, Checkpoint
+
+# Core engine imports (from core package)
+from qradle.core.engine import DeterministicEngine, ExecutionContext, ExecutionResult
+from qradle.core.invariants import FatalInvariants as CoreFatalInvariants
+from qradle.core.invariants import InvariantViolation
+from qradle.core.merkle import MerkleChain as CoreMerkleChain
+from qradle.core.merkle import MerkleProof
+from qradle.core.rollback import RollbackManager as CoreRollbackManager
+from qradle.core.rollback import Checkpoint as CoreCheckpoint
+from qradle.contracts.system import ContractExecutor, ContractValidator
+from qradle.events.chain import EventChain, Event
+
+# Unified exports with both legacy and new components
 __all__ = [
+    # Legacy engine
     "QRADLEEngine",
     "Contract",
     "ContractStatus",
+    "ContractExecution",
     "MerkleChain",
     "MerkleNode",
     "FatalInvariants",
     "RollbackManager",
     "Checkpoint",
-]
-
-__version__ = "1.0.0"
-This is the foundational execution layer for QRATUM, providing:
-- Deterministic execution with cryptographic proofs
-- Merkle-chained event logs for complete auditability
-- Contract-based operations with rollback capability
-- 8 Fatal Invariants enforcement at runtime
-
-Version: 1.0.0
-Status: Production-Ready
-"""
-
-from qradle.core.engine import DeterministicEngine, ExecutionContext, ExecutionResult
-from qradle.core.invariants import FatalInvariants, InvariantViolation
-from qradle.core.merkle import MerkleChain, MerkleProof
-from qradle.core.rollback import RollbackManager, Checkpoint
-from qradle.contracts.system import ContractExecutor, ContractValidator
-from qradle.events.chain import EventChain, Event
-
-__version__ = "1.0.0"
-__all__ = [
+    # Core engine
     "DeterministicEngine",
     "ExecutionContext",
     "ExecutionResult",
-    "FatalInvariants",
+    "CoreFatalInvariants",
     "InvariantViolation",
-    "MerkleChain",
+    "CoreMerkleChain",
     "MerkleProof",
-    "RollbackManager",
-    "Checkpoint",
+    "CoreRollbackManager",
+    "CoreCheckpoint",
     "ContractExecutor",
     "ContractValidator",
     "EventChain",
