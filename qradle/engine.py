@@ -9,7 +9,7 @@ import time
 import uuid
 from typing import Any, Callable, Dict, Optional
 
-from .contracts import Contract, ContractExecution, ContractStatus
+from .contract_types import Contract, ContractExecution, ContractStatus
 from .invariants import FatalInvariants, InvariantViolation
 from .merkle import MerkleChain
 from .rollback import RollbackManager, Checkpoint
