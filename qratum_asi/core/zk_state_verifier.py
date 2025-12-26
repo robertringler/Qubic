@@ -113,10 +113,21 @@ class ZKProof:
         hasher = hashlib.sha3_256()
         hasher.update(self.proof_data)
         hasher.update(self.public_inputs)
-        hasher.update(self.timestamp.to_bytes(8, 'little', signed=False) if isinstance(self.timestamp, int) else str(self.timestamp).encode())
+        hasher.update(self._encode_timestamp())
         hasher.update(self.nonce)
         hasher.update(self.epoch_id.to_bytes(8, 'little'))
         return hasher.hexdigest()
+    
+    def _encode_timestamp(self) -> bytes:
+        """Encode timestamp to bytes for hashing.
+        
+        Handles both int and float timestamps uniformly.
+        """
+        if isinstance(self.timestamp, int):
+            return self.timestamp.to_bytes(8, 'little', signed=False)
+        else:
+            # For float timestamps, use string representation for consistency
+            return str(self.timestamp).encode()
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -394,11 +405,24 @@ class ZKStateVerifier:
     def _verify_risc0(self, proof: ZKProof, commitment: StateCommitment) -> bool:
         """Verify Risc0 proof (placeholder).
         
+        Risc0 is a RISC-V zkVM that enables general computation proofs.
+        
+        Integration points for production:
+        - risc0-zkvm crate: https://github.com/risc0/risc0
+        - Receipt verification: risc0_zkvm::Receipt::verify()
+        - Program ID: ELF hash of the guest program
+        
         In production, would:
-        1. Deserialize receipt from proof_data
-        2. Verify proof using Risc0 verifier
-        3. Check program ID matches expected
-        4. Validate public outputs
+        1. Deserialize receipt from proof_data using bincode
+        2. Verify proof using risc0_zkvm::Receipt::verify(IMAGE_ID)
+        3. Check program ID matches expected guest program
+        4. Extract and validate journal (public outputs)
+        
+        Example integration:
+            let receipt: Receipt = bincode::deserialize(&proof.proof_data)?;
+            receipt.verify(STATE_TRANSITION_ID)?;
+            let journal = receipt.journal.decode()?;
+            // Validate journal contents match commitment
         """
         # Placeholder: always return True for non-empty proofs
         return len(proof.proof_data) > 0 and len(proof.public_inputs) > 0
@@ -406,11 +430,25 @@ class ZKStateVerifier:
     def _verify_halo2(self, proof: ZKProof, commitment: StateCommitment) -> bool:
         """Verify Halo2 proof (placeholder).
         
+        Halo2 is a recursive SNARK system enabling efficient ZK proofs.
+        
+        Integration points for production:
+        - halo2_proofs crate: https://github.com/zcash/halo2
+        - Verification key: Pre-computed from circuit setup
+        - Proof format: Serialized using Blake2b transcript
+        
         In production, would:
-        1. Load verification key
-        2. Deserialize proof
-        3. Verify using Halo2 verifier
-        4. Check public inputs match
+        1. Load verification key from trusted source
+        2. Deserialize proof using halo2_proofs::plonk::read_proof()
+        3. Verify using halo2_proofs::plonk::verify_proof()
+        4. Check public inputs match commitment values
+        
+        Example integration:
+            let params = load_params(K);
+            let vk = load_verifying_key(&params, &circuit);
+            let proof = plonk::read_proof(&params, &vk, &proof_data)?;
+            let public_inputs = vec![commitment.to_field()];
+            verify_proof(&params, &vk, proof, &public_inputs)?;
         """
         # Placeholder: always return True for non-empty proofs
         return len(proof.proof_data) > 0 and len(proof.public_inputs) > 0

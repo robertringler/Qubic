@@ -15,6 +15,12 @@ This script verifies all major components are working correctly.
 import sys
 sys.path.insert(0, '.')
 
+# Version constants
+VERIFICATION_VERSION = "2.0.0"
+VERIFICATION_LABEL = "Mega Prompt Calibrated"
+QUASIM_VERSION = "v2025.12.26"
+TASK_STATUS = "Task 4 ZK Complete"
+
 def print_header(title):
     print("\n" + "="*70)
     print(f"  {title}")
@@ -331,8 +337,8 @@ def main():
     """Run all verification tests."""
     print("\n" + "="*70)
     print("  QRATUM FULL STACK VERIFICATION")
-    print("  Version 2.0.0 - Mega Prompt Calibrated")
-    print("  QuASIM v2025.12.26 - Task 4 ZK Complete")
+    print(f"  Version {VERIFICATION_VERSION} - {VERIFICATION_LABEL}")
+    print(f"  QuASIM {QUASIM_VERSION} - {TASK_STATUS}")
     print("="*70)
     
     results = []

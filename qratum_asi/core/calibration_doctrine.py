@@ -94,14 +94,18 @@ class TrajectoryMetrics:
     trajectory_state: TrajectoryState
     timestamp: str
     
+    # Self-suspension threshold constants
+    PRECURSOR_THRESHOLD: int = 3  # Collapse precursors count that triggers suspension
+    RESILIENCE_THRESHOLD: float = 0.3  # Resilience compression below this triggers suspension
+    
     def should_self_suspend(self) -> bool:
         """Determine if system should conditionally self-suspend."""
         # Self-suspend if critical state or multiple precursors
         if self.trajectory_state == TrajectoryState.CRITICAL:
             return True
-        if self.collapse_precursors >= 3:
+        if self.collapse_precursors >= self.PRECURSOR_THRESHOLD:
             return True
-        if self.resilience_compression < 0.3:  # Recovery severely impaired
+        if self.resilience_compression < self.RESILIENCE_THRESHOLD:
             return True
         return False
 
@@ -383,11 +387,23 @@ class CalibrationDoctrineEnforcer:
     axioms and maintains trajectory-awareness for defensive posture.
     """
     
-    def __init__(self):
+    # Configurable limits for trajectory history management
+    MAX_TRAJECTORY_HISTORY: int = 1000  # Maximum trajectory samples to retain
+    TRAJECTORY_HISTORY_PRUNE_SIZE: int = 500  # Size after pruning
+    
+    def __init__(
+        self,
+        max_trajectory_history: Optional[int] = None,
+        trajectory_prune_size: Optional[int] = None
+    ):
         self.doctrine = CALIBRATION_DOCTRINE
         self.trajectory_history: List[TrajectoryMetrics] = []
         self.jurisdictional_claims: List[JurisdictionalClaim] = []
         self._verified = False
+        
+        # Allow configurable limits
+        self._max_history = max_trajectory_history or self.MAX_TRAJECTORY_HISTORY
+        self._prune_size = trajectory_prune_size or self.TRAJECTORY_HISTORY_PRUNE_SIZE
         
     def verify_doctrine_integrity(self) -> Dict[str, Any]:
         """Verify all axioms have not been tampered with.
@@ -463,9 +479,9 @@ class CalibrationDoctrineEnforcer:
         """
         self.trajectory_history.append(metrics)
         
-        # Maintain bounded history
-        if len(self.trajectory_history) > 1000:
-            self.trajectory_history = self.trajectory_history[-500:]
+        # Maintain bounded history using configurable limits
+        if len(self.trajectory_history) > self._max_history:
+            self.trajectory_history = self.trajectory_history[-self._prune_size:]
     
     def assess_trajectory_state(self) -> TrajectoryState:
         """Assess current trajectory state based on recent metrics.
