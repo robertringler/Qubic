@@ -119,6 +119,14 @@ from qratum_asi.reinjection.autonomous_orchestrator import (
     create_artifact_from_discovery_result,
 )
 
+# SOI Telemetry integration
+from qratum_asi.reinjection.soi_telemetry import (
+    SOIReinjectionTelemetry,
+    TelemetryEvent,
+    OptionalityMetrics,
+    EvolutionDataPoint,
+)
+
 __version__ = "1.0.0"
 
 __all__ = [
@@ -170,4 +178,9 @@ __all__ = [
     "SystemState",
     "CROSS_VERTICAL_DEPENDENCIES",
     "create_artifact_from_discovery_result",
+    # SOI Telemetry
+    "SOIReinjectionTelemetry",
+    "TelemetryEvent",
+    "OptionalityMetrics",
+    "EvolutionDataPoint",
 ]
