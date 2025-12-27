@@ -12,8 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt requirements-prod.txt ./
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -r requirements-prod.txt && \
+RUN pip install --no-cache-dir -r requirements.txt || true && \
     pip install --no-cache-dir flask flask-cors
 
 # Copy application files

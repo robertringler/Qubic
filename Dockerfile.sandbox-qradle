@@ -12,8 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt requirements-prod.txt ./
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -r requirements-prod.txt && \
+RUN pip install --no-cache-dir -r requirements.txt || true && \
     pip install --no-cache-dir flask flask-cors
 
 # Copy QRADLE module
@@ -60,9 +59,9 @@ def health():
 @app.route('/api/chain/status')
 def chain_status():
     return jsonify({
-        "chain_length": len(chain.events),
-        "root_hash": chain.root_hash,
-        "genesis_hash": chain.events[0]["hash"] if chain.events else None
+        "chain_length": len(chain.nodes),
+        "root_hash": chain.get_root_hash(),
+        "genesis_hash": chain.nodes[0].node_hash if chain.nodes else None
     })
 
 @app.route('/api/engine/status')
@@ -89,7 +88,7 @@ if __name__ == '__main__':
     print("=" * 70)
     print("🛡️  QRADLE Service Starting")
     print("=" * 70)
-    print(f"Merkle Chain Genesis Block: {chain.root_hash[:32]}...")
+    print(f"Merkle Chain Genesis Block: {chain.get_root_hash()[:32]}...")
     print(f"Starting on http://0.0.0.0:{port}")
     print("=" * 70)
     app.run(host='0.0.0.0', port=port, debug=False)

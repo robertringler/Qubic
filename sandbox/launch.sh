@@ -82,8 +82,9 @@ success "Core dependencies installed"
 
 if [ -f "requirements-prod.txt" ]; then
     status "Installing production dependencies from requirements-prod.txt..."
-    pip install -r requirements-prod.txt -q
-    success "Production dependencies installed"
+    # Try to install, but continue if some packages fail due to version constraints
+    pip install -r requirements-prod.txt -q || warning "Some production dependencies could not be installed (may be due to Python version constraints)"
+    success "Production dependencies installation attempted"
 fi
 
 # Install Flask and Flask-CORS if not present (for platform server)
@@ -99,8 +100,6 @@ sys.path.insert(0, '.')
 
 from qradle.core.merkle import MerkleChain
 from qradle.core.engine import DeterministicEngine
-from qradle.core.invariants import FatalInvariants
-import json
 import time
 
 # Create genesis block
@@ -116,9 +115,9 @@ chain = MerkleChain(genesis_data={
 engine = DeterministicEngine()
 
 # Verify initialization
-if len(chain.events) >= 1:
+if len(chain.nodes) >= 1:
     print(f"✓ QRADLE genesis block created")
-    print(f"  Genesis hash: {chain.root_hash[:16]}...")
+    print(f"  Genesis hash: {chain.get_root_hash()[:16]}...")
     print(f"  Deterministic engine initialized")
 else:
     print("✗ Failed to initialize QRADLE")
@@ -148,7 +147,6 @@ from flask_cors import CORS
 import time
 from qradle.core.merkle import MerkleChain
 from qradle.core.engine import DeterministicEngine
-from qradle.core.invariants import FatalInvariants
 
 app = Flask(__name__)
 CORS(app)
@@ -177,9 +175,9 @@ def health():
 def chain_status():
     """Get Merkle chain status"""
     return jsonify({
-        "chain_length": len(chain.events),
-        "root_hash": chain.root_hash,
-        "genesis_hash": chain.events[0]["hash"] if chain.events else None
+        "chain_length": len(chain.nodes),
+        "root_hash": chain.get_root_hash(),
+        "genesis_hash": chain.nodes[0].node_hash if chain.nodes else None
     })
 
 @app.route('/api/engine/status')
@@ -209,7 +207,7 @@ if __name__ == '__main__':
     print("=" * 70)
     print()
     print("Merkle Chain Genesis Block Initialized")
-    print(f"Root Hash: {chain.root_hash[:32]}...")
+    print(f"Root Hash: {chain.get_root_hash()[:32]}...")
     print()
     print("Starting QRADLE on http://0.0.0.0:8001")
     print("=" * 70)
