@@ -1,6 +1,7 @@
 build/
 install/
 .venv/
+venv-sandbox/
 obj_dir/
 __pycache__/
 *.pyc

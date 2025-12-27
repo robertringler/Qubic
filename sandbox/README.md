@@ -237,10 +237,14 @@ docker-compose -f sandbox/docker-compose.sandbox.yml ps
 ## 🛑 Stopping Services
 
 ### Local Python
-Press `Ctrl+C` in the terminal where `launch.sh` is running, or:
+Press `Ctrl+C` in the terminal where `launch.sh` is running, or use the stop script:
 
 ```bash
-# Find and kill processes
+./sandbox/stop.sh
+```
+
+Alternatively, find and kill processes manually:
+```bash
 pkill -f qradle_server
 pkill -f qratum_platform
 ```
