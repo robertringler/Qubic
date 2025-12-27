@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
@@ -249,8 +250,6 @@ class ReinjectionEngine:
         Returns:
             ReinjectionCycleResult with full cycle outcome
         """
-        import time
-
         start_time = time.perf_counter()
         self._cycle_counter += 1
         cycle_id = f"cycle_{candidate.candidate_id}_{self._cycle_counter:04d}"

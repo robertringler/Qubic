@@ -298,7 +298,7 @@ class ReinjectionValidator:
 
         elif domain == DiscoveryDomain.LONGEVITY:
             # Longevity research has enhanced safety requirements
-            if candidate.validation_level.value not in ("enhanced", "critical"):
+            if candidate.validation_level not in (ValidationLevel.ENHANCED, ValidationLevel.CRITICAL):
                 errors.append("Longevity research requires enhanced or critical validation")
 
         return len(errors) == 0, errors

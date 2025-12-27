@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
@@ -171,8 +172,6 @@ class SandboxOrchestrator:
         Returns:
             SandboxResult with test outcomes
         """
-        import time
-
         start_time = time.perf_counter()
 
         # Create sandbox
@@ -308,8 +307,6 @@ class SandboxOrchestrator:
 
     def _test_rollback(self, sandbox: SandboxState) -> RollbackTest:
         """Test rollback capability in sandbox."""
-        import time
-
         test_id = f"rb_test_{sandbox.sandbox_id}"
         start_time = time.perf_counter()
         errors: list[str] = []

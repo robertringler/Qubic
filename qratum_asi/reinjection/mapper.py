@@ -262,10 +262,10 @@ class DiscoveryPriorMapper:
         payload = candidate.data_payload
 
         for prior_type in prior_types:
-            # Check if this prior is in target_priors
-            matching_targets = [
-                t for t in candidate.target_priors if prior_type in t.lower()
-            ]
+            # Check if this prior is in target_priors (used for prioritization)
+            has_matching_target = any(
+                prior_type in t.lower() for t in candidate.target_priors
+            )
 
             # Get or initialize current prior value
             prior_id = f"{candidate.domain.value}_{prior_type}"
@@ -295,8 +295,8 @@ class DiscoveryPriorMapper:
                 domain=candidate.domain,
             )
 
-            # Only add if there's meaningful change
-            if update.relative_change > 0.001 or matching_targets:
+            # Only add if there's meaningful change or matches target priors
+            if update.relative_change > 0.001 or has_matching_target:
                 updates.append(update)
 
         return updates
