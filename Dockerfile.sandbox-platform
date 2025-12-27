@@ -1,0 +1,31 @@
+# QRATUM Platform Sandbox Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt requirements-prod.txt ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r requirements-prod.txt && \
+    pip install --no-cache-dir flask flask-cors
+
+# Copy application files
+COPY qratum_platform.py ./
+COPY qradle ./qradle
+COPY quasim ./quasim
+COPY qratum ./qratum
+
+# Modify qratum_platform.py to use PORT env variable and update port in main
+RUN sed -i 's/port=9000/port=int(os.getenv("PORT", "8002"))/g' qratum_platform.py && \
+    sed -i '1 i\import os' qratum_platform.py
+
+EXPOSE 8002
+
+CMD ["python3", "qratum_platform.py"]
