@@ -171,115 +171,95 @@ const QratumDCGE = (function() {
     }
 
     /**
+     * Language-specific code templates for demo generation
+     */
+    const CODE_TEMPLATES = {
+        rust: {
+            header: (purpose, timestamp) => `// DCGE Generated Code\n// Purpose: ${purpose}\n// Generated: ${timestamp}\n\n`,
+            function: (name, purpose) => `/// ${purpose}\nfn ${name}() -> Result<(), Box<dyn std::error::Error>> {\n    // Implementation\n    Ok(())\n}\n`,
+            struct: (name, purpose) => `/// ${purpose}\n#[derive(Debug, Clone)]\npub struct ${name} {\n    // Fields\n}\n\nimpl ${name} {\n    pub fn new() -> Self {\n        Self {}\n    }\n}\n`,
+            module: (name, purpose) => `//! ${purpose}\n\npub mod ${name} {\n    pub fn init() {\n        // Initialization\n    }\n}\n`,
+            fileio: (name, purpose) => `use std::fs;\nuse std::io::Result;\n\n/// ${purpose}\nfn ${name}(path: &str) -> Result<String> {\n    fs::read_to_string(path)\n}\n`,
+            threading: (name, purpose) => `use std::thread;\n\n/// ${purpose}\nfn ${name}() -> thread::JoinHandle<()> {\n    thread::spawn(|| {\n        // Thread work\n    })\n}\n`
+        },
+        python: {
+            header: (purpose, timestamp) => `# DCGE Generated Code\n# Purpose: ${purpose}\n# Generated: ${timestamp}\n\n`,
+            function: (name, purpose) => `def ${name}():\n    """${purpose}"""\n    pass\n`,
+            struct: (name, purpose) => `class ${name}:\n    """${purpose}"""\n    \n    def __init__(self):\n        pass\n`,
+            module: (name, purpose) => `"""${purpose}"""\n\ndef init():\n    pass\n`,
+            fileio: (name, purpose) => `def ${name}(path: str) -> str:\n    """${purpose}"""\n    with open(path, 'r') as f:\n        return f.read()\n`,
+            threading: (name, purpose) => `import threading\n\ndef ${name}():\n    """${purpose}"""\n    thread = threading.Thread(target=lambda: None)\n    thread.start()\n    return thread\n`
+        },
+        javascript: {
+            header: (purpose, timestamp) => `// DCGE Generated Code\n// Purpose: ${purpose}\n// Generated: ${timestamp}\n\n`,
+            function: (name, purpose) => `/**\n * ${purpose}\n */\nfunction ${name}() {\n  // Implementation\n}\n`,
+            struct: (name, purpose) => `/**\n * ${purpose}\n */\nclass ${name} {\n  constructor() {\n    // Initialize\n  }\n}\n`,
+            module: (name, purpose) => `/**\n * ${purpose}\n */\nexport const ${name} = {\n  init() {\n    // Initialization\n  }\n};\n`,
+            fileio: (name, purpose) => `const fs = require('fs');\n\n/**\n * ${purpose}\n */\nfunction ${name}(path) {\n  return fs.readFileSync(path, 'utf8');\n}\n`,
+            threading: (name, purpose) => `const { Worker } = require('worker_threads');\n\n/**\n * ${purpose}\n */\nfunction ${name}() {\n  return new Worker('./worker.js');\n}\n`
+        },
+        c: {
+            header: (purpose, timestamp) => `/* DCGE Generated Code */\n/* Purpose: ${purpose} */\n/* Generated: ${timestamp} */\n\n`,
+            function: (name, purpose) => `#include <stdio.h>\n\n/* ${purpose} */\nint ${name}(void) {\n    return 0;\n}\n`,
+            struct: (name, purpose) => `/* ${purpose} */\ntypedef struct {\n    int field;\n} ${name};\n\n${name} ${name}_new(void) {\n    ${name} s = {0};\n    return s;\n}\n`,
+            module: (name, purpose) => `#ifndef ${name.toUpperCase()}_H\n#define ${name.toUpperCase()}_H\n\n/* ${purpose} */\nvoid ${name}_init(void);\n\n#endif\n`,
+            fileio: (name, purpose) => `#include <stdio.h>\n#include <stdlib.h>\n\n/* ${purpose} */\nchar* ${name}(const char* path) {\n    FILE* f = fopen(path, "r");\n    if (!f) return NULL;\n    // Read implementation\n    fclose(f);\n    return NULL;\n}\n`,
+            threading: (name, purpose) => `#include <pthread.h>\n\n/* ${purpose} */\npthread_t ${name}(void* (*func)(void*)) {\n    pthread_t thread;\n    pthread_create(&thread, NULL, func, NULL);\n    return thread;\n}\n`
+        }
+    };
+
+    /**
+     * Generate demo code for any supported language
+     * @param {string} language - The target language (rust, python, javascript, c)
+     * @param {string} type - The code type (function, struct, module, fileio, threading)
+     * @param {string} name - The name of the generated element
+     * @param {string} purpose - Description of the code's purpose
+     * @returns {string} Generated code
+     */
+    function generateDemoCode(language, type, name, purpose) {
+        const timestamp = new Date().toISOString();
+        const templates = CODE_TEMPLATES[language];
+        
+        if (!templates) {
+            return `// Unsupported language: ${language}\n`;
+        }
+        
+        const header = templates.header(purpose, timestamp);
+        const bodyFn = templates[type];
+        
+        if (!bodyFn) {
+            return header + `// Unsupported type: ${type}\n`;
+        }
+        
+        return header + bodyFn(name, purpose);
+    }
+
+    /**
      * Generate Rust demo code
      */
     function generateRustDemo(type, name, purpose) {
-        const timestamp = new Date().toISOString();
-        let code = `// DCGE Generated Code\n// Purpose: ${purpose}\n// Generated: ${timestamp}\n\n`;
-        
-        switch (type) {
-            case 'function':
-                code += `/// ${purpose}\nfn ${name}() -> Result<(), Box<dyn std::error::Error>> {\n    // Implementation\n    Ok(())\n}\n`;
-                break;
-            case 'struct':
-                code += `/// ${purpose}\n#[derive(Debug, Clone)]\npub struct ${name} {\n    // Fields\n}\n\nimpl ${name} {\n    pub fn new() -> Self {\n        Self {}\n    }\n}\n`;
-                break;
-            case 'module':
-                code += `//! ${purpose}\n\npub mod ${name} {\n    pub fn init() {\n        // Initialization\n    }\n}\n`;
-                break;
-            case 'fileio':
-                code += `use std::fs;\nuse std::io::Result;\n\n/// ${purpose}\nfn ${name}(path: &str) -> Result<String> {\n    fs::read_to_string(path)\n}\n`;
-                break;
-            case 'threading':
-                code += `use std::thread;\n\n/// ${purpose}\nfn ${name}() -> thread::JoinHandle<()> {\n    thread::spawn(|| {\n        // Thread work\n    })\n}\n`;
-                break;
-        }
-        
-        return code;
+        return generateDemoCode('rust', type, name, purpose);
     }
 
     /**
      * Generate Python demo code
      */
     function generatePythonDemo(type, name, purpose) {
-        const timestamp = new Date().toISOString();
-        let code = `# DCGE Generated Code\n# Purpose: ${purpose}\n# Generated: ${timestamp}\n\n`;
-        
-        switch (type) {
-            case 'function':
-                code += `def ${name}():\n    """${purpose}"""\n    pass\n`;
-                break;
-            case 'struct':
-                code += `class ${name}:\n    """${purpose}"""\n    \n    def __init__(self):\n        pass\n`;
-                break;
-            case 'module':
-                code += `"""${purpose}"""\n\ndef init():\n    pass\n`;
-                break;
-            case 'fileio':
-                code += `def ${name}(path: str) -> str:\n    """${purpose}"""\n    with open(path, 'r') as f:\n        return f.read()\n`;
-                break;
-            case 'threading':
-                code += `import threading\n\ndef ${name}():\n    """${purpose}"""\n    thread = threading.Thread(target=lambda: None)\n    thread.start()\n    return thread\n`;
-                break;
-        }
-        
-        return code;
+        return generateDemoCode('python', type, name, purpose);
     }
 
     /**
      * Generate JavaScript demo code
      */
     function generateJSDemo(type, name, purpose) {
-        const timestamp = new Date().toISOString();
-        let code = `// DCGE Generated Code\n// Purpose: ${purpose}\n// Generated: ${timestamp}\n\n`;
-        
-        switch (type) {
-            case 'function':
-                code += `/**\n * ${purpose}\n */\nfunction ${name}() {\n  // Implementation\n}\n`;
-                break;
-            case 'struct':
-                code += `/**\n * ${purpose}\n */\nclass ${name} {\n  constructor() {\n    // Initialize\n  }\n}\n`;
-                break;
-            case 'module':
-                code += `/**\n * ${purpose}\n */\nexport const ${name} = {\n  init() {\n    // Initialization\n  }\n};\n`;
-                break;
-            case 'fileio':
-                code += `const fs = require('fs');\n\n/**\n * ${purpose}\n */\nfunction ${name}(path) {\n  return fs.readFileSync(path, 'utf8');\n}\n`;
-                break;
-            case 'threading':
-                code += `const { Worker } = require('worker_threads');\n\n/**\n * ${purpose}\n */\nfunction ${name}() {\n  return new Worker('./worker.js');\n}\n`;
-                break;
-        }
-        
-        return code;
+        return generateDemoCode('javascript', type, name, purpose);
     }
 
     /**
      * Generate C demo code
      */
     function generateCDemo(type, name, purpose) {
-        const timestamp = new Date().toISOString();
-        let code = `/* DCGE Generated Code */\n/* Purpose: ${purpose} */\n/* Generated: ${timestamp} */\n\n`;
-        
-        switch (type) {
-            case 'function':
-                code += `#include <stdio.h>\n\n/* ${purpose} */\nint ${name}(void) {\n    return 0;\n}\n`;
-                break;
-            case 'struct':
-                code += `/* ${purpose} */\ntypedef struct {\n    int field;\n} ${name};\n\n${name} ${name}_new(void) {\n    ${name} s = {0};\n    return s;\n}\n`;
-                break;
-            case 'module':
-                code += `#ifndef ${name.toUpperCase()}_H\n#define ${name.toUpperCase()}_H\n\n/* ${purpose} */\nvoid ${name}_init(void);\n\n#endif\n`;
-                break;
-            case 'fileio':
-                code += `#include <stdio.h>\n#include <stdlib.h>\n\n/* ${purpose} */\nchar* ${name}(const char* path) {\n    FILE* f = fopen(path, "r");\n    if (!f) return NULL;\n    // Read implementation\n    fclose(f);\n    return NULL;\n}\n`;
-                break;
-            case 'threading':
-                code += `#include <pthread.h>\n\n/* ${purpose} */\npthread_t ${name}(void* (*func)(void*)) {\n    pthread_t thread;\n    pthread_create(&thread, NULL, func, NULL);\n    return thread;\n}\n`;
-                break;
-        }
-        
-        return code;
+        return generateDemoCode('c', type, name, purpose);
     }
 
     /**
