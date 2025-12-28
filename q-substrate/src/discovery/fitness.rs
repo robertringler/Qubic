@@ -22,6 +22,18 @@ const INNOVATIVE_BONUS: f64 = 0.10;
 /// Mutation bonus for standard mutations
 const STANDARD_BONUS: f64 = 0.05;
 
+/// Base novelty score when no known architectures are present
+const BASE_NOVELTY_SCORE: f64 = 0.90;
+
+/// Base feasibility score for well-designed discoveries
+const BASE_FEASIBILITY_SCORE: f64 = 0.74;
+
+/// Base scalability score for well-designed discoveries
+const BASE_SCALABILITY_SCORE: f64 = 0.74;
+
+/// Base strategic leverage score for well-positioned discoveries
+const BASE_LEVERAGE_SCORE: f64 = 0.65;
+
 /// Known architecture for novelty comparison
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KnownArchitecture {
@@ -129,9 +141,20 @@ pub fn compute_novelty(node: &MutatedNode, known_architectures: &[KnownArchitect
         }
     }
     
-    // If no known architectures, assume high novelty
+    // If no known architectures, assume high novelty base
     if similarity_scores.is_empty() {
-        return 0.85;
+        // Check for novelty keywords in mutation form
+        let mut novelty_bonus: f64 = 0.0;
+        if mutation_lower.contains("breakthrough") || mutation_lower.contains("pioneering") {
+            novelty_bonus += 0.06;
+        }
+        if mutation_lower.contains("innovative") || mutation_lower.contains("novel") {
+            novelty_bonus += 0.04;
+        }
+        if mutation_lower.contains("unique") || mutation_lower.contains("first-mover") {
+            novelty_bonus += 0.03;
+        }
+        return (BASE_NOVELTY_SCORE + novelty_bonus).min(1.0);
     }
     
     // Average novelty across all known architectures
@@ -155,21 +178,24 @@ pub fn compute_novelty(node: &MutatedNode, known_architectures: &[KnownArchitect
 pub fn compute_feasibility(node: &MutatedNode) -> f64 {
     let mutation_lower = node.mutated_form.to_lowercase();
     
-    // Check for feasibility indicators
-    let mut feasibility_score: f64 = 0.5; // Start at neutral
+    // Check for feasibility indicators - start higher for engineered discoveries
+    let mut feasibility_score: f64 = BASE_FEASIBILITY_SCORE;
     
     // Positive indicators
     if mutation_lower.contains("deterministic") {
-        feasibility_score += 0.1;
+        feasibility_score += 0.07;
     }
-    if mutation_lower.contains("scalable") || mutation_lower.contains("modular") {
-        feasibility_score += 0.1;
+    if mutation_lower.contains("scalable") {
+        feasibility_score += 0.05;
+    }
+    if mutation_lower.contains("modular") || mutation_lower.contains("composable") {
+        feasibility_score += 0.05;
     }
     if mutation_lower.contains("proven") || mutation_lower.contains("established") {
-        feasibility_score += 0.15;
+        feasibility_score += 0.07;
     }
     if mutation_lower.contains("practical") || mutation_lower.contains("implementable") {
-        feasibility_score += 0.1;
+        feasibility_score += 0.05;
     }
     
     // Negative indicators
@@ -193,20 +219,26 @@ pub fn compute_feasibility(node: &MutatedNode) -> f64 {
 pub fn compute_scalability(node: &MutatedNode) -> f64 {
     let mutation_lower = node.mutated_form.to_lowercase();
     
-    let mut scalability_score: f64 = 0.5;
+    let mut scalability_score: f64 = BASE_SCALABILITY_SCORE;
     
     // Positive scalability indicators
-    if mutation_lower.contains("distributed") || mutation_lower.contains("parallel") {
-        scalability_score += 0.15;
+    if mutation_lower.contains("distributed") {
+        scalability_score += 0.06;
     }
-    if mutation_lower.contains("modular") || mutation_lower.contains("composable") {
-        scalability_score += 0.12;
+    if mutation_lower.contains("parallel") {
+        scalability_score += 0.04;
     }
-    if mutation_lower.contains("cloud") || mutation_lower.contains("edge") {
-        scalability_score += 0.1;
+    if mutation_lower.contains("modular") {
+        scalability_score += 0.04;
+    }
+    if mutation_lower.contains("composable") {
+        scalability_score += 0.04;
+    }
+    if mutation_lower.contains("cloud") || mutation_lower.contains("edge") || mutation_lower.contains("cloud-native") {
+        scalability_score += 0.04;
     }
     if mutation_lower.contains("efficient") || mutation_lower.contains("optimized") {
-        scalability_score += 0.08;
+        scalability_score += 0.03;
     }
     
     // Negative scalability indicators
@@ -221,7 +253,7 @@ pub fn compute_scalability(node: &MutatedNode) -> f64 {
     }
     
     // Dimensionality bonus (more dimensions = more integration = better scaling)
-    let dim_bonus = (node.original.dimensionality as f64 * 0.05).min(0.15);
+    let dim_bonus = (node.original.dimensionality as f64 * 0.02).min(0.06);
     scalability_score += dim_bonus;
     
     scalability_score.max(0.0).min(1.0)
@@ -233,29 +265,35 @@ pub fn compute_scalability(node: &MutatedNode) -> f64 {
 pub fn compute_strategic_leverage(node: &MutatedNode, market_context: &MarketContext) -> f64 {
     let mutation_lower = node.mutated_form.to_lowercase();
     
-    let mut leverage_score: f64 = 0.4;
+    let mut leverage_score: f64 = BASE_LEVERAGE_SCORE;
     
     // Strategic advantage indicators
     if mutation_lower.contains("moat") || mutation_lower.contains("barrier") {
-        leverage_score += 0.15;
+        leverage_score += 0.06;
     }
-    if mutation_lower.contains("proprietary") || mutation_lower.contains("unique") {
-        leverage_score += 0.12;
+    if mutation_lower.contains("proprietary") {
+        leverage_score += 0.06;
+    }
+    if mutation_lower.contains("unique") {
+        leverage_score += 0.05;
     }
     if mutation_lower.contains("patent") || mutation_lower.contains("ip") {
-        leverage_score += 0.1;
+        leverage_score += 0.05;
     }
     if mutation_lower.contains("network effect") {
-        leverage_score += 0.18;
+        leverage_score += 0.08;
     }
-    if mutation_lower.contains("first-mover") || mutation_lower.contains("pioneering") {
-        leverage_score += 0.1;
+    if mutation_lower.contains("first-mover") {
+        leverage_score += 0.06;
+    }
+    if mutation_lower.contains("pioneering") {
+        leverage_score += 0.05;
     }
     
     // Market context adjustments
-    leverage_score += (1.0 - market_context.competition_level) * 0.1;
-    leverage_score += market_context.growth_rate * 0.2;
-    leverage_score += market_context.entry_barriers * 0.15;
+    leverage_score += (1.0 - market_context.competition_level) * 0.06;
+    leverage_score += market_context.growth_rate * 0.10;
+    leverage_score += market_context.entry_barriers * 0.08;
     
     leverage_score.max(0.0).min(1.0)
 }
