@@ -1,9 +1,11 @@
-use crate::backend::{health, kernel, LogEntry, HealthResponse};
-use crate::codegen::{CodeGenerator, ast::IntentSpec};
-use crate::qr_os_supreme::{OSSupreme, OSSupremeStats, QubitStateInfo, GateOperation, WasmPodConfig, IntentClassification};
+use crate::backend::{health, kernel, HealthResponse, LogEntry};
+use crate::codegen::{ast::IntentSpec, CodeGenerator};
+use crate::qr_os_supreme::{
+    GateOperation, IntentClassification, OSSupreme, OSSupremeStats, QubitStateInfo, WasmPodConfig,
+};
 use crate::AppState;
+use serde::{Deserialize, Serialize};
 use tauri::State;
-use serde::{Serialize, Deserialize};
 
 #[tauri::command]
 pub async fn get_health() -> Result<HealthResponse, String> {
@@ -11,7 +13,9 @@ pub async fn get_health() -> Result<HealthResponse, String> {
 }
 
 #[tauri::command]
-pub async fn execute_kernel(request: kernel::KernelRequest) -> Result<kernel::KernelResponse, String> {
+pub async fn execute_kernel(
+    request: kernel::KernelRequest,
+) -> Result<kernel::KernelResponse, String> {
     kernel::execute_kernel(request).await
 }
 
@@ -26,24 +30,27 @@ pub fn get_logs(state: State<AppState>, limit: Option<usize>) -> Vec<LogEntry> {
 pub async fn generate_code(intent: IntentSpec) -> Result<String, String> {
     let generator = CodeGenerator::new(intent.language.clone());
     let result = generator.generate(intent)?;
-    
+
     if !result.validation.success {
-        return Err(format!("Code generation failed: {:?}", result.validation.errors));
+        return Err(format!(
+            "Code generation failed: {:?}",
+            result.validation.errors
+        ));
     }
-    
+
     Ok(result.source)
 }
 
 #[tauri::command]
 pub async fn validate_code(language: String, source: String) -> Result<bool, String> {
-    use crate::codegen::validator::CompilerValidator;
     use crate::codegen::ast::AstNode;
     use crate::codegen::ir::TypedIR;
-    
+    use crate::codegen::validator::CompilerValidator;
+
     let validator = CompilerValidator::new(language);
     let ast = AstNode::Block { statements: vec![] }; // Placeholder
     let ir = TypedIR::new();
-    
+
     let result = validator.validate(&source, &ast, &ir);
     Ok(result.success)
 }
@@ -95,7 +102,7 @@ pub async fn get_os_supreme_stats() -> Result<OSSupremeStats, String> {
 #[tauri::command]
 pub async fn get_quantum_state() -> Result<Vec<QubitStateInfo>, String> {
     let mut os = OSSupreme::new();
-    os.run_bell_state();  // Initialize with a Bell state for visualization
+    os.run_bell_state(); // Initialize with a Bell state for visualization
     Ok(os.get_quantum_state())
 }
 
@@ -110,7 +117,7 @@ pub struct GHZResult {
 pub async fn run_ghz_state() -> Result<GHZResult, String> {
     let mut os = OSSupreme::new();
     let probs = os.run_ghz_state();
-    Ok(GHZResult { 
+    Ok(GHZResult {
         p000: probs[0],
         p111: probs[1],
     })
@@ -134,7 +141,7 @@ pub struct GateResponse {
 #[tauri::command]
 pub async fn apply_quantum_gate(request: GateRequest) -> Result<GateResponse, String> {
     let mut os = OSSupreme::new();
-    
+
     match request.gate.as_str() {
         "H" => os.apply_hadamard(request.qubits[0]),
         "X" => os.apply_pauli_x(request.qubits[0]),
@@ -151,7 +158,7 @@ pub async fn apply_quantum_gate(request: GateRequest) -> Result<GateResponse, St
         "RZ" => os.apply_rz(request.qubits[0], request.theta.unwrap_or(0.0)),
         _ => return Err(format!("Unknown gate: {}", request.gate)),
     }
-    
+
     Ok(GateResponse {
         success: true,
         state: os.get_quantum_state(),
@@ -196,21 +203,21 @@ pub async fn run_dcge_benchmark(intent: IntentSpec) -> Result<DCGEBenchmarkResul
     let start = std::time::Instant::now();
     let generator = CodeGenerator::new(intent.language.clone());
     let result = generator.generate(intent)?;
-    
+
     // Calculate metrics
     let footprint = result.source.len();
     let generation_time = start.elapsed().as_millis() as u64;
-    
+
     // Simulated benchmark comparisons (deterministic)
     let correctness = if result.validation.success { 0.99 } else { 0.0 };
-    
+
     Ok(DCGEBenchmarkResult {
         correctness_score: correctness,
-        determinism_compliance: true,  // DCGE is always deterministic
+        determinism_compliance: true, // DCGE is always deterministic
         footprint_bytes: footprint,
         generation_time_ms: generation_time,
-        copilot_comparison: 0.95,  // DCGE vs Copilot relative score
-        cursor_comparison: 0.97,   // DCGE vs Cursor relative score
+        copilot_comparison: 0.95, // DCGE vs Copilot relative score
+        cursor_comparison: 0.97,  // DCGE vs Cursor relative score
     })
 }
 
@@ -226,14 +233,15 @@ pub struct BinaryMetrics {
 
 #[tauri::command]
 pub async fn get_binary_metrics() -> Result<BinaryMetrics, String> {
-    use crate::qr_os_supreme::{TEXT_SIZE_TARGET, STACK_SIZE_TARGET, QUANTUM_STATE_BYTES};
-    
+    use crate::qr_os_supreme::{QUANTUM_STATE_BYTES, STACK_SIZE_TARGET, TEXT_SIZE_TARGET};
+
     Ok(BinaryMetrics {
         text_bytes: TEXT_SIZE_TARGET,
         stack_bytes: STACK_SIZE_TARGET,
-        heap_bytes: 0,  // No heap allocation in quantum pod
+        heap_bytes: 0, // No heap allocation in quantum pod
         regression_delta: "PASS".to_string(),
-        total_footprint_mb: (TEXT_SIZE_TARGET + STACK_SIZE_TARGET + QUANTUM_STATE_BYTES) as f32 / (1024.0 * 1024.0),
+        total_footprint_mb: (TEXT_SIZE_TARGET + STACK_SIZE_TARGET + QUANTUM_STATE_BYTES) as f32
+            / (1024.0 * 1024.0),
     })
 }
 

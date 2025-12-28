@@ -1,13 +1,13 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{CustomMenuItem, SystemTray, SystemTrayMenu, Manager};
 use std::sync::{Arc, Mutex};
+use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayMenu};
 
 mod backend;
-mod commands;
-mod tray;
 mod codegen;
+mod commands;
 mod qr_os_supreme;
+mod tray;
 
 // Lightweight in-memory database (no SQLite)
 #[derive(Default)]
@@ -22,9 +22,9 @@ fn main() {
         .add_item(CustomMenuItem::new("hide".to_string(), "Hide"))
         .add_native_item(tauri::SystemTrayMenuItem::Separator)
         .add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
-    
+
     let tray = SystemTray::new().with_menu(tray_menu);
-    
+
     let app = tauri::Builder::<tauri::Wry>::default()
         .manage(AppState::default())
         .system_tray(tray)
@@ -57,7 +57,7 @@ fn main() {
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
-    
+
     app.run(|_app_handle, event| match event {
         tauri::RunEvent::ExitRequested { api, .. } => {
             api.prevent_exit();
