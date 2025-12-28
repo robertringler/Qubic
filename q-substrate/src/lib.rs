@@ -26,6 +26,7 @@ pub mod dcge;
 pub mod wasm_pod;
 pub mod config;
 pub mod audit;
+pub mod discovery;
 
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -38,6 +39,7 @@ pub use dcge::{DCGEngine, GeneratedCode, SupremacyMetrics};
 pub use wasm_pod::{WasmPod, PodConfig, PodIsolation};
 pub use config::{QSubstrateConfig, MemoryConfig, RuntimeMode};
 pub use audit::{AuditLog, AuditEntry, ProvenanceRecord};
+pub use discovery::{Discovery, DiscoveryEngine, DiscoveryError, DiscoveryLattice};
 
 /// Q-Substrate version string
 pub const VERSION: &str = "1.0.0";

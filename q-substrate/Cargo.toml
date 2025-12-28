@@ -17,6 +17,10 @@ path = "src/lib.rs"
 name = "q-substrate"
 path = "src/main.rs"
 
+[[bin]]
+name = "qratum-discover"
+path = "src/bin/qratum-discover.rs"
+
 # Supremacy Build Profile: Target sub-500KB compressed binary
 [profile.release]
 opt-level = "z"          # Optimize for size (smallest binary)
