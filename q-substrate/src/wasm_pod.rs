@@ -11,6 +11,7 @@
 
 extern crate alloc;
 
+use alloc::collections::VecDeque;
 use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -241,8 +242,8 @@ pub struct PodIsolation {
     dcge_pod: WasmPod,
     /// Provenance log
     provenance_log: Vec<ProvenanceEntry>,
-    /// Message queue
-    message_queue: Vec<PodMessage>,
+    /// Message queue (VecDeque for O(1) pop_front)
+    message_queue: VecDeque<PodMessage>,
     /// Global timestamp
     global_timestamp: u64,
 }
@@ -279,7 +280,7 @@ impl PodIsolation {
                 provenance_logging: true,
             }),
             provenance_log: Vec::new(),
-            message_queue: Vec::new(),
+            message_queue: VecDeque::new(),
             global_timestamp: 0,
         }
     }
@@ -330,16 +331,13 @@ impl PodIsolation {
             });
         }
         
-        self.message_queue.push(msg);
+        self.message_queue.push_back(msg);
         Ok(())
     }
 
-    /// Process next message in queue
+    /// Process next message in queue (O(1) using VecDeque)
     pub fn process_message(&mut self) -> Option<PodMessage> {
-        if self.message_queue.is_empty() {
-            return None;
-        }
-        Some(self.message_queue.remove(0))
+        self.message_queue.pop_front()
     }
 
     /// Get all pod statuses

@@ -548,6 +548,9 @@ impl MiniQuASIM {
             })
             .collect();
         
+        // Sort by probability descending. NaN values from invalid amplitudes
+        // are treated as Equal to maintain determinism and avoid panics.
+        // In valid quantum states, probabilities are always finite.
         states.sort_by(|a, b| b.probability.partial_cmp(&a.probability).unwrap_or(core::cmp::Ordering::Equal));
         states
     }
