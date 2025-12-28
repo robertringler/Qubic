@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -207,8 +208,6 @@ class MerkleVerifiedChannel:
         Returns:
             VerificationResult indicating validity
         """
-        import time
-
         start_time = time.perf_counter()
 
         with self._lock:

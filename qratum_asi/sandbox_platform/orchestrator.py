@@ -503,7 +503,7 @@ class SandboxPlatformOrchestrator:
                 return {
                     "evaluated": True,
                     "proposal_id": prop.proposal_id,
-                    "payload_keys": list(prop.payload.keys()),
+                    "payload_key_count": len(prop.payload.keys()),
                 }
 
             result = self.isolated_executor.execute(

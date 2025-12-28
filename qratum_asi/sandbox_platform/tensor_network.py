@@ -11,7 +11,7 @@ import json
 import threading
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Callable
 
@@ -235,8 +235,6 @@ class TensorNetworkPrecomputer:
                 cache_id = f"tcache_{self.precomputer_id}_{self._cache_counter:08d}"
 
                 # Calculate expiration
-                from datetime import timedelta
-
                 expires_at = (
                     datetime.now(timezone.utc) + timedelta(seconds=self.cache_ttl_seconds)
                 ).isoformat()

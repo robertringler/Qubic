@@ -145,6 +145,17 @@ class LazyEvaluator:
             "audit",
         }
 
+        # Sensitive data keys that indicate critical evaluation needed
+        self._sensitive_data_keys: set[str] = {
+            "credentials",
+            "secrets",
+            "patient_data",
+            "phi",
+            "pii",
+            "ssn",
+            "api_key",
+        }
+
         # Assessment cache
         self._assessments: dict[str, CriticalityAssessment] = {}
         self._assessment_counter = 0
@@ -189,6 +200,22 @@ class LazyEvaluator:
             subsystem: Subsystem name to add
         """
         self._critical_subsystems.add(subsystem)
+
+    def set_sensitive_data_keys(self, keys: set[str]) -> None:
+        """Set the list of sensitive data keys.
+
+        Args:
+            keys: Set of key names that indicate sensitive data
+        """
+        self._sensitive_data_keys = keys
+
+    def add_sensitive_data_key(self, key: str) -> None:
+        """Add a sensitive data key.
+
+        Args:
+            key: Key name to add
+        """
+        self._sensitive_data_keys.add(key)
 
     def set_custom_assessor(
         self,
@@ -242,7 +269,7 @@ class LazyEvaluator:
         # Factor: Has sensitive data
         has_sensitive = any(
             k in proposal.payload
-            for k in ["credentials", "secrets", "patient_data", "phi"]
+            for k in self._sensitive_data_keys
         )
         factors["sensitive"] = 1.0 if has_sensitive else 0.0
 
