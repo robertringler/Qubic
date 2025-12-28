@@ -90,7 +90,7 @@ const QratumDCGE = (function() {
         // Build intent spec
         const intentSpec = {
             language: language,
-            intent_type: buildIntentType(intentType, name, prompt),
+            intent_type: createIntentTypeVariant(intentType, name, prompt),
             constraints: [],
             docstring: prompt
         };
@@ -120,9 +120,13 @@ const QratumDCGE = (function() {
     }
 
     /**
-     * Build intent type object
+     * Create intent type variant structure suitable for Rust enum serialization
+     * @param {string} type - The intent type (function, struct, module, fileio, threading)
+     * @param {string} name - The name of the generated element
+     * @param {string} purpose - Description of the code's purpose
+     * @returns {Object} Variant structure matching Rust enum format
      */
-    function buildIntentType(type, name, purpose) {
+    function createIntentTypeVariant(type, name, purpose) {
         switch (type) {
             case 'function':
                 return { Function: { name, purpose } };
