@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 mod backend;
 mod commands;
 mod tray;
+mod codegen;
 
 // Lightweight in-memory database (no SQLite)
 #[derive(Default)]
@@ -31,6 +32,8 @@ fn main() {
             commands::get_health,
             commands::execute_kernel,
             commands::get_logs,
+            commands::generate_code,
+            commands::validate_code,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
