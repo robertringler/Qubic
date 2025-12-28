@@ -111,11 +111,10 @@ pub struct GateApplicationResult {
     pub message: String,
 }
 
-#[tauri::command]
-pub async fn apply_quantum_gate(gate_op: GateOperation) -> Result<GateApplicationResult, String> {
-    let mut os = OSSupreme::new();
-    
-    let success = match gate_op.gate_type.to_uppercase().as_str() {
+/// Helper function to apply a single gate to the quantum state
+/// Returns true if gate was successfully applied
+fn apply_gate_to_os(os: &mut OSSupreme, gate_op: &GateOperation) -> bool {
+    match gate_op.gate_type.to_uppercase().as_str() {
         "H" | "HADAMARD" => {
             gate_op.qubits.first().map(|&q| os.apply_hadamard(q)).unwrap_or(false)
         }
@@ -149,7 +148,17 @@ pub async fn apply_quantum_gate(gate_op: GateOperation) -> Result<GateApplicatio
             }
         }
         _ => false,
-    };
+    }
+}
+
+/// Apply a quantum gate to a fresh quantum state
+/// Note: Each call creates a new OSSupreme instance starting from |0⟩ state.
+/// For stateful operations, use run_quantum_circuit instead.
+#[tauri::command]
+pub async fn apply_quantum_gate(gate_op: GateOperation) -> Result<GateApplicationResult, String> {
+    let mut os = OSSupreme::new();
+    
+    let success = apply_gate_to_os(&mut os, &gate_op);
     
     let visualization = os.get_quantum_state_visualization();
     let message = if success {
@@ -171,49 +180,14 @@ pub struct QuantumCircuit {
     pub gates: Vec<GateOperation>,
 }
 
+/// Execute a quantum circuit - sequence of gates applied to the same quantum state
 #[tauri::command]
 pub async fn run_quantum_circuit(circuit: QuantumCircuit) -> Result<GateApplicationResult, String> {
     let mut os = OSSupreme::new();
     let mut all_success = true;
     
-    for gate_op in circuit.gates {
-        let success = match gate_op.gate_type.to_uppercase().as_str() {
-            "H" | "HADAMARD" => {
-                gate_op.qubits.first().map(|&q| os.apply_hadamard(q)).unwrap_or(false)
-            }
-            "X" | "PAULI_X" => {
-                gate_op.qubits.first().map(|&q| os.apply_pauli_x(q)).unwrap_or(false)
-            }
-            "Y" | "PAULI_Y" => {
-                gate_op.qubits.first().map(|&q| os.apply_pauli_y(q)).unwrap_or(false)
-            }
-            "Z" | "PAULI_Z" => {
-                gate_op.qubits.first().map(|&q| os.apply_pauli_z(q)).unwrap_or(false)
-            }
-            "S" | "PHASE" => {
-                gate_op.qubits.first().map(|&q| os.apply_phase_gate(q)).unwrap_or(false)
-            }
-            "T" => {
-                gate_op.qubits.first().map(|&q| os.apply_t_gate(q)).unwrap_or(false)
-            }
-            "CNOT" | "CX" => {
-                if gate_op.qubits.len() >= 2 {
-                    os.apply_cnot(gate_op.qubits[0], gate_op.qubits[1])
-                } else {
-                    false
-                }
-            }
-            "TOFFOLI" | "CCNOT" | "CCX" => {
-                if gate_op.qubits.len() >= 3 {
-                    os.apply_toffoli(gate_op.qubits[0], gate_op.qubits[1], gate_op.qubits[2])
-                } else {
-                    false
-                }
-            }
-            _ => false,
-        };
-        
-        if !success {
+    for gate_op in &circuit.gates {
+        if !apply_gate_to_os(&mut os, gate_op) {
             all_success = false;
         }
     }
