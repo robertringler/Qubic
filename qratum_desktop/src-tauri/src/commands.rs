@@ -190,32 +190,42 @@ pub struct QuantumCircuit {
 
 /// Execute a quantum circuit - sequence of gates applied to the same quantum state.
 ///
-/// Note: If any gate fails to apply (e.g., invalid qubit index), the circuit continues
-/// executing remaining gates but `success` will be `false`. The returned visualization
-/// shows the final state after all attempted operations, which may be an intermediate
-/// state if some gates failed. Consider validating gate parameters before submission.
+/// This function implements **rollback semantics**: if any gate fails to apply (e.g., 
+/// invalid qubit index), execution stops immediately and returns the state before
+/// the circuit was executed (fresh |0⟩ state). This ensures the returned visualization
+/// is always consistent - either the complete circuit succeeded, or nothing was applied.
+///
+/// For partial execution or to identify which gate failed, consider validating gate
+/// parameters individually using `apply_quantum_gate` before submitting a circuit.
 #[tauri::command]
 pub async fn run_quantum_circuit(circuit: QuantumCircuit) -> Result<GateApplicationResult, String> {
+    // Create a fresh quantum state
     let mut os = OSSupreme::new();
-    let mut all_success = true;
     
-    for gate_op in &circuit.gates {
+    // Track which gate we're on for error reporting
+    for (idx, gate_op) in circuit.gates.iter().enumerate() {
         if !apply_gate_to_os(&mut os, gate_op) {
-            all_success = false;
+            // Rollback: return a fresh state (equivalent to not executing anything)
+            let fresh_os = OSSupreme::new();
+            let visualization = fresh_os.get_quantum_state_visualization();
+            return Ok(GateApplicationResult {
+                success: false,
+                visualization,
+                message: format!(
+                    "Circuit execution failed at gate {} ({}). Rolled back to initial |0⟩ state.",
+                    idx + 1,
+                    gate_op.gate_type
+                ),
+            });
         }
     }
     
+    // All gates succeeded - return the final state
     let visualization = os.get_quantum_state_visualization();
-    let message = if all_success {
-        "Circuit executed successfully".to_string()
-    } else {
-        "Some gates failed to apply".to_string()
-    };
-    
     Ok(GateApplicationResult {
-        success: all_success,
+        success: true,
         visualization,
-        message,
+        message: format!("Circuit executed successfully ({} gates applied)", circuit.gates.len()),
     })
 }
 
