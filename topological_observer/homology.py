@@ -162,7 +162,10 @@ class PersistenceDiagram:
             if i.birth <= threshold < i.death
         )
         
-        # Ensure at least 1 connected component if we have data
+        # Topological convention: if we have data (intervals), there must be at least
+        # one connected component (β₀ ≥ 1). This prevents degenerate cases where
+        # the threshold computation yields 0 for all dimensions.
+        # Mathematical justification: Any non-empty simplicial complex has H_0 ≠ 0.
         if beta_0 == 0 and len(self.intervals) > 0:
             beta_0 = 1
         
@@ -448,8 +451,14 @@ class PersistentHomologyObserver:
             cycle_count = self._estimate_cycles(distances, edges)
             for i in range(cycle_count):
                 # Heuristic birth/death based on edge distribution
-                birth = edges[min(len(edges) // 3, len(edges) - 1)][0] if edges else 0.0
-                death = edges[min(2 * len(edges) // 3, len(edges) - 1)][0] if edges else float("inf")
+                if len(edges) > 0:
+                    birth_idx = min(len(edges) // 3, len(edges) - 1)
+                    death_idx = min(2 * len(edges) // 3, len(edges) - 1)
+                    birth = edges[birth_idx][0]
+                    death = edges[death_idx][0]
+                else:
+                    birth = 0.0
+                    death = float("inf")
                 intervals.append(PersistenceInterval(
                     birth=birth,
                     death=death,
@@ -460,7 +469,11 @@ class PersistentHomologyObserver:
         if self.max_dimension >= 2 and n_points >= 4:
             void_count = self._estimate_voids(n_points)
             for i in range(void_count):
-                birth = edges[min(len(edges) // 2, len(edges) - 1)][0] if edges else 0.0
+                if len(edges) > 0:
+                    birth_idx = min(len(edges) // 2, len(edges) - 1)
+                    birth = edges[birth_idx][0]
+                else:
+                    birth = 0.0
                 intervals.append(PersistenceInterval(
                     birth=birth,
                     death=float("inf"),
@@ -470,26 +483,41 @@ class PersistentHomologyObserver:
         return intervals
     
     def _estimate_cycles(self, distances: np.ndarray, edges: list) -> int:
-        """Estimate number of 1-cycles (simplified heuristic)."""
+        """Estimate number of 1-cycles (simplified heuristic).
+        
+        Uses Euler characteristic heuristic: χ = V - E + F - ...
+        For a connected graph, excess edges beyond spanning tree create cycles.
+        
+        Heuristic constants:
+        - Divisor 3: Conservative estimate assuming ~3 edges per cycle on average
+        - Divisor 4: Upper bound to prevent over-estimation (at most n/4 cycles)
+        
+        These values balance detection sensitivity with false positive rate.
+        In production, use proper matrix reduction (ripser/gudhi) for exact results.
+        """
         n = len(distances)
         if n < 3:
             return 0
         
-        # Euler characteristic heuristic
-        # For a simplicial complex: χ = V - E + F - ...
         # Estimate cycles from edge density
         edge_count = len(edges)
         expected_tree_edges = n - 1
         excess_edges = max(0, edge_count - expected_tree_edges)
         
-        # Each excess edge potentially creates a cycle
+        # Conservative cycle count: each excess edge potentially creates a cycle
+        # Divided by 3 to account for shared edges between cycles
+        # Capped at n/4 to prevent over-estimation
         return min(excess_edges // 3, n // 4)
     
     def _estimate_voids(self, n_points: int) -> int:
-        """Estimate number of 2-voids (simplified heuristic)."""
+        """Estimate number of 2-voids (simplified heuristic).
+        
+        Uses conservative estimate based on point count.
+        Divisor 50: Most point clouds have very few 2-dimensional voids.
+        In production, use proper matrix reduction for exact results.
+        """
         if n_points < 4:
             return 0
-        # Conservative estimate
         return n_points // 50
     
     @property

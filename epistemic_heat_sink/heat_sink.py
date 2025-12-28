@@ -257,10 +257,18 @@ class EpistemicHeatSink:
             mode=ReasoningMode.DEDUCTIVE,
         )
         
-        # Compute model output (simplified)
-        np.random.seed(42)
-        model_weights = np.random.randn(len(inputs.flatten()), 8) * 0.1
-        outputs = inputs.flatten()[:model_weights.shape[0]] @ model_weights
+        # Compute model output (simplified deterministic weights for reproducibility)
+        # Note: In production, these would be loaded from a verified model
+        # The seed ensures deterministic behavior for verifiable proofs
+        input_flat = inputs.flatten()
+        input_size = len(input_flat)
+        output_size = 8
+        
+        # Use hash of inputs as deterministic seed for reproducible weights
+        input_hash = int(hashlib.sha256(input_flat.tobytes()).hexdigest()[:8], 16)
+        rng = np.random.default_rng(seed=input_hash % (2**31))
+        model_weights = rng.standard_normal((input_size, output_size)) * 0.1
+        outputs = input_flat @ model_weights
         
         # Generate ZK proof
         proof = self.prover.prove_inference(
