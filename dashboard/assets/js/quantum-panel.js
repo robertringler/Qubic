@@ -193,6 +193,13 @@ const QratumQuantum = (function() {
      * Simulate gate application in demo mode
      */
     function simulateGate(gate, qubits) {
+        // Validate qubit indices
+        const targetQubit = qubits[0];
+        if (targetQubit === undefined || targetQubit < 0 || targetQubit >= quantumState.numQubits) {
+            showGateNotification(gate, false, 'Invalid qubit index');
+            return;
+        }
+        
         quantumState.gateCount++;
         
         // Simple simulation for demo
@@ -219,6 +226,12 @@ const QratumQuantum = (function() {
                 quantumState.states = [
                     { index: 1 << q, amplitude: 1.0, phase: Math.PI / 2, probability: 1.0 }
                 ];
+            } else if (gate === 'CNOT' || gate === 'Toffoli') {
+                // Multi-qubit gates on |0⟩ state have no effect
+                console.log(`[Quantum] ${gate} gate on |0⟩ state - no effect`);
+            } else {
+                // Unknown gate in demo mode
+                console.log(`[Quantum] Gate '${gate}' not fully simulated in demo mode`);
             }
         } else if (gate === 'CNOT' && quantumState.states.length === 2) {
             // If in superposition and applying CNOT, create entanglement
@@ -229,14 +242,17 @@ const QratumQuantum = (function() {
                     { index: 3, amplitude: 0.707, phase: 0, probability: 0.5 }
                 ];
             }
+        } else {
+            // Log unsimulated gate combinations in demo mode
+            console.log(`[Quantum] Gate '${gate}' simulation limited in demo mode for current state`);
         }
         
-        // Calculate entropy
+        // Calculate entropy (using log base 2 for quantum information theory)
         let entropy = 0;
         quantumState.states.forEach(s => {
             const p = s.probability;
             if (p > 0.001) {
-                entropy -= p * Math.log(p);
+                entropy -= p * Math.log2(p);
             }
         });
         quantumState.entropy = entropy;

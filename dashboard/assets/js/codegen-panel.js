@@ -456,11 +456,15 @@ const QratumDCGE = (function() {
 
     /**
      * Escape HTML for safe display
+     * Uses cached div element for better performance
      */
+    let _escapeHtmlDiv;
     function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        if (!_escapeHtmlDiv) {
+            _escapeHtmlDiv = document.createElement('div');
+        }
+        _escapeHtmlDiv.textContent = text;
+        return _escapeHtmlDiv.innerHTML;
     }
 
     /**

@@ -362,11 +362,13 @@
     <script>
         const { invoke } = window.__TAURI__.tauri;
 
-        function switchView(viewId) {
+        function switchView(viewId, event) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             document.getElementById(viewId + '-view').classList.add('active');
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
         }
 
         async function updateHealth() {
@@ -397,10 +399,11 @@
         async function runGate(gateType) {
             const target = parseInt(document.getElementById('target-qubit').value);
             const control = parseInt(document.getElementById('control-qubit').value);
+            const control2 = parseInt(document.getElementById('control-qubit2').value);
             
             let qubits = [target];
             if (gateType === 'CNOT') qubits = [control, target];
-            if (gateType === 'Toffoli') qubits = [control, Math.min(control + 1, 11), target];
+            if (gateType === 'Toffoli') qubits = [control, control2, target];
             
             try {
                 const result = await invoke('apply_quantum_gate', {

@@ -61,7 +61,11 @@ impl Complex {
     /// Get phase (argument) of complex number in radians
     #[inline(always)]
     pub fn phase(self) -> f32 {
-        self.im.atan2(self.re)
+        if self.re == 0.0 && self.im == 0.0 {
+            0.0
+        } else {
+            self.im.atan2(self.re)
+        }
     }
 }
 
@@ -472,7 +476,7 @@ impl OSSupreme {
         true
     }
 
-    /// Apply Pauli-Y gate  
+    /// Apply Pauli-Y gate
     pub fn apply_pauli_y(&mut self, qubit: usize) -> bool {
         if qubit >= QUBITS {
             return false;

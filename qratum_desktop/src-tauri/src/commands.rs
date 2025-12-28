@@ -100,7 +100,8 @@ pub async fn get_os_supreme_stats() -> Result<OSSupremeStats, String> {
 #[derive(Serialize, Deserialize)]
 pub struct GateOperation {
     pub gate_type: String,  // "H", "X", "Y", "Z", "S", "T", "CNOT", "Toffoli"
-    pub qubits: Vec<usize>, // Target qubit(s)
+    /// Qubit indices: single-qubit gates use qubits[0]; two-qubit gates (e.g. CNOT) use [control, target]; three-qubit gates (e.g. Toffoli) use [control1, control2, target].
+    pub qubits: Vec<usize>,
 }
 
 /// Result of applying gates, includes visualization data
@@ -151,9 +152,16 @@ fn apply_gate_to_os(os: &mut OSSupreme, gate_op: &GateOperation) -> bool {
     }
 }
 
-/// Apply a quantum gate to a fresh quantum state
-/// Note: Each call creates a new OSSupreme instance starting from |0⟩ state.
-/// For stateful operations, use run_quantum_circuit instead.
+/// Apply a single quantum gate to a fresh quantum state.
+///
+/// WARNING: This command is **stateless across calls**. Each invocation creates a
+/// new `OSSupreme` instance initialized in the `|0⟩` state, applies the requested
+/// gate once, and then discards the instance. Calling this repeatedly will **not**
+/// build up a circuit or preserve quantum state between calls.
+///
+/// Use this primarily for applying and visualizing individual gates. For any
+/// stateful operation or a sequence of gates that should act on the *same*
+/// quantum state, use `run_quantum_circuit` instead.
 #[tauri::command]
 pub async fn apply_quantum_gate(gate_op: GateOperation) -> Result<GateApplicationResult, String> {
     let mut os = OSSupreme::new();
@@ -180,7 +188,12 @@ pub struct QuantumCircuit {
     pub gates: Vec<GateOperation>,
 }
 
-/// Execute a quantum circuit - sequence of gates applied to the same quantum state
+/// Execute a quantum circuit - sequence of gates applied to the same quantum state.
+///
+/// Note: If any gate fails to apply (e.g., invalid qubit index), the circuit continues
+/// executing remaining gates but `success` will be `false`. The returned visualization
+/// shows the final state after all attempted operations, which may be an intermediate
+/// state if some gates failed. Consider validating gate parameters before submission.
 #[tauri::command]
 pub async fn run_quantum_circuit(circuit: QuantumCircuit) -> Result<GateApplicationResult, String> {
     let mut os = OSSupreme::new();
