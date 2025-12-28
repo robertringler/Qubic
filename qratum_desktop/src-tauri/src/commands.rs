@@ -1,9 +1,9 @@
-use crate::backend::{health, kernel, LogEntry};
+use crate::backend::{health, kernel, LogEntry, HealthResponse};
 use crate::AppState;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_health() -> Result<health::HealthResponse, String> {
+pub async fn get_health() -> Result<HealthResponse, String> {
     Ok(health::get_health())
 }
 

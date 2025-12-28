@@ -23,7 +23,7 @@ fn main() {
     
     let tray = SystemTray::new().with_menu(tray_menu);
     
-    tauri::Builder::default()
+    let app = tauri::Builder::<tauri::Wry>::default()
         .manage(AppState::default())
         .system_tray(tray)
         .on_system_tray_event(tray::handle_tray_event)
@@ -32,6 +32,13 @@ fn main() {
             commands::execute_kernel,
             commands::get_logs,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+    
+    app.run(|_app_handle, event| match event {
+        tauri::RunEvent::ExitRequested { api, .. } => {
+            api.prevent_exit();
+        }
+        _ => {}
+    });
 }
