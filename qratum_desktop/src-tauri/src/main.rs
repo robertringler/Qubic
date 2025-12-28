@@ -40,6 +40,13 @@ fn main() {
             commands::run_ai_inference,
             commands::run_supremacy_test,
             commands::get_os_supreme_stats,
+            // Phase 4 commands
+            commands::apply_quantum_gate,
+            commands::run_quantum_circuit,
+            commands::get_quantum_state,
+            commands::create_wasm_pod,
+            commands::get_dcge_benchmark,
+            commands::get_phase4_module_output,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

@@ -1,6 +1,9 @@
 use crate::backend::{health, kernel, LogEntry, HealthResponse};
 use crate::codegen::{CodeGenerator, ast::IntentSpec};
-use crate::qr_os_supreme::{OSSupreme, OSSupremeStats};
+use crate::qr_os_supreme::{
+    OSSupreme, OSSupremeStats, QuantumStateVisualization,
+    WasmPod, PodType, PodStatus, DCGEBenchmark, Phase4ModuleOutput
+};
 use crate::AppState;
 use tauri::State;
 use serde::{Serialize, Deserialize};
@@ -87,4 +90,196 @@ pub async fn run_supremacy_test(input: Vec<u8>) -> Result<(f32, u8), String> {
 pub async fn get_os_supreme_stats() -> Result<OSSupremeStats, String> {
     let os = OSSupreme::new();
     Ok(os.get_stats())
+}
+
+// =================================================================
+// Phase 4 Commands: Advanced Quantum Gates
+// =================================================================
+
+/// Apply a quantum gate to the circuit
+#[derive(Serialize, Deserialize)]
+pub struct GateOperation {
+    pub gate_type: String,  // "H", "X", "Y", "Z", "S", "T", "CNOT", "Toffoli"
+    pub qubits: Vec<usize>, // Target qubit(s)
+}
+
+/// Result of applying gates, includes visualization data
+#[derive(Serialize, Deserialize)]
+pub struct GateApplicationResult {
+    pub success: bool,
+    pub visualization: QuantumStateVisualization,
+    pub message: String,
+}
+
+#[tauri::command]
+pub async fn apply_quantum_gate(gate_op: GateOperation) -> Result<GateApplicationResult, String> {
+    let mut os = OSSupreme::new();
+    
+    let success = match gate_op.gate_type.to_uppercase().as_str() {
+        "H" | "HADAMARD" => {
+            gate_op.qubits.first().map(|&q| os.apply_hadamard(q)).unwrap_or(false)
+        }
+        "X" | "PAULI_X" => {
+            gate_op.qubits.first().map(|&q| os.apply_pauli_x(q)).unwrap_or(false)
+        }
+        "Y" | "PAULI_Y" => {
+            gate_op.qubits.first().map(|&q| os.apply_pauli_y(q)).unwrap_or(false)
+        }
+        "Z" | "PAULI_Z" => {
+            gate_op.qubits.first().map(|&q| os.apply_pauli_z(q)).unwrap_or(false)
+        }
+        "S" | "PHASE" => {
+            gate_op.qubits.first().map(|&q| os.apply_phase_gate(q)).unwrap_or(false)
+        }
+        "T" => {
+            gate_op.qubits.first().map(|&q| os.apply_t_gate(q)).unwrap_or(false)
+        }
+        "CNOT" | "CX" => {
+            if gate_op.qubits.len() >= 2 {
+                os.apply_cnot(gate_op.qubits[0], gate_op.qubits[1])
+            } else {
+                false
+            }
+        }
+        "TOFFOLI" | "CCNOT" | "CCX" => {
+            if gate_op.qubits.len() >= 3 {
+                os.apply_toffoli(gate_op.qubits[0], gate_op.qubits[1], gate_op.qubits[2])
+            } else {
+                false
+            }
+        }
+        _ => false,
+    };
+    
+    let visualization = os.get_quantum_state_visualization();
+    let message = if success {
+        format!("Applied {} gate successfully", gate_op.gate_type)
+    } else {
+        format!("Failed to apply {} gate", gate_op.gate_type)
+    };
+    
+    Ok(GateApplicationResult {
+        success,
+        visualization,
+        message,
+    })
+}
+
+/// Run a quantum circuit (sequence of gates)
+#[derive(Serialize, Deserialize)]
+pub struct QuantumCircuit {
+    pub gates: Vec<GateOperation>,
+}
+
+#[tauri::command]
+pub async fn run_quantum_circuit(circuit: QuantumCircuit) -> Result<GateApplicationResult, String> {
+    let mut os = OSSupreme::new();
+    let mut all_success = true;
+    
+    for gate_op in circuit.gates {
+        let success = match gate_op.gate_type.to_uppercase().as_str() {
+            "H" | "HADAMARD" => {
+                gate_op.qubits.first().map(|&q| os.apply_hadamard(q)).unwrap_or(false)
+            }
+            "X" | "PAULI_X" => {
+                gate_op.qubits.first().map(|&q| os.apply_pauli_x(q)).unwrap_or(false)
+            }
+            "Y" | "PAULI_Y" => {
+                gate_op.qubits.first().map(|&q| os.apply_pauli_y(q)).unwrap_or(false)
+            }
+            "Z" | "PAULI_Z" => {
+                gate_op.qubits.first().map(|&q| os.apply_pauli_z(q)).unwrap_or(false)
+            }
+            "S" | "PHASE" => {
+                gate_op.qubits.first().map(|&q| os.apply_phase_gate(q)).unwrap_or(false)
+            }
+            "T" => {
+                gate_op.qubits.first().map(|&q| os.apply_t_gate(q)).unwrap_or(false)
+            }
+            "CNOT" | "CX" => {
+                if gate_op.qubits.len() >= 2 {
+                    os.apply_cnot(gate_op.qubits[0], gate_op.qubits[1])
+                } else {
+                    false
+                }
+            }
+            "TOFFOLI" | "CCNOT" | "CCX" => {
+                if gate_op.qubits.len() >= 3 {
+                    os.apply_toffoli(gate_op.qubits[0], gate_op.qubits[1], gate_op.qubits[2])
+                } else {
+                    false
+                }
+            }
+            _ => false,
+        };
+        
+        if !success {
+            all_success = false;
+        }
+    }
+    
+    let visualization = os.get_quantum_state_visualization();
+    let message = if all_success {
+        "Circuit executed successfully".to_string()
+    } else {
+        "Some gates failed to apply".to_string()
+    };
+    
+    Ok(GateApplicationResult {
+        success: all_success,
+        visualization,
+        message,
+    })
+}
+
+/// Get quantum state visualization
+#[tauri::command]
+pub async fn get_quantum_state() -> Result<QuantumStateVisualization, String> {
+    let os = OSSupreme::new();
+    Ok(os.get_quantum_state_visualization())
+}
+
+// =================================================================
+// Phase 4 Commands: WASM Pod Isolation
+// =================================================================
+
+#[derive(Serialize, Deserialize)]
+pub struct PodInfo {
+    pub pod_id: u32,
+    pub pod_type: String,
+    pub status: String,
+    pub memory_limit_kb: u32,
+    pub exec_count: u32,
+}
+
+#[tauri::command]
+pub async fn create_wasm_pod(pod_type: String, pod_id: u32, seed: u32) -> Result<PodInfo, String> {
+    let pod = match pod_type.to_lowercase().as_str() {
+        "os_supreme" | "ossupreme" => WasmPod::new_os_supreme(pod_id, seed),
+        "mini_quasim" | "miniquasim" | "quasim" => WasmPod::new_mini_quasim(pod_id, seed),
+        "minilm" | "mini_lm" => WasmPod::new_minilm(pod_id, seed),
+        _ => return Err(format!("Unknown pod type: {}", pod_type)),
+    };
+    
+    Ok(PodInfo {
+        pod_id: pod.pod_id,
+        pod_type: format!("{:?}", pod.pod_type),
+        status: format!("{:?}", pod.status),
+        memory_limit_kb: pod.memory_limit_kb,
+        exec_count: pod.exec_count,
+    })
+}
+
+// =================================================================
+// Phase 4 Commands: Benchmark Metrics
+// =================================================================
+
+#[tauri::command]
+pub async fn get_dcge_benchmark() -> Result<DCGEBenchmark, String> {
+    Ok(DCGEBenchmark::default())
+}
+
+#[tauri::command]
+pub async fn get_phase4_module_output() -> Result<Phase4ModuleOutput, String> {
+    Ok(Phase4ModuleOutput::default())
 }
