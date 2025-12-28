@@ -30,16 +30,30 @@ fn main() {
         .system_tray(tray)
         .on_system_tray_event(tray::handle_tray_event)
         .invoke_handler(tauri::generate_handler![
+            // Core commands
             commands::get_health,
             commands::execute_kernel,
             commands::get_logs,
             commands::generate_code,
             commands::validate_code,
+            // Quantum simulation
             commands::run_bell_state,
             commands::run_quantum_teleportation,
+            commands::run_ghz_state,
+            commands::get_quantum_state,
+            commands::apply_quantum_gate,
+            // AI inference
             commands::run_ai_inference,
+            commands::classify_text,
+            commands::embed_text,
+            // Combined operations
             commands::run_supremacy_test,
             commands::get_os_supreme_stats,
+            commands::get_pod_config,
+            // DCGE benchmarking
+            commands::run_dcge_benchmark,
+            commands::get_binary_metrics,
+            commands::get_failure_modes,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
