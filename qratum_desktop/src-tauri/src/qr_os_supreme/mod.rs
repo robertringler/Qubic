@@ -462,6 +462,10 @@ impl Default for QuantumState {
 
 // MiniLM-L6-v2 Stub Module (8MB footprint placeholder)
 // Deterministic AI inference for DCGE + OS Supreme
+
+/// Initial vocabulary hash for deterministic embedding generation
+pub const INITIAL_VOCAB_HASH: u64 = 0xDEAD_BEEF;
+
 pub struct MiniLMInference {
     seed: u32,
     embedding_dim: usize,
@@ -476,7 +480,7 @@ impl MiniLMInference {
         MiniLMInference {
             seed,
             embedding_dim: Self::EMBEDDING_DIM,
-            vocab_hash: 0xDEADBEEF,
+            vocab_hash: INITIAL_VOCAB_HASH,
         }
     }
 
@@ -602,7 +606,7 @@ impl MiniAI {
             minilm: MiniLMInference {
                 seed,
                 embedding_dim: MiniLMInference::EMBEDDING_DIM,
-                vocab_hash: 0xDEADBEEF,
+                vocab_hash: INITIAL_VOCAB_HASH,
             },
         }
     }

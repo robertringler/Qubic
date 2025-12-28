@@ -680,7 +680,7 @@
                 addLog(`[QUANTUM] Bell state: P(00)=${result.p00.toFixed(3)}, P(11)=${result.p11.toFixed(3)}`);
                 updateQuantumGrid();
             } catch (error) {
-                addLog(`[ERROR] ${error}`);
+                addLog(`[ERROR] ${sanitize(String(error))}`);
             }
         }
 
@@ -691,7 +691,7 @@
                 addLog(`[QUANTUM] GHZ state: P(000)=${result.p000.toFixed(3)}, P(111)=${result.p111.toFixed(3)}`);
                 updateQuantumGrid();
             } catch (error) {
-                addLog(`[ERROR] ${error}`);
+                addLog(`[ERROR] ${sanitize(String(error))}`);
             }
         }
 
@@ -701,7 +701,7 @@
                 const result = await invoke('run_supremacy_test', { input: [42, 43, 44] });
                 addLog(`[SUPREMACY] Q=${result[0].toFixed(4)}, AI=${result[1]}`);
             } catch (error) {
-                addLog(`[ERROR] ${error}`);
+                addLog(`[ERROR] ${sanitize(String(error))}`);
             }
         }
 
@@ -718,12 +718,19 @@
                         theta: null
                     }
                 });
-                addLog(`[GATE] Applied ${gate} to qubit(s) ${allQubits.join(', ')}`);
+                addLog(`[GATE] Applied ${sanitize(gate)} to qubit(s) ${allQubits.join(', ')}`);
                 updateQuantumGridFromState(result.state);
                 updateGateHistory(result.gate_history);
             } catch (error) {
-                addLog(`[ERROR] ${error}`);
+                addLog(`[ERROR] ${sanitize(String(error))}`);
             }
+        }
+
+        // Sanitize string to prevent XSS (data comes from backend but extra safety)
+        function sanitize(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
 
         // Update quantum state grid
@@ -738,21 +745,33 @@
 
         function updateQuantumGridFromState(states) {
             const grid = document.getElementById('quantum-state-grid');
-            grid.innerHTML = states.slice(0, 16).map(s => `
+            // Note: Data comes from our backend (Tauri commands), values are numeric
+            // Using toFixed/toString for safety, but adding extra validation
+            grid.innerHTML = states.slice(0, 16).map(s => {
+                const stateIdx = Number(s.state_index) || 0;
+                const prob = Number(s.probability) || 0;
+                const phase = Number(s.phase) || 0;
+                return `
                 <div class="qubit-state">
-                    <div class="state-label">|${s.state_index.toString(2).padStart(4, '0')}⟩</div>
-                    <div class="probability">${(s.probability * 100).toFixed(1)}%</div>
-                    <div class="phase">φ=${s.phase.toFixed(2)}</div>
+                    <div class="state-label">|${stateIdx.toString(2).padStart(4, '0')}⟩</div>
+                    <div class="probability">${(prob * 100).toFixed(1)}%</div>
+                    <div class="phase">φ=${phase.toFixed(2)}</div>
                     <div class="probability-bar">
-                        <div class="probability-bar-fill" style="width: ${s.probability * 100}%"></div>
+                        <div class="probability-bar-fill" style="width: ${(prob * 100).toFixed(1)}%"></div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function updateGateHistory(history) {
             const el = document.getElementById('gate-history');
-            el.innerHTML = history.map(g => `${g.gate_name}(${g.qubits.join(',')})`).join(' → ') || 'No gates applied';
+            // Sanitize gate names and ensure numeric qubits
+            el.innerHTML = history.map(g => {
+                const gateName = sanitize(String(g.gate_name));
+                const qubits = Array.isArray(g.qubits) ? g.qubits.map(q => Number(q) || 0).join(',') : '';
+                return `${gateName}(${qubits})`;
+            }).join(' → ') || 'No gates applied';
         }
 
         // Generate code
@@ -776,10 +795,10 @@
                 document.getElementById('codegen-time').textContent = `${(endTime - startTime).toFixed(0)}ms`;
                 document.getElementById('codegen-size').textContent = `${code.length} bytes`;
                 
-                addLog(`[DCGE] Generated ${language} code (${code.length} bytes)`);
+                addLog(`[DCGE] Generated ${sanitize(language)} code (${code.length} bytes)`);
             } catch (error) {
-                document.getElementById('generated-code').textContent = `// Error: ${error}`;
-                addLog(`[ERROR] ${error}`);
+                document.getElementById('generated-code').textContent = `// Error: ${String(error)}`;
+                addLog(`[ERROR] ${sanitize(String(error))}`);
             }
         }
 
@@ -802,7 +821,7 @@
                 
                 addLog(`[BENCHMARK] DCGE: ${(result.correctness_score * 100).toFixed(0)}% correct, ${result.generation_time_ms}ms`);
             } catch (error) {
-                addLog(`[ERROR] ${error}`);
+                addLog(`[ERROR] ${sanitize(String(error))}`);
             }
         }
 

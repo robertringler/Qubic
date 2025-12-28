@@ -5,14 +5,19 @@ use std::mem;
 #[test]
 fn test_os_supreme_size_constraints() {
     use crate::qr_os_supreme::{OSSupreme, QUANTUM_STATE_BYTES};
-    
+
     // Check struct sizes
     let os_size = mem::size_of::<OSSupreme>();
     println!("OSSupreme size: {} bytes", os_size);
     println!("Quantum state size: {} bytes", QUANTUM_STATE_BYTES);
-    
+
     // Should fit within reasonable stack limits
-    // 32KB for quantum state + overhead
+    // Phase 4 increases size limit from 40KB to 50KB due to:
+    // - MiniLM integration adds MiniAI struct with MiniLMInference
+    // - WasmPodConfig for pod isolation configuration
+    // - Gate history vector for operation tracking
+    // - Additional quantum gates implementation overhead
+    // Base quantum state is still 32KB (4096 * 8 bytes)
     assert!(os_size < 50_000, "OSSupreme too large: {} bytes", os_size);
 }
 
