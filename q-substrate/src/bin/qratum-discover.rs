@@ -658,9 +658,21 @@ fn load_discoveries_from_dir(dir: &str) -> Vec<Discovery> {
         for entry in entries.flatten() {
             if let Ok(path) = entry.path().canonicalize() {
                 if path.extension().and_then(|s| s.to_str()) == Some("json") {
+                    // Skip PROVENANCE_CHAIN.json and other non-discovery files
+                    if let Some(filename) = path.file_name() {
+                        let name = filename.to_string_lossy();
+                        if !name.starts_with("QRD-") {
+                            continue;
+                        }
+                    }
+                    
                     if let Ok(content) = fs::read_to_string(&path) {
-                        if let Ok(discovery) = import_discoveries_json(&content) {
-                            discoveries.extend(discovery);
+                        // Try parsing as single discovery first
+                        if let Ok(discovery) = serde_json::from_str::<Discovery>(&content) {
+                            discoveries.push(discovery);
+                        } else if let Ok(discovery_array) = import_discoveries_json(&content) {
+                            // Fallback: try parsing as array
+                            discoveries.extend(discovery_array);
                         }
                     }
                 }

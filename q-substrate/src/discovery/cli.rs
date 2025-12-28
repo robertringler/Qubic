@@ -73,25 +73,37 @@ pub fn run_discovery_directive(
 
 /// Write discoveries to directory structure
 ///
-/// Creates JSON files in validated/, pending/, or rejected/ subdirectories
+/// Creates JSON files directly in the base directory (pending)
+/// These will be moved to validated/ or rejected/ by the archive phase
+#[cfg(feature = "std")]
 fn write_discoveries_to_dir(discoveries: &[Discovery], base_dir: &str) -> Result<(), DiscoveryError> {
+    use std::fs;
+    
+    // Create base directory if it doesn't exist
+    if let Err(e) = fs::create_dir_all(base_dir) {
+        return Err(DiscoveryError::Generic(alloc::format!("Failed to create directory: {}", e)));
+    }
+    
     for discovery in discoveries {
-        // Determine subdirectory based on fitness score
-        let subdir = if discovery.fitness_score >= 0.87 {
-            "validated"
-        } else {
-            "rejected"
-        };
+        let filename = alloc::format!("{}/{}.json", base_dir, discovery.id);
         
-        let filename = alloc::format!("{}/{}/{}.json", base_dir, subdir, discovery.id);
+        // Serialize discovery to JSON
+        let json = serde_json::to_string_pretty(discovery)
+            .map_err(|e| DiscoveryError::SerializationError(alloc::format!("{}", e)))?;
         
-        // In a real implementation, this would write to file
-        // For now, we just validate the path
-        if filename.is_empty() {
-            return Err(DiscoveryError::Generic("Invalid filename".into()));
+        // Write to file
+        if let Err(e) = fs::write(&filename, &json) {
+            return Err(DiscoveryError::Generic(alloc::format!("Failed to write {}: {}", filename, e)));
         }
     }
     
+    Ok(())
+}
+
+/// Write discoveries to directory structure (no_std version - no-op)
+#[cfg(not(feature = "std"))]
+fn write_discoveries_to_dir(_discoveries: &[Discovery], _base_dir: &str) -> Result<(), DiscoveryError> {
+    // No file I/O in no_std environment
     Ok(())
 }
 
