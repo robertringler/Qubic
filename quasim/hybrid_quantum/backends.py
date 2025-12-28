@@ -355,10 +355,16 @@ class IBMHybridBackend(HybridQuantumBackend):
         result = job.result()
         execution_time = time.time() - start_time
 
+        # Get job ID, handling both simulator and real hardware cases
+        if hasattr(job, "job_id") and callable(job.job_id):
+            job_id = job.job_id()
+        else:
+            job_id = "simulator"
+
         exec_result = ExecutionResult(
             execution_id=execution_id,
             counts=result.get_counts(),
-            raw_data={"job_id": getattr(job, "job_id", lambda: "simulator")()},
+            raw_data={"job_id": job_id},
             execution_time=execution_time,
             success=result.success,
             provenance_hash=provenance_hash,

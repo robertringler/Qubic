@@ -472,10 +472,11 @@ class AHTCAccelerator:
 
         # Combined compression ratio
         original_size = tensor.size
-        compressed_size = (
-            sum(v.size for v in left_result.compressed_data.values() if isinstance(v, np.ndarray))
-            + sum(v.size for v in right_result.compressed_data.values() if isinstance(v, np.ndarray))
-        )
+
+        # Calculate compressed sizes for both parts
+        left_arrays = [v for v in left_result.compressed_data.values() if isinstance(v, np.ndarray)]
+        right_arrays = [v for v in right_result.compressed_data.values() if isinstance(v, np.ndarray)]
+        compressed_size = sum(arr.size for arr in left_arrays) + sum(arr.size for arr in right_arrays)
 
         return CompressionResult(
             compressed_data={

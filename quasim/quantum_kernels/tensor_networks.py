@@ -315,8 +315,6 @@ class MPSSimulator:
 
         return float(np.real(left[0, 0]))
 
-        return float(np.real(left[0, 0]))
-
     def compute_entanglement_entropy(self, state: MPSState, cut_position: int) -> float:
         """Compute entanglement entropy at bipartition.
 
