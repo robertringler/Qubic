@@ -22,6 +22,18 @@ const INNOVATIVE_BONUS: f64 = 0.10;
 /// Mutation bonus for standard mutations
 const STANDARD_BONUS: f64 = 0.05;
 
+/// Base novelty score when no known architectures are present
+const BASE_NOVELTY_SCORE: f64 = 0.90;
+
+/// Base feasibility score for well-designed discoveries
+const BASE_FEASIBILITY_SCORE: f64 = 0.74;
+
+/// Base scalability score for well-designed discoveries
+const BASE_SCALABILITY_SCORE: f64 = 0.74;
+
+/// Base strategic leverage score for well-positioned discoveries
+const BASE_LEVERAGE_SCORE: f64 = 0.65;
+
 /// Known architecture for novelty comparison
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KnownArchitecture {
@@ -142,7 +154,7 @@ pub fn compute_novelty(node: &MutatedNode, known_architectures: &[KnownArchitect
         if mutation_lower.contains("unique") || mutation_lower.contains("first-mover") {
             novelty_bonus += 0.03;
         }
-        return (0.90_f64 + novelty_bonus).min(1.0);
+        return (BASE_NOVELTY_SCORE + novelty_bonus).min(1.0);
     }
     
     // Average novelty across all known architectures
@@ -167,7 +179,7 @@ pub fn compute_feasibility(node: &MutatedNode) -> f64 {
     let mutation_lower = node.mutated_form.to_lowercase();
     
     // Check for feasibility indicators - start higher for engineered discoveries
-    let mut feasibility_score: f64 = 0.74; // Higher base for well-designed discoveries
+    let mut feasibility_score: f64 = BASE_FEASIBILITY_SCORE;
     
     // Positive indicators
     if mutation_lower.contains("deterministic") {
@@ -207,8 +219,7 @@ pub fn compute_feasibility(node: &MutatedNode) -> f64 {
 pub fn compute_scalability(node: &MutatedNode) -> f64 {
     let mutation_lower = node.mutated_form.to_lowercase();
     
-    // Higher base for well-designed discoveries
-    let mut scalability_score: f64 = 0.74;
+    let mut scalability_score: f64 = BASE_SCALABILITY_SCORE;
     
     // Positive scalability indicators
     if mutation_lower.contains("distributed") {
@@ -254,8 +265,7 @@ pub fn compute_scalability(node: &MutatedNode) -> f64 {
 pub fn compute_strategic_leverage(node: &MutatedNode, market_context: &MarketContext) -> f64 {
     let mutation_lower = node.mutated_form.to_lowercase();
     
-    // Higher base for strategically positioned discoveries
-    let mut leverage_score: f64 = 0.65;
+    let mut leverage_score: f64 = BASE_LEVERAGE_SCORE;
     
     // Strategic advantage indicators
     if mutation_lower.contains("moat") || mutation_lower.contains("barrier") {

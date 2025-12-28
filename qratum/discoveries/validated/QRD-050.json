@@ -39,7 +39,7 @@
       "Fallback to proven baseline implementations"
     ]
   },
-  "fitness_score": 0.9176000000000002,
+  "fitness_score": 0.9176,
   "provenance": {
     "generated_at": "2025-01-03T01:43:37Z",
     "qradle_hash": "QRDL-1856db37665cd6ef",

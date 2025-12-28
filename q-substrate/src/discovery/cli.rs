@@ -100,11 +100,16 @@ fn write_discoveries_to_dir(discoveries: &[Discovery], base_dir: &str) -> Result
     Ok(())
 }
 
-/// Write discoveries to directory structure (no_std version - no-op)
+/// Write discoveries to directory structure (no_std version)
+///
+/// Returns an error since file I/O is not available without std
 #[cfg(not(feature = "std"))]
 fn write_discoveries_to_dir(_discoveries: &[Discovery], _base_dir: &str) -> Result<(), DiscoveryError> {
-    // No file I/O in no_std environment
-    Ok(())
+    // File I/O is not available in no_std environments
+    // Return an error to prevent silent data loss
+    Err(DiscoveryError::Generic(
+        "File I/O not available in no_std environment - discoveries cannot be written".into()
+    ))
 }
 
 /// Get current time in milliseconds (simplified for deterministic execution)

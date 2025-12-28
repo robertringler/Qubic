@@ -290,9 +290,12 @@ impl DiscoveryEngine {
                 
                 let fitness = self.evaluate_fitness(&mutation);
                 
+                // Round fitness to 4 decimal places to avoid floating-point precision issues
+                let fitness_rounded = (fitness * 10000.0).round() / 10000.0;
+                
                 // Only synthesize if fitness meets threshold
-                if fitness >= self.fitness_threshold {
-                    let discovery = self.synthesize_discovery(&mutation, discovery_count, fitness);
+                if fitness_rounded >= self.fitness_threshold {
+                    let discovery = self.synthesize_discovery(&mutation, discovery_count, fitness_rounded);
                     
                     self.discoveries.push(discovery);
                     discovery_count += 1;
