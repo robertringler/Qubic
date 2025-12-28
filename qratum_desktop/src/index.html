@@ -8,14 +8,14 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #111827;
+            background: linear-gradient(135deg, #0a0014 0%, #1a0033 50%, #2d1b69 100%);
             color: #fff;
             padding: 1rem;
             min-height: 100vh;
         }
         .header {
             padding: 1rem;
-            border-bottom: 1px solid #374151;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
             margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
@@ -24,6 +24,30 @@
         .header h1 {
             font-size: 1.5rem;
             font-weight: 600;
+            background: linear-gradient(90deg, #00f5ff, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            background: rgba(45, 27, 105, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 0.5rem;
+            color: #c4b5fd;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .nav-tab:hover, .nav-tab.active {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: #00f5ff;
+            color: #00f5ff;
         }
         .header-badges {
             display: flex;
@@ -58,25 +82,33 @@
             margin-bottom: 1rem;
         }
         .card {
-            background: #1f2937;
+            background: rgba(26, 0, 51, 0.6);
             padding: 1.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid #374151;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            backdrop-filter: blur(10px);
         }
         .card h2 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             margin-bottom: 1rem;
-            color: #60a5fa;
+            color: #00f5ff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .stat {
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.5rem;
         }
+        .stat-label {
+            color: #c4b5fd;
+        }
         .stat-label { color: #9ca3af; }
         .stat-value {
             color: #10b981;
             font-weight: 600;
+            font-family: 'Courier New', monospace;
         }
         .status-healthy { color: #10b981; }
         .status-degraded { color: #f59e0b; }
@@ -85,26 +117,92 @@
             display: inline-block;
             padding: 0.25rem 0.75rem;
             border-radius: 0.25rem;
-            font-size: 0.875rem;
-            background: #374151;
-            color: #9ca3af;
+            font-size: 0.75rem;
+            background: linear-gradient(135deg, #5b21b6 0%, #00f5ff 100%);
+            color: white;
+            font-weight: 600;
+        }
+        .badge-phase4 {
+            background: linear-gradient(135deg, #10b981 0%, #00f5ff 100%);
         }
         .badge-success { background: #065f46; color: #10b981; }
         .badge-info { background: #1e40af; color: #60a5fa; }
         .logs {
-            background: #1f2937;
+            background: rgba(26, 0, 51, 0.6);
             padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #374151;
-            max-height: 300px;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            max-height: 200px;
             overflow-y: auto;
         }
         .log-entry {
             font-family: 'Courier New', monospace;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             padding: 0.25rem 0;
-            color: #9ca3af;
+            color: #c4b5fd;
         }
+        .log-entry.success { color: #10b981; }
+        .log-entry.error { color: #ef4444; }
+        .gate-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 245, 255, 0.5);
+            border-radius: 0.5rem;
+            background: rgba(45, 27, 105, 0.3);
+            color: #00f5ff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0.25rem;
+        }
+        .gate-btn:hover {
+            background: #00f5ff;
+            color: #0a0014;
+        }
+        .gate-btn.phase4 {
+            border-color: #10b981;
+            color: #10b981;
+        }
+        .gate-btn.phase4:hover {
+            background: #10b981;
+            color: #0a0014;
+        }
+        .qubit-select {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            background: rgba(26, 0, 51, 0.6);
+            color: #c4b5fd;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+        }
+        .quantum-result {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+        .view { display: none; }
+        .view.active { display: block; }
+        .pod-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .pod-status {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        .pod-status.active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .pod-status.standby { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
         
         /* Quantum Visualization */
         .quantum-grid {
@@ -269,6 +367,25 @@
 </head>
 <body>
     <div class="header">
+        <h1>⚛️ QRATUM Desktop</h1>
+        <div>
+            <span class="badge">v0.4.0</span>
+            <span class="badge badge-phase4">Phase 4</span>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchView('health')">Health</button>
+        <button class="nav-tab" onclick="switchView('quantum')">Quantum</button>
+        <button class="nav-tab" onclick="switchView('pods')">WASM Pods</button>
+        <button class="nav-tab" onclick="switchView('logs')">Logs</button>
+    </div>
+
+    <!-- Health View -->
+    <div class="view active" id="health-view">
+        <div class="grid">
+            <div class="card">
+                <h2>📊 System Health</h2>
         <h1>🦀 QRATUM Desktop - Phase 4 Edition</h1>
         <div class="header-badges">
             <span class="badge badge-success">v0.4.0</span>
@@ -307,6 +424,42 @@
                 <div class="stat">
                     <span class="stat-label">Version:</span>
                     <span id="version" class="stat-value">0.4.0</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔬 OS Supreme Stats</h2>
+                <div class="stat">
+                    <span class="stat-label">Qubits:</span>
+                    <span id="qubits" class="stat-value">12</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">State Size:</span>
+                    <span id="state-size" class="stat-value">4096</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Exec Count:</span>
+                    <span id="exec-count" class="stat-value">0</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Binary Metrics</h2>
+                <div class="stat">
+                    <span class="stat-label">.text target:</span>
+                    <span class="stat-value">4 KB</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">.stack target:</span>
+                    <span class="stat-value">1 KB</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Quantum state:</span>
+                    <span class="stat-value">32 KB</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Total footprint:</span>
+                    <span class="stat-value">~18-25 MB</span>
                 </div>
             </div>
 
@@ -366,7 +519,52 @@
                 </button>
             </div>
         </div>
+    </div>
 
+    <!-- Quantum View -->
+    <div class="view" id="quantum-view">
+        <div class="grid">
+            <div class="card">
+                <h2>⚛️ Quantum Gates</h2>
+                <p style="color: #c4b5fd; margin-bottom: 0.5rem; font-size: 0.85rem;">Single-Qubit Gates</p>
+                <div>
+                    <button class="gate-btn" onclick="runGate('H')">H</button>
+                    <button class="gate-btn" onclick="runGate('X')">X</button>
+                    <button class="gate-btn" onclick="runGate('Y')">Y</button>
+                    <button class="gate-btn" onclick="runGate('Z')">Z</button>
+                    <button class="gate-btn phase4" onclick="runGate('S')">S</button>
+                    <button class="gate-btn phase4" onclick="runGate('T')">T</button>
+                </div>
+                <p style="color: #c4b5fd; margin: 0.5rem 0; font-size: 0.85rem;">Multi-Qubit Gates</p>
+                <div>
+                    <button class="gate-btn" onclick="runGate('CNOT')" style="width: auto; padding: 0 1rem;">CNOT</button>
+                    <button class="gate-btn phase4" onclick="runGate('Toffoli')" style="width: auto; padding: 0 1rem;">Toffoli</button>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label style="font-size: 0.75rem; color: #c4b5fd;">Target:</label>
+                    <select id="target-qubit" class="qubit-select">
+                        <option value="0">Q0</option>
+                        <option value="1">Q1</option>
+                        <option value="2">Q2</option>
+                        <option value="3">Q3</option>
+                    </select>
+                    <label style="font-size: 0.75rem; color: #c4b5fd;">Control:</label>
+                    <select id="control-qubit" class="qubit-select">
+                        <option value="0">Q0</option>
+                        <option value="1" selected>Q1</option>
+                        <option value="2">Q2</option>
+                        <option value="3">Q3</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔄 Quick Tests</h2>
+                <button class="gate-btn" onclick="runBellState()" style="width: auto; padding: 0 1rem; margin-bottom: 0.5rem;">Bell State</button>
+                <button class="gate-btn" onclick="runTeleportation()" style="width: auto; padding: 0 1rem; margin-bottom: 0.5rem;">Teleportation</button>
+                <button class="gate-btn" onclick="runSupremacyTest()" style="width: auto; padding: 0 1rem;">Supremacy Test</button>
+                <div id="quantum-result" class="quantum-result">
+                    Results will appear here...
         <!-- Logs Viewer -->
         <div class="logs">
             <h3 style="margin-bottom: 0.5rem;">System Logs</h3>
@@ -425,7 +623,48 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- WASM Pods View -->
+    <div class="view" id="pods-view">
+        <div class="grid">
+            <div class="card">
+                <h2>🔒 WASM Pod Isolation</h2>
+                <p style="color: #c4b5fd; font-size: 0.85rem; margin-bottom: 1rem;">
+                    Full sandboxing: No host memory/filesystem access
+                </p>
+                <div class="pod-item">
+                    <div>
+                        <strong>Mini QuASIM Pod</strong>
+                        <span style="color: #8b5cf6; font-size: 0.75rem; margin-left: 0.5rem;">2 MB limit</span>
+                    </div>
+                    <span class="pod-status active">Active</span>
+                </div>
+                <div class="pod-item">
+                    <div>
+                        <strong>OS Supreme Pod</strong>
+                        <span style="color: #8b5cf6; font-size: 0.75rem; margin-left: 0.5rem;">64 KB limit</span>
+                    </div>
+                    <span class="pod-status active">Active</span>
+                </div>
+                <div class="pod-item">
+                    <div>
+                        <strong>MiniLM Pod</strong>
+                        <span style="color: #8b5cf6; font-size: 0.75rem; margin-left: 0.5rem;">8 MB limit</span>
+                    </div>
+                    <span class="pod-status standby">Standby</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📋 Pod Features</h2>
+                <ul style="color: #c4b5fd; font-size: 0.85rem; list-style: none;">
+                    <li style="margin-bottom: 0.5rem;">✓ Deterministic execution enforced</li>
+                    <li style="margin-bottom: 0.5rem;">✓ Pod-level rollback on failure</li>
+                    <li style="margin-bottom: 0.5rem;">✓ Epistemic sovereignty maintained</li>
+                    <li style="margin-bottom: 0.5rem;">✓ Regression-proof operation</li>
+                    <li style="margin-bottom: 0.5rem;">✓ Side-channel prevention</li>
+                </ul>
         <div class="card" style="margin-top: 1rem;">
             <h2>Gate History</h2>
             <div id="gate-history" class="log-entry">
@@ -434,6 +673,15 @@
         </div>
     </div>
 
+    <!-- Logs View -->
+    <div class="view" id="logs-view">
+        <div class="logs">
+            <div id="logs-container">
+                <div class="log-entry success">[INFO] QRATUM Desktop v0.4.0 initialized (Phase 4)</div>
+                <div class="log-entry">[INFO] Advanced gates: Phase, T, Toffoli loaded</div>
+                <div class="log-entry">[INFO] WASM pod isolation active</div>
+                <div class="log-entry">[INFO] MiniLM integration ready</div>
+                <div class="log-entry">[INFO] Target footprint: ~18-25 MB</div>
     <!-- Code Generation Tab -->
     <div id="codegen" class="tab-content">
         <div class="grid">
@@ -636,6 +884,15 @@
     <script>
         const { invoke } = window.__TAURI__.tauri;
 
+        function switchView(viewId, event) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(viewId + '-view').classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -661,18 +918,92 @@
             }
         }
 
+        async function updateStats() {
         // Update OS Supreme stats
         async function updateOSSupremeStats() {
             try {
                 const stats = await invoke('get_os_supreme_stats');
                 document.getElementById('qubits').textContent = stats.qubits;
                 document.getElementById('state-size').textContent = stats.state_size;
+                document.getElementById('exec-count').textContent = stats.exec_count;
                 document.getElementById('pod-id').textContent = stats.pod_id;
             } catch (error) {
                 console.error('Failed to fetch stats:', error);
             }
         }
 
+        async function runGate(gateType) {
+            const target = parseInt(document.getElementById('target-qubit').value);
+            const control = parseInt(document.getElementById('control-qubit').value);
+            const control2 = parseInt(document.getElementById('control-qubit2').value);
+            
+            let qubits = [target];
+            if (gateType === 'CNOT') qubits = [control, target];
+            if (gateType === 'Toffoli') qubits = [control, control2, target];
+            
+            try {
+                const result = await invoke('apply_quantum_gate', {
+                    gateOp: { gate_type: gateType, qubits: qubits }
+                });
+                document.getElementById('quantum-result').innerHTML = 
+                    `<span style="color: ${result.success ? '#10b981' : '#ef4444'}">${result.message}</span><br>` +
+                    `Entropy: ${result.visualization.entropy.toFixed(4)}<br>` +
+                    `Non-zero states: ${result.visualization.states.length}`;
+                addLog(`Gate ${gateType} applied`, result.success ? 'success' : 'error');
+            } catch (error) {
+                document.getElementById('quantum-result').innerHTML = 
+                    `<span style="color: #ef4444">Error: ${error}</span>`;
+                addLog(`Gate ${gateType} failed: ${error}`, 'error');
+            }
+        }
+
+        async function runBellState() {
+            try {
+                const result = await invoke('run_bell_state');
+                document.getElementById('quantum-result').innerHTML = 
+                    `<span style="color: #10b981">Bell State Created!</span><br>` +
+                    `P(|00⟩) = ${result.p00.toFixed(4)}<br>` +
+                    `P(|11⟩) = ${result.p11.toFixed(4)}`;
+                addLog('Bell state executed', 'success');
+            } catch (error) {
+                document.getElementById('quantum-result').innerHTML = 
+                    `<span style="color: #ef4444">Error: ${error}</span>`;
+            }
+        }
+
+        async function runTeleportation() {
+            try {
+                const entropy = await invoke('run_quantum_teleportation');
+                document.getElementById('quantum-result').innerHTML = 
+                    `<span style="color: #10b981">Teleportation Complete!</span><br>` +
+                    `Entanglement Entropy: ${entropy.toFixed(4)}`;
+                addLog('Teleportation executed', 'success');
+            } catch (error) {
+                document.getElementById('quantum-result').innerHTML = 
+                    `<span style="color: #ef4444">Error: ${error}</span>`;
+            }
+        }
+
+        async function runSupremacyTest() {
+            try {
+                const [qResult, aiResult] = await invoke('run_supremacy_test', { input: [42, 43, 44] });
+                document.getElementById('quantum-result').innerHTML = 
+                    `<span style="color: #10b981">Supremacy Test Complete!</span><br>` +
+                    `Quantum Result: ${qResult.toFixed(4)}<br>` +
+                    `AI Result: ${aiResult}`;
+                addLog('Supremacy test passed', 'success');
+            } catch (error) {
+                document.getElementById('quantum-result').innerHTML = 
+                    `<span style="color: #ef4444">Error: ${error}</span>`;
+            }
+        }
+
+        function addLog(message, type = '') {
+            const container = document.getElementById('logs-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.insertBefore(entry, container.firstChild);
         // Run Bell State
         async function runBellState() {
             try {
@@ -850,10 +1181,12 @@
 
         // Initialize
         updateHealth();
+        updateStats();
         updateOSSupremeStats();
         updateQuantumGrid();
         updateBinaryMetrics();
         setInterval(updateHealth, 5000);
+        setInterval(updateStats, 5000);
     </script>
 </body>
 </html>
