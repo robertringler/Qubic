@@ -7,6 +7,7 @@ mod backend;
 mod commands;
 mod tray;
 mod codegen;
+mod qr_os_supreme;
 
 // Lightweight in-memory database (no SQLite)
 #[derive(Default)]
@@ -34,6 +35,11 @@ fn main() {
             commands::get_logs,
             commands::generate_code,
             commands::validate_code,
+            commands::run_bell_state,
+            commands::run_quantum_teleportation,
+            commands::run_ai_inference,
+            commands::run_supremacy_test,
+            commands::get_os_supreme_stats,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
