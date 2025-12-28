@@ -13,6 +13,15 @@ use serde::{Deserialize, Serialize};
 
 use super::lattice::MutatedNode;
 
+/// Mutation bonus for breakthrough discoveries
+const BREAKTHROUGH_BONUS: f64 = 0.15;
+
+/// Mutation bonus for innovative discoveries
+const INNOVATIVE_BONUS: f64 = 0.10;
+
+/// Mutation bonus for standard mutations
+const STANDARD_BONUS: f64 = 0.05;
+
 /// Known architecture for novelty comparison
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KnownArchitecture {
@@ -130,11 +139,11 @@ pub fn compute_novelty(node: &MutatedNode, known_architectures: &[KnownArchitect
     
     // Boost novelty based on mutation type
     let mutation_bonus = if node.mutation_type.contains("breakthrough") {
-        0.15
+        BREAKTHROUGH_BONUS
     } else if node.mutation_type.contains("innovative") {
-        0.10
+        INNOVATIVE_BONUS
     } else {
-        0.05
+        STANDARD_BONUS
     };
     
     (avg_novelty + mutation_bonus).min(1.0)

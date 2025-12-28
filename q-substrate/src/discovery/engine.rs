@@ -129,7 +129,7 @@ impl DiscoveryEngine {
     }
 
     /// Synthesize discovery from surviving node
-    pub fn synthesize_discovery(&self, node: &MutatedNode, discovery_id: usize) -> Discovery {
+    pub fn synthesize_discovery(&self, node: &MutatedNode, discovery_id: usize, fitness: f64) -> Discovery {
         let id = format!("QRD-{:03}", discovery_id + 1);
         
         // Generate timestamp (simplified for deterministic execution)
@@ -208,7 +208,7 @@ impl DiscoveryEngine {
                     "Fallback to proven baseline implementations".into(),
                 ],
             },
-            fitness_score: node.novelty_score, // Will be replaced with actual fitness
+            fitness_score: fitness,
             provenance: Provenance {
                 generated_at: timestamp,
                 qradle_hash,
@@ -255,8 +255,7 @@ impl DiscoveryEngine {
                 
                 // Only synthesize if fitness meets threshold
                 if fitness >= self.fitness_threshold {
-                    let mut discovery = self.synthesize_discovery(&mutation, discovery_count);
-                    discovery.fitness_score = fitness;
+                    let discovery = self.synthesize_discovery(&mutation, discovery_count, fitness);
                     
                     self.discoveries.push(discovery);
                     discovery_count += 1;
@@ -354,7 +353,7 @@ mod tests {
             novelty_score: 0.9,
         }];
         
-        let discovery = engine.synthesize_discovery(&mutations[0], 0);
+        let discovery = engine.synthesize_discovery(&mutations[0], 0, 0.9);
         assert_eq!(discovery.id, "QRD-001");
         assert!(discovery.has_valid_id());
     }
