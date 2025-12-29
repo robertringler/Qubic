@@ -109,6 +109,35 @@ class GenomicDiscovery:
 class GenomicDiscoveriesGenerator:
     """Generator for novel genomic discoveries."""
 
+    # Score generation constants
+    MIN_FITNESS_SCORE = 0.65
+    FITNESS_SCORE_RANGE = 0.34  # Max will be 0.65 + 0.34 = 0.99
+    MIN_EFFICACY_SCORE = 0.70
+    EFFICACY_SCORE_RANGE = 0.29  # Max will be 0.70 + 0.29 = 0.99
+    MIN_CONFIDENCE_SCORE = 0.75
+    CONFIDENCE_SCORE_RANGE = 0.24  # Max will be 0.75 + 0.24 = 0.99
+
+    # Simulation node constants
+    MAX_SIMULATION_NODES = 100
+
+    # Value generation constants (in millions USD)
+    VALUE_BASE_OPTIONS = [10, 50, 100, 250, 500]  # Base values in millions
+    VALUE_MULTIPLIERS = [1, 2, 3, 5]  # More conservative multipliers
+
+    # Category selection weights (must sum to 1.0)
+    # Distribution: rare_variant(12%), common_variant(12%), structural_variant(10%),
+    # epigenetic_modifier(12%), regulatory_network(12%), synthetic_allele(8%),
+    # gene_environment(10%), evolutionary(8%), multi_omics(10%), pathway(6%)
+    CATEGORY_WEIGHTS = [0.12, 0.12, 0.10, 0.12, 0.12, 0.08, 0.10, 0.08, 0.10, 0.06]
+
+    # Organism selection weights (must sum to 1.0)
+    # Human has highest weight (40%), followed by common model organisms
+    ORGANISM_WEIGHTS = [0.40, 0.15, 0.10, 0.08, 0.08, 0.05, 0.05, 0.04, 0.05]
+
+    # Genome type weights (must sum to 1.0)
+    # Nuclear (70%), mitochondrial (10%), chloroplast (5%), synthetic (10%), engineered (5%)
+    GENOME_TYPE_WEIGHTS = [0.70, 0.10, 0.05, 0.10, 0.05]
+
     ORGANISMS = [
         "Homo sapiens",
         "Mus musculus",
@@ -829,7 +858,10 @@ ALGORITHM PathwayDiscovery:
         method_idx = self.rng.randint(len(self.VALIDATION_METHODS))
         rig_idx = self.rng.randint(len(self.TEST_RIGS))
 
-        confidence = round(0.75 + self.rng.random() * 0.24, 3)  # 0.75-0.99
+        # Generate confidence score using class constants
+        confidence = round(
+            self.MIN_CONFIDENCE_SCORE + self.rng.random() * self.CONFIDENCE_SCORE_RANGE, 3
+        )
 
         expected_outcomes = {
             "rare_variant": (
@@ -923,11 +955,12 @@ ALGORITHM PathwayDiscovery:
             ),
         }
 
-        # Generate estimated value
-        base_value = self.rng.choice([10, 50, 100, 250, 500, 1000])
-        multiplier = self.rng.choice([1, 2, 5, 10])
-        unit = self.rng.choice(["million", "billion"])
-        value = f"${base_value * multiplier} {unit} USD (10-year horizon)"
+        # Generate estimated value using class constants
+        # Values are in millions USD, with reasonable multipliers
+        base_value = self.rng.choice(self.VALUE_BASE_OPTIONS)
+        multiplier = self.rng.choice(self.VALUE_MULTIPLIERS)
+        total_millions = base_value * multiplier
+        value = f"${total_millions} million USD (10-year horizon)"
 
         return IndustrialImpact(
             application=applications.get(
@@ -1184,15 +1217,14 @@ ALGORITHM PathwayDiscovery:
         Returns:
             Complete GenomicDiscovery object
         """
-        # Select category based on distribution
-        category_weights = [0.12, 0.12, 0.10, 0.12, 0.12, 0.08, 0.10, 0.08, 0.10, 0.06]
-        category = self.rng.choice(self.CATEGORIES, p=category_weights)
+        # Select category based on distribution (using class constant weights)
+        category = self.rng.choice(self.CATEGORIES, p=self.CATEGORY_WEIGHTS)
 
-        # Select organism with human having higher weight
-        organism_weights = [0.40, 0.15, 0.10, 0.08, 0.08, 0.05, 0.05, 0.04, 0.05]
-        organism = self.rng.choice(self.ORGANISMS, p=organism_weights)
+        # Select organism with human having higher weight (using class constant weights)
+        organism = self.rng.choice(self.ORGANISMS, p=self.ORGANISM_WEIGHTS)
 
-        genome_type = self.rng.choice(self.GENOME_TYPES, p=[0.70, 0.10, 0.05, 0.10, 0.05])
+        # Select genome type (using class constant weights)
+        genome_type = self.rng.choice(self.GENOME_TYPES, p=self.GENOME_TYPE_WEIGHTS)
         gene = self.rng.choice(self.GENES)
         pathway = self.rng.choice(self.PATHWAYS)
         tissue = self.rng.choice(self.TISSUES)
@@ -1214,20 +1246,24 @@ ALGORITHM PathwayDiscovery:
         risk_envelope = self._generate_risk_envelope(category)
         visualization_schema = self._generate_visualization_schema(category)
 
-        # Generate scores
-        fitness_score = round(0.65 + self.rng.random() * 0.34, 3)
-        efficacy_score = round(0.70 + self.rng.random() * 0.29, 3)
+        # Generate scores using class constants
+        fitness_score = round(
+            self.MIN_FITNESS_SCORE + self.rng.random() * self.FITNESS_SCORE_RANGE, 3
+        )
+        efficacy_score = round(
+            self.MIN_EFFICACY_SCORE + self.rng.random() * self.EFFICACY_SCORE_RANGE, 3
+        )
 
         # Generate tags
         tags = [category, organism.split()[0].lower(), gene, pathway.split()[0].lower()]
         if genome_type != "nuclear":
             tags.append(genome_type)
 
-        # Provenance
+        # Provenance with simulation node using class constant
         provenance = Provenance(
             generated_at=self.generated_at,
             seed=self.seed,
-            simulation_node=f"XENON-v5-node-{self.rng.randint(1, 100):03d}",
+            simulation_node=f"XENON-v5-node-{self.rng.randint(1, self.MAX_SIMULATION_NODES):03d}",
             lineage=[
                 f"QRATUM/bioinformatics/{category}_module",
                 f"reference_genome/{organism.replace(' ', '_')}_GRCh38",
