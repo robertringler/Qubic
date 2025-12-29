@@ -31,6 +31,7 @@ QRATUM's safety depends on maintaining 8 Fatal Invariants across all operations.
   - Properties: Safety (invariants always hold) and liveness (progress guarantees)
 
 **Usage:**
+
 ```bash
 # Install TLA+ Tools
 # https://lamport.azurewebsites.net/tla/tools.html
@@ -47,6 +48,7 @@ tlc contract_execution.tla
   - Theorems: Initial state safety, operation preservation
 
 **Usage:**
+
 ```bash
 # Install Coq (version 8.18+)
 coqc FatalInvariants.v
@@ -60,6 +62,7 @@ coqc FatalInvariants.v
   - Mathlib integration
 
 **Usage:**
+
 ```bash
 # Install Lean4 and elan
 curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
@@ -117,8 +120,8 @@ These formal specifications contribute to DO-178C Level A certification:
 
 ## References
 
-- TLA+: https://lamport.azurewebsites.net/tla/tla.html
-- Coq: https://coq.inria.fr/
-- Lean4: https://leanprover.github.io/lean4/doc/
+- TLA+: <https://lamport.azurewebsites.net/tla/tla.html>
+- Coq: <https://coq.inria.fr/>
+- Lean4: <https://leanprover.github.io/lean4/doc/>
 - DO-178C: RTCA DO-178C Software Considerations in Airborne Systems
-- CBMC: https://www.cprover.org/cbmc/
+- CBMC: <https://www.cprover.org/cbmc/>
