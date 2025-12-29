@@ -460,10 +460,14 @@ impl SecureDrbg {
     }
     
     /// Generate random bytes with automatic reseeding
+    ///
+    /// Thread-safe: The mutex is held for the entire operation, ensuring
+    /// that reseed check and generate are atomic with respect to other threads.
     pub fn generate(&self, output: &mut [u8]) -> Result<(), DrbgError> {
         let mut drbg = self.drbg.lock().unwrap();
         
         // Auto-reseed if approaching limit
+        // Note: Check and reseed are atomic because mutex is held
         if drbg.reseed_counter() > self.reseed_interval {
             let mut entropy = [0u8; MIN_ENTROPY * 2];
             getrandom::getrandom(&mut entropy).map_err(|_| DrbgError::EntropySourceFailed)?;

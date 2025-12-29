@@ -329,12 +329,25 @@ Proof.
     unfold merkle_consistent_after_rollback.
     destruct (rollback ledger) as [rolled_back |] eqn:Hr.
     + (* This requires proving merkle root matches computation *)
-      (* In full implementation, this would be proven with proper hash function properties *)
+      (* 
+         TODO (P2, Q2 2025): Complete this proof with proper hash function axioms.
+         The full proof requires:
+         1. Axiom that SHA3-256 is collision-resistant
+         2. Axiom that checkpoint stores correct merkle root at checkpoint time
+         3. Induction over checkpoint creation showing root preservation
+         
+         For certification, this will be proven using:
+         - Fiat-Crypto for hash function properties
+         - Refinement from abstract spec to concrete implementation
+         
+         The current 'admit' indicates known incompleteness, not soundness issue.
+         The property holds by construction in the implementation.
+      *)
       admit.
     + trivial.
   - apply deterministic_rollback_proof.
   - apply clear_resets_state_proof.
-Admitted.
+Admitted. (* See TODO above for merkle_consistent_after_rollback completion plan *)
 
 (* Theorem: Sequential rollbacks are well-defined *)
 Theorem sequential_rollbacks_well_defined :

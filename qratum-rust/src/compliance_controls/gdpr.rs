@@ -444,18 +444,24 @@ struct EncryptionKey {
 }
 
 impl EncryptionKey {
-    fn new() -> Self {
+    fn new() -> Result<Self, &'static str> {
         let mut key_material = [0u8; 32];
-        // In production, use secure RNG
+        // Use secure RNG with proper error handling
         #[cfg(feature = "std")]
         {
-            let _ = getrandom::getrandom(&mut key_material);
+            getrandom::getrandom(&mut key_material)
+                .map_err(|_| "Failed to generate encryption key: entropy source unavailable")?;
+        }
+        #[cfg(not(feature = "std"))]
+        {
+            // In no_std environment, key generation requires external entropy
+            return Err("Encryption key generation requires std feature for entropy");
         }
         
-        Self {
+        Ok(Self {
             key_material,
             created_at: current_timestamp(),
-        }
+        })
     }
 }
 
@@ -473,13 +479,16 @@ impl GdprComplianceEngine {
     }
     
     /// Register personal data record
-    pub fn register_record(&mut self, record: PersonalDataRecord) {
+    ///
+    /// Returns error if encryption key generation fails.
+    pub fn register_record(&mut self, record: PersonalDataRecord) -> Result<(), &'static str> {
         // Generate encryption key for this record
-        let key = EncryptionKey::new();
+        let key = EncryptionKey::new()?;
         let key_id = record.encryption_key_id;
         
         self.encryption_keys.insert(key_id, key);
         self.records.insert(record.record_id, record);
+        Ok(())
     }
     
     /// Handle erasure request (Article 17)
@@ -733,7 +742,7 @@ mod tests {
             LawfulBasis::Consent,
             vec!["Processing".into()],
         );
-        engine.register_record(record);
+        engine.register_record(record).unwrap();
         
         // Create erasure request
         let request = DataSubjectAccessRequest::new(

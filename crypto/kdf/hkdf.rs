@@ -70,7 +70,7 @@ fn hmac_sha3_512(key: &[u8], data: &[u8]) -> [u8; HASH_LENGTH] {
         inner_hasher.update(&[byte ^ IPAD]);
     }
     inner_hasher.update(data);
-    let inner_hash: [u8; HASH_LENGTH] = inner_hasher.finalize().into();
+    let mut inner_hash: [u8; HASH_LENGTH] = inner_hasher.finalize().into();
     
     // Outer hash: H((K ⊕ opad) || inner_hash)
     let mut outer_hasher = Sha3_512::new();
@@ -79,8 +79,9 @@ fn hmac_sha3_512(key: &[u8], data: &[u8]) -> [u8; HASH_LENGTH] {
     }
     outer_hasher.update(&inner_hash);
     
-    // Zeroize sensitive data
+    // Zeroize all sensitive intermediate data
     padded_key.zeroize();
+    inner_hash.zeroize();
     
     outer_hasher.finalize().into()
 }
