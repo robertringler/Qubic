@@ -3,7 +3,7 @@
     "title": "QRATUM XENON v5 Genomic Discoveries Dataset",
     "description": "100 novel genomic discoveries spanning human, model organism, and synthetic genomes",
     "version": "1.0.0",
-    "generated_at": "2025-12-29T00:16:34.450952+00:00",
+    "generated_at": "2025-12-29T00:21:18.690288+00:00",
     "generator": "GenomicDiscoveriesGenerator",
     "seed": 42,
     "total_discoveries": 100,
@@ -14,7 +14,7 @@
       "Standard bioinformatics databases (VCF, BED, GFF3)",
       "Knowledge graph ingestion pipelines"
     ],
-    "content_hash_sha256": "f7b82ab55f6552a56a5c7d8a50aa0d1f4c428569b9681e1abdc9c1cfa9215ac4"
+    "content_hash_sha256": "b1ba2a9f207784dd75968bef971fa0906a3c5526256fbd864e90ee3ecfb029ec"
   },
   "summary_statistics": {
     "by_category": {
@@ -96,7 +96,7 @@
       "fitness_score": 0.699,
       "efficacy_score": 0.889,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-053",
         "lineage": [
@@ -175,7 +175,7 @@
       "fitness_score": 0.858,
       "efficacy_score": 0.74,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-092",
         "lineage": [
@@ -253,7 +253,7 @@
       "fitness_score": 0.978,
       "efficacy_score": 0.934,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-009",
         "lineage": [
@@ -331,7 +331,7 @@
       "fitness_score": 0.907,
       "efficacy_score": 0.823,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-054",
         "lineage": [
@@ -409,7 +409,7 @@
       "fitness_score": 0.977,
       "efficacy_score": 0.945,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-082",
         "lineage": [
@@ -488,7 +488,7 @@
       "fitness_score": 0.75,
       "efficacy_score": 0.704,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-081",
         "lineage": [
@@ -532,7 +532,7 @@
           "Norm_of_Reaction_Plasticity = max(P_env) - min(P_env)"
         ],
         "pseudocode": "\nALGORITHM GeneEnvironmentInteraction:\n    INPUT: genotypes, phenotypes, environmental_exposures\n\n    geno_matrix = STANDARDIZE(genotypes)\n    env_matrix = STANDARDIZE(environmental_exposures)\n\n    FOR each SNP IN geno_matrix:\n        FOR each ENV IN env_matrix:\n            # Full interaction model\n            model = LINEAR_MIXED_MODEL(\n                phenotype ~ SNP + ENV + SNP*ENV + covariates,\n                random=~1|family\n            )\n\n            interaction_pval = model.pvalue['SNP*ENV']\n            IF interaction_pval < (0.05 / n_tests):  # Bonferroni\n                # Stratified analysis\n                effect_low_env = EFFECT_in_stratum(SNP, ENV < median)\n                effect_high_env = EFFECT_in_stratum(SNP, ENV >= median)\n\n                IF sign(effect_low_env) != sign(effect_high_env):\n                    YIELD crossover_interaction(SNP, ENV, model)\n                ELIF abs(effect_high_env) > 2*abs(effect_low_env):\n                    YIELD amplifying_interaction(SNP, ENV, model)\n\n    OUTPUT: significant_gene_environment_interactions\n",
-        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf AND |beta_high_E - beta_low_E| > 2*SE"
+        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
       },
       "validation": {
         "method": "Single-cell RNA-seq perturbation profiling",
@@ -567,7 +567,7 @@
       "fitness_score": 0.776,
       "efficacy_score": 0.894,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-037",
         "lineage": [
@@ -610,7 +610,7 @@
           "Norm_of_Reaction_Plasticity = max(P_env) - min(P_env)"
         ],
         "pseudocode": "\nALGORITHM GeneEnvironmentInteraction:\n    INPUT: genotypes, phenotypes, environmental_exposures\n\n    geno_matrix = STANDARDIZE(genotypes)\n    env_matrix = STANDARDIZE(environmental_exposures)\n\n    FOR each SNP IN geno_matrix:\n        FOR each ENV IN env_matrix:\n            # Full interaction model\n            model = LINEAR_MIXED_MODEL(\n                phenotype ~ SNP + ENV + SNP*ENV + covariates,\n                random=~1|family\n            )\n\n            interaction_pval = model.pvalue['SNP*ENV']\n            IF interaction_pval < (0.05 / n_tests):  # Bonferroni\n                # Stratified analysis\n                effect_low_env = EFFECT_in_stratum(SNP, ENV < median)\n                effect_high_env = EFFECT_in_stratum(SNP, ENV >= median)\n\n                IF sign(effect_low_env) != sign(effect_high_env):\n                    YIELD crossover_interaction(SNP, ENV, model)\n                ELIF abs(effect_high_env) > 2*abs(effect_low_env):\n                    YIELD amplifying_interaction(SNP, ENV, model)\n\n    OUTPUT: significant_gene_environment_interactions\n",
-        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf AND |beta_high_E - beta_low_E| > 2*SE"
+        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
       },
       "validation": {
         "method": "In vivo mouse model phenotypic assessment",
@@ -645,7 +645,7 @@
       "fitness_score": 0.892,
       "efficacy_score": 0.732,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-077",
         "lineage": [
@@ -724,7 +724,7 @@
       "fitness_score": 0.728,
       "efficacy_score": 0.722,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-059",
         "lineage": [
@@ -767,7 +767,7 @@
           "Norm_of_Reaction_Plasticity = max(P_env) - min(P_env)"
         ],
         "pseudocode": "\nALGORITHM GeneEnvironmentInteraction:\n    INPUT: genotypes, phenotypes, environmental_exposures\n\n    geno_matrix = STANDARDIZE(genotypes)\n    env_matrix = STANDARDIZE(environmental_exposures)\n\n    FOR each SNP IN geno_matrix:\n        FOR each ENV IN env_matrix:\n            # Full interaction model\n            model = LINEAR_MIXED_MODEL(\n                phenotype ~ SNP + ENV + SNP*ENV + covariates,\n                random=~1|family\n            )\n\n            interaction_pval = model.pvalue['SNP*ENV']\n            IF interaction_pval < (0.05 / n_tests):  # Bonferroni\n                # Stratified analysis\n                effect_low_env = EFFECT_in_stratum(SNP, ENV < median)\n                effect_high_env = EFFECT_in_stratum(SNP, ENV >= median)\n\n                IF sign(effect_low_env) != sign(effect_high_env):\n                    YIELD crossover_interaction(SNP, ENV, model)\n                ELIF abs(effect_high_env) > 2*abs(effect_low_env):\n                    YIELD amplifying_interaction(SNP, ENV, model)\n\n    OUTPUT: significant_gene_environment_interactions\n",
-        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf AND |beta_high_E - beta_low_E| > 2*SE"
+        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
       },
       "validation": {
         "method": "Multi-center clinical cohort analysis (N>10,000)",
@@ -802,7 +802,7 @@
       "fitness_score": 0.727,
       "efficacy_score": 0.824,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-077",
         "lineage": [
@@ -880,7 +880,7 @@
       "fitness_score": 0.724,
       "efficacy_score": 0.862,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-052",
         "lineage": [
@@ -958,7 +958,7 @@
       "fitness_score": 0.982,
       "efficacy_score": 0.819,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-087",
         "lineage": [
@@ -1037,7 +1037,7 @@
       "fitness_score": 0.898,
       "efficacy_score": 0.807,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-098",
         "lineage": [
@@ -1115,7 +1115,7 @@
       "fitness_score": 0.892,
       "efficacy_score": 0.935,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-020",
         "lineage": [
@@ -1193,7 +1193,7 @@
       "fitness_score": 0.728,
       "efficacy_score": 0.751,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-060",
         "lineage": [
@@ -1271,7 +1271,7 @@
       "fitness_score": 0.952,
       "efficacy_score": 0.926,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-024",
         "lineage": [
@@ -1350,7 +1350,7 @@
       "fitness_score": 0.754,
       "efficacy_score": 0.841,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-035",
         "lineage": [
@@ -1429,7 +1429,7 @@
       "fitness_score": 0.755,
       "efficacy_score": 0.857,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-059",
         "lineage": [
@@ -1508,7 +1508,7 @@
       "fitness_score": 0.821,
       "efficacy_score": 0.867,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-064",
         "lineage": [
@@ -1586,7 +1586,7 @@
       "fitness_score": 0.966,
       "efficacy_score": 0.824,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-053",
         "lineage": [
@@ -1664,7 +1664,7 @@
       "fitness_score": 0.844,
       "efficacy_score": 0.728,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-032",
         "lineage": [
@@ -1707,7 +1707,7 @@
           "Norm_of_Reaction_Plasticity = max(P_env) - min(P_env)"
         ],
         "pseudocode": "\nALGORITHM GeneEnvironmentInteraction:\n    INPUT: genotypes, phenotypes, environmental_exposures\n\n    geno_matrix = STANDARDIZE(genotypes)\n    env_matrix = STANDARDIZE(environmental_exposures)\n\n    FOR each SNP IN geno_matrix:\n        FOR each ENV IN env_matrix:\n            # Full interaction model\n            model = LINEAR_MIXED_MODEL(\n                phenotype ~ SNP + ENV + SNP*ENV + covariates,\n                random=~1|family\n            )\n\n            interaction_pval = model.pvalue['SNP*ENV']\n            IF interaction_pval < (0.05 / n_tests):  # Bonferroni\n                # Stratified analysis\n                effect_low_env = EFFECT_in_stratum(SNP, ENV < median)\n                effect_high_env = EFFECT_in_stratum(SNP, ENV >= median)\n\n                IF sign(effect_low_env) != sign(effect_high_env):\n                    YIELD crossover_interaction(SNP, ENV, model)\n                ELIF abs(effect_high_env) > 2*abs(effect_low_env):\n                    YIELD amplifying_interaction(SNP, ENV, model)\n\n    OUTPUT: significant_gene_environment_interactions\n",
-        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf AND |beta_high_E - beta_low_E| > 2*SE"
+        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
       },
       "validation": {
         "method": "In silico simulation with 10,000 bootstrapped replicates",
@@ -1742,7 +1742,7 @@
       "fitness_score": 0.925,
       "efficacy_score": 0.935,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-025",
         "lineage": [
@@ -1820,7 +1820,7 @@
       "fitness_score": 0.765,
       "efficacy_score": 0.809,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-066",
         "lineage": [
@@ -1898,7 +1898,7 @@
       "fitness_score": 0.828,
       "efficacy_score": 0.923,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-005",
         "lineage": [
@@ -1976,7 +1976,7 @@
       "fitness_score": 0.893,
       "efficacy_score": 0.712,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-063",
         "lineage": [
@@ -2054,7 +2054,7 @@
       "fitness_score": 0.837,
       "efficacy_score": 0.907,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-001",
         "lineage": [
@@ -2132,7 +2132,7 @@
       "fitness_score": 0.681,
       "efficacy_score": 0.727,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-094",
         "lineage": [
@@ -2210,7 +2210,7 @@
       "fitness_score": 0.666,
       "efficacy_score": 0.975,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-034",
         "lineage": [
@@ -2288,7 +2288,7 @@
       "fitness_score": 0.945,
       "efficacy_score": 0.885,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-084",
         "lineage": [
@@ -2367,7 +2367,7 @@
       "fitness_score": 0.717,
       "efficacy_score": 0.72,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-095",
         "lineage": [
@@ -2445,7 +2445,7 @@
       "fitness_score": 0.746,
       "efficacy_score": 0.734,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-075",
         "lineage": [
@@ -2523,7 +2523,7 @@
       "fitness_score": 0.693,
       "efficacy_score": 0.773,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-096",
         "lineage": [
@@ -2602,7 +2602,7 @@
       "fitness_score": 0.684,
       "efficacy_score": 0.716,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-061",
         "lineage": [
@@ -2681,7 +2681,7 @@
       "fitness_score": 0.879,
       "efficacy_score": 0.918,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-023",
         "lineage": [
@@ -2759,7 +2759,7 @@
       "fitness_score": 0.69,
       "efficacy_score": 0.741,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-074",
         "lineage": [
@@ -2842,7 +2842,7 @@
       "fitness_score": 0.679,
       "efficacy_score": 0.986,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-065",
         "lineage": [
@@ -2925,7 +2925,7 @@
       "fitness_score": 0.688,
       "efficacy_score": 0.843,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-013",
         "lineage": [
@@ -3004,7 +3004,7 @@
       "fitness_score": 0.812,
       "efficacy_score": 0.724,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-033",
         "lineage": [
@@ -3083,7 +3083,7 @@
       "fitness_score": 0.838,
       "efficacy_score": 0.981,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-018",
         "lineage": [
@@ -3161,7 +3161,7 @@
       "fitness_score": 0.861,
       "efficacy_score": 0.78,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-092",
         "lineage": [
@@ -3239,7 +3239,7 @@
       "fitness_score": 0.927,
       "efficacy_score": 0.899,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-029",
         "lineage": [
@@ -3317,7 +3317,7 @@
       "fitness_score": 0.706,
       "efficacy_score": 0.819,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-065",
         "lineage": [
@@ -3396,7 +3396,7 @@
       "fitness_score": 0.669,
       "efficacy_score": 0.951,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-081",
         "lineage": [
@@ -3474,7 +3474,7 @@
       "fitness_score": 0.72,
       "efficacy_score": 0.773,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-045",
         "lineage": [
@@ -3553,7 +3553,7 @@
       "fitness_score": 0.755,
       "efficacy_score": 0.937,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-005",
         "lineage": [
@@ -3631,7 +3631,7 @@
       "fitness_score": 0.769,
       "efficacy_score": 0.871,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-030",
         "lineage": [
@@ -3709,7 +3709,7 @@
       "fitness_score": 0.806,
       "efficacy_score": 0.944,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-017",
         "lineage": [
@@ -3788,7 +3788,7 @@
       "fitness_score": 0.887,
       "efficacy_score": 0.752,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-004",
         "lineage": [
@@ -3867,7 +3867,7 @@
       "fitness_score": 0.768,
       "efficacy_score": 0.709,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-070",
         "lineage": [
@@ -3945,7 +3945,7 @@
       "fitness_score": 0.678,
       "efficacy_score": 0.953,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-063",
         "lineage": [
@@ -4023,7 +4023,7 @@
       "fitness_score": 0.831,
       "efficacy_score": 0.909,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-026",
         "lineage": [
@@ -4102,7 +4102,7 @@
       "fitness_score": 0.778,
       "efficacy_score": 0.706,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-057",
         "lineage": [
@@ -4181,7 +4181,7 @@
       "fitness_score": 0.813,
       "efficacy_score": 0.869,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-086",
         "lineage": [
@@ -4259,7 +4259,7 @@
       "fitness_score": 0.819,
       "efficacy_score": 0.796,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-033",
         "lineage": [
@@ -4337,7 +4337,7 @@
       "fitness_score": 0.79,
       "efficacy_score": 0.985,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-095",
         "lineage": [
@@ -4415,7 +4415,7 @@
       "fitness_score": 0.839,
       "efficacy_score": 0.866,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-051",
         "lineage": [
@@ -4494,7 +4494,7 @@
       "fitness_score": 0.911,
       "efficacy_score": 0.725,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-011",
         "lineage": [
@@ -4577,7 +4577,7 @@
       "fitness_score": 0.883,
       "efficacy_score": 0.725,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-063",
         "lineage": [
@@ -4620,7 +4620,7 @@
           "Norm_of_Reaction_Plasticity = max(P_env) - min(P_env)"
         ],
         "pseudocode": "\nALGORITHM GeneEnvironmentInteraction:\n    INPUT: genotypes, phenotypes, environmental_exposures\n\n    geno_matrix = STANDARDIZE(genotypes)\n    env_matrix = STANDARDIZE(environmental_exposures)\n\n    FOR each SNP IN geno_matrix:\n        FOR each ENV IN env_matrix:\n            # Full interaction model\n            model = LINEAR_MIXED_MODEL(\n                phenotype ~ SNP + ENV + SNP*ENV + covariates,\n                random=~1|family\n            )\n\n            interaction_pval = model.pvalue['SNP*ENV']\n            IF interaction_pval < (0.05 / n_tests):  # Bonferroni\n                # Stratified analysis\n                effect_low_env = EFFECT_in_stratum(SNP, ENV < median)\n                effect_high_env = EFFECT_in_stratum(SNP, ENV >= median)\n\n                IF sign(effect_low_env) != sign(effect_high_env):\n                    YIELD crossover_interaction(SNP, ENV, model)\n                ELIF abs(effect_high_env) > 2*abs(effect_low_env):\n                    YIELD amplifying_interaction(SNP, ENV, model)\n\n    OUTPUT: significant_gene_environment_interactions\n",
-        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf AND |beta_high_E - beta_low_E| > 2*SE"
+        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
       },
       "validation": {
         "method": "In vivo mouse model phenotypic assessment",
@@ -4655,7 +4655,7 @@
       "fitness_score": 0.692,
       "efficacy_score": 0.912,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-009",
         "lineage": [
@@ -4733,7 +4733,7 @@
       "fitness_score": 0.713,
       "efficacy_score": 0.768,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-078",
         "lineage": [
@@ -4812,7 +4812,7 @@
       "fitness_score": 0.834,
       "efficacy_score": 0.827,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-097",
         "lineage": [
@@ -4891,7 +4891,7 @@
       "fitness_score": 0.898,
       "efficacy_score": 0.901,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-015",
         "lineage": [
@@ -4969,7 +4969,7 @@
       "fitness_score": 0.699,
       "efficacy_score": 0.759,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-066",
         "lineage": [
@@ -5048,7 +5048,7 @@
       "fitness_score": 0.701,
       "efficacy_score": 0.766,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-076",
         "lineage": [
@@ -5130,7 +5130,7 @@
       "fitness_score": 0.859,
       "efficacy_score": 0.964,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-062",
         "lineage": [
@@ -5212,7 +5212,7 @@
       "fitness_score": 0.846,
       "efficacy_score": 0.876,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-051",
         "lineage": [
@@ -5256,7 +5256,7 @@
           "Norm_of_Reaction_Plasticity = max(P_env) - min(P_env)"
         ],
         "pseudocode": "\nALGORITHM GeneEnvironmentInteraction:\n    INPUT: genotypes, phenotypes, environmental_exposures\n\n    geno_matrix = STANDARDIZE(genotypes)\n    env_matrix = STANDARDIZE(environmental_exposures)\n\n    FOR each SNP IN geno_matrix:\n        FOR each ENV IN env_matrix:\n            # Full interaction model\n            model = LINEAR_MIXED_MODEL(\n                phenotype ~ SNP + ENV + SNP*ENV + covariates,\n                random=~1|family\n            )\n\n            interaction_pval = model.pvalue['SNP*ENV']\n            IF interaction_pval < (0.05 / n_tests):  # Bonferroni\n                # Stratified analysis\n                effect_low_env = EFFECT_in_stratum(SNP, ENV < median)\n                effect_high_env = EFFECT_in_stratum(SNP, ENV >= median)\n\n                IF sign(effect_low_env) != sign(effect_high_env):\n                    YIELD crossover_interaction(SNP, ENV, model)\n                ELIF abs(effect_high_env) > 2*abs(effect_low_env):\n                    YIELD amplifying_interaction(SNP, ENV, model)\n\n    OUTPUT: significant_gene_environment_interactions\n",
-        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf AND |beta_high_E - beta_low_E| > 2*SE"
+        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
       },
       "validation": {
         "method": "Structural biology cryo-EM confirmation",
@@ -5291,7 +5291,7 @@
       "fitness_score": 0.946,
       "efficacy_score": 0.85,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-040",
         "lineage": [
@@ -5370,7 +5370,7 @@
       "fitness_score": 0.944,
       "efficacy_score": 0.968,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-007",
         "lineage": [
@@ -5449,7 +5449,7 @@
       "fitness_score": 0.744,
       "efficacy_score": 0.764,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-085",
         "lineage": [
@@ -5527,7 +5527,7 @@
       "fitness_score": 0.922,
       "efficacy_score": 0.801,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-030",
         "lineage": [
@@ -5605,7 +5605,7 @@
       "fitness_score": 0.786,
       "efficacy_score": 0.862,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-063",
         "lineage": [
@@ -5683,7 +5683,7 @@
       "fitness_score": 0.893,
       "efficacy_score": 0.891,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-065",
         "lineage": [
@@ -5761,7 +5761,7 @@
       "fitness_score": 0.733,
       "efficacy_score": 0.909,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-046",
         "lineage": [
@@ -5839,7 +5839,7 @@
       "fitness_score": 0.938,
       "efficacy_score": 0.736,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-019",
         "lineage": [
@@ -5921,7 +5921,7 @@
       "fitness_score": 0.862,
       "efficacy_score": 0.819,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-094",
         "lineage": [
@@ -6000,7 +6000,7 @@
       "fitness_score": 0.658,
       "efficacy_score": 0.778,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-040",
         "lineage": [
@@ -6043,7 +6043,7 @@
           "Norm_of_Reaction_Plasticity = max(P_env) - min(P_env)"
         ],
         "pseudocode": "\nALGORITHM GeneEnvironmentInteraction:\n    INPUT: genotypes, phenotypes, environmental_exposures\n\n    geno_matrix = STANDARDIZE(genotypes)\n    env_matrix = STANDARDIZE(environmental_exposures)\n\n    FOR each SNP IN geno_matrix:\n        FOR each ENV IN env_matrix:\n            # Full interaction model\n            model = LINEAR_MIXED_MODEL(\n                phenotype ~ SNP + ENV + SNP*ENV + covariates,\n                random=~1|family\n            )\n\n            interaction_pval = model.pvalue['SNP*ENV']\n            IF interaction_pval < (0.05 / n_tests):  # Bonferroni\n                # Stratified analysis\n                effect_low_env = EFFECT_in_stratum(SNP, ENV < median)\n                effect_high_env = EFFECT_in_stratum(SNP, ENV >= median)\n\n                IF sign(effect_low_env) != sign(effect_high_env):\n                    YIELD crossover_interaction(SNP, ENV, model)\n                ELIF abs(effect_high_env) > 2*abs(effect_low_env):\n                    YIELD amplifying_interaction(SNP, ENV, model)\n\n    OUTPUT: significant_gene_environment_interactions\n",
-        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf AND |beta_high_E - beta_low_E| > 2*SE"
+        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
       },
       "validation": {
         "method": "Multi-center clinical cohort analysis (N>10,000)",
@@ -6078,7 +6078,7 @@
       "fitness_score": 0.882,
       "efficacy_score": 0.939,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-085",
         "lineage": [
@@ -6156,7 +6156,7 @@
       "fitness_score": 0.741,
       "efficacy_score": 0.912,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-098",
         "lineage": [
@@ -6238,7 +6238,7 @@
       "fitness_score": 0.673,
       "efficacy_score": 0.943,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-011",
         "lineage": [
@@ -6316,7 +6316,7 @@
       "fitness_score": 0.661,
       "efficacy_score": 0.776,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-099",
         "lineage": [
@@ -6394,7 +6394,7 @@
       "fitness_score": 0.818,
       "efficacy_score": 0.9,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-042",
         "lineage": [
@@ -6473,7 +6473,7 @@
       "fitness_score": 0.919,
       "efficacy_score": 0.9,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-047",
         "lineage": [
@@ -6551,7 +6551,7 @@
       "fitness_score": 0.816,
       "efficacy_score": 0.764,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-026",
         "lineage": [
@@ -6630,7 +6630,7 @@
       "fitness_score": 0.751,
       "efficacy_score": 0.968,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-059",
         "lineage": [
@@ -6708,7 +6708,7 @@
       "fitness_score": 0.691,
       "efficacy_score": 0.722,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-037",
         "lineage": [
@@ -6787,7 +6787,7 @@
       "fitness_score": 0.827,
       "efficacy_score": 0.824,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-066",
         "lineage": [
@@ -6865,7 +6865,7 @@
       "fitness_score": 0.663,
       "efficacy_score": 0.839,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-016",
         "lineage": [
@@ -6943,7 +6943,7 @@
       "fitness_score": 0.751,
       "efficacy_score": 0.947,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-018",
         "lineage": [
@@ -7022,7 +7022,7 @@
       "fitness_score": 0.921,
       "efficacy_score": 0.775,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-070",
         "lineage": [
@@ -7100,7 +7100,7 @@
       "fitness_score": 0.871,
       "efficacy_score": 0.876,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-074",
         "lineage": [
@@ -7178,7 +7178,7 @@
       "fitness_score": 0.853,
       "efficacy_score": 0.852,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-035",
         "lineage": [
@@ -7221,7 +7221,7 @@
           "Norm_of_Reaction_Plasticity = max(P_env) - min(P_env)"
         ],
         "pseudocode": "\nALGORITHM GeneEnvironmentInteraction:\n    INPUT: genotypes, phenotypes, environmental_exposures\n\n    geno_matrix = STANDARDIZE(genotypes)\n    env_matrix = STANDARDIZE(environmental_exposures)\n\n    FOR each SNP IN geno_matrix:\n        FOR each ENV IN env_matrix:\n            # Full interaction model\n            model = LINEAR_MIXED_MODEL(\n                phenotype ~ SNP + ENV + SNP*ENV + covariates,\n                random=~1|family\n            )\n\n            interaction_pval = model.pvalue['SNP*ENV']\n            IF interaction_pval < (0.05 / n_tests):  # Bonferroni\n                # Stratified analysis\n                effect_low_env = EFFECT_in_stratum(SNP, ENV < median)\n                effect_high_env = EFFECT_in_stratum(SNP, ENV >= median)\n\n                IF sign(effect_low_env) != sign(effect_high_env):\n                    YIELD crossover_interaction(SNP, ENV, model)\n                ELIF abs(effect_high_env) > 2*abs(effect_low_env):\n                    YIELD amplifying_interaction(SNP, ENV, model)\n\n    OUTPUT: significant_gene_environment_interactions\n",
-        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf AND |beta_high_E - beta_low_E| > 2*SE"
+        "formal_specification": "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
       },
       "validation": {
         "method": "Proteomics mass spectrometry validation",
@@ -7256,7 +7256,7 @@
       "fitness_score": 0.806,
       "efficacy_score": 0.813,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-092",
         "lineage": [
@@ -7334,7 +7334,7 @@
       "fitness_score": 0.652,
       "efficacy_score": 0.902,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-048",
         "lineage": [
@@ -7413,7 +7413,7 @@
       "fitness_score": 0.93,
       "efficacy_score": 0.801,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-098",
         "lineage": [
@@ -7491,7 +7491,7 @@
       "fitness_score": 0.881,
       "efficacy_score": 0.879,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-038",
         "lineage": [
@@ -7570,7 +7570,7 @@
       "fitness_score": 0.907,
       "efficacy_score": 0.775,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-066",
         "lineage": [
@@ -7649,7 +7649,7 @@
       "fitness_score": 0.656,
       "efficacy_score": 0.825,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-098",
         "lineage": [
@@ -7728,7 +7728,7 @@
       "fitness_score": 0.891,
       "efficacy_score": 0.837,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-022",
         "lineage": [
@@ -7807,7 +7807,7 @@
       "fitness_score": 0.929,
       "efficacy_score": 0.808,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-032",
         "lineage": [
@@ -7886,7 +7886,7 @@
       "fitness_score": 0.751,
       "efficacy_score": 0.944,
       "provenance": {
-        "generated_at": "2025-12-29T00:16:34.450952+00:00",
+        "generated_at": "2025-12-29T00:21:18.690288+00:00",
         "seed": 42,
         "simulation_node": "XENON-v5-node-047",
         "lineage": [

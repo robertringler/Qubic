@@ -125,17 +125,23 @@ class GenomicDiscoveriesGenerator:
     VALUE_MULTIPLIERS = [1, 2, 3, 5]  # More conservative multipliers
 
     # Category selection weights (must sum to 1.0)
-    # Distribution: rare_variant(12%), common_variant(12%), structural_variant(10%),
+    # Order matches CATEGORIES list:
+    # rare_variant(12%), common_variant(12%), structural_variant(10%),
     # epigenetic_modifier(12%), regulatory_network(12%), synthetic_allele(8%),
-    # gene_environment(10%), evolutionary(8%), multi_omics(10%), pathway(6%)
+    # gene_environment_interaction(10%), evolutionary_adaptation(8%),
+    # multi_omics_correlation(10%), pathway_discovery(6%)
     CATEGORY_WEIGHTS = [0.12, 0.12, 0.10, 0.12, 0.12, 0.08, 0.10, 0.08, 0.10, 0.06]
 
     # Organism selection weights (must sum to 1.0)
-    # Human has highest weight (40%), followed by common model organisms
+    # Order matches ORGANISMS list:
+    # Homo sapiens(40%), Mus musculus(15%), Drosophila melanogaster(10%),
+    # Caenorhabditis elegans(8%), Danio rerio(8%), Arabidopsis thaliana(5%),
+    # Saccharomyces cerevisiae(5%), Escherichia coli(4%), Synthetic construct(5%)
     ORGANISM_WEIGHTS = [0.40, 0.15, 0.10, 0.08, 0.08, 0.05, 0.05, 0.04, 0.05]
 
     # Genome type weights (must sum to 1.0)
-    # Nuclear (70%), mitochondrial (10%), chloroplast (5%), synthetic (10%), engineered (5%)
+    # Order matches GENOME_TYPES list:
+    # nuclear(70%), mitochondrial(10%), chloroplast(5%), synthetic(10%), engineered(5%)
     GENOME_TYPE_WEIGHTS = [0.70, 0.10, 0.05, 0.10, 0.05]
 
     ORGANISMS = [
@@ -836,8 +842,8 @@ ALGORITHM PathwayDiscovery:
                 f"AND translation_rate > 3x wildtype"
             ),
             "gene_environment_interaction": (
-                "beta_GxE(v,E) != 0: P(interaction) < alpha_bonf "
-                "AND |beta_high_E - beta_low_E| > 2*SE"
+                "beta_GxE(v,E) != 0: P(interaction) < alpha_bonferroni "
+                "AND |beta_high_exposure - beta_low_exposure| > 2 * standard_error"
             ),
             "evolutionary_adaptation": (
                 f"Selection({gene}): Tajimas_D < -2 OR iHS > 2 OR FST > 99th_percentile"
