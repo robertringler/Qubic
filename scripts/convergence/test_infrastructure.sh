@@ -73,7 +73,12 @@ echo ""
 
 echo "=== 4. GITHUB ACTIONS WORKFLOW ==="
 test_check "convergence-evidence-gate.yml exists" "[ -f '.github/workflows/convergence-evidence-gate.yml' ]"
-test_check "Workflow has valid YAML syntax" "python3 -c 'import yaml; yaml.safe_load(open(\".github/workflows/convergence-evidence-gate.yml\"))'"
+# Try Python YAML validation if available, otherwise skip with warning
+if command -v python3 &>/dev/null && python3 -c 'import yaml' 2>/dev/null; then
+    test_check "Workflow has valid YAML syntax" "python3 -c 'import yaml; yaml.safe_load(open(\".github/workflows/convergence-evidence-gate.yml\"))'"
+else
+    echo "Testing: Workflow has valid YAML syntax ... ⚠ SKIPPED (PyYAML not available)"
+fi
 test_check "Workflow has workflow_dispatch trigger" "grep -q 'workflow_dispatch' '.github/workflows/convergence-evidence-gate.yml'"
 test_check "Workflow has schedule trigger" "grep -q 'schedule' '.github/workflows/convergence-evidence-gate.yml'"
 test_check "Workflow has correct permissions" "grep -q 'contents: write' '.github/workflows/convergence-evidence-gate.yml'"

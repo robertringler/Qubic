@@ -19,9 +19,18 @@ git rev-parse HEAD > "$EVIDENCE_DIR/pr_${PR_NUM}_head_sha.txt"
 # Capture PR metadata
 gh pr view "$PR_NUM" --json number,title,state,isDraft,mergeable,mergeStateStatus,baseRefName,headRefName,commits,additions,deletions,changedFiles,reviewDecision,labels > "$EVIDENCE_DIR/pr_${PR_NUM}_meta.json"
 
-# Capture CI check status
-gh pr checks "$PR_NUM" > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.txt" || echo "No CI checks" > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.txt"
-gh pr checks "$PR_NUM" --json name,status,conclusion,detailsUrl > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.json" || echo "[]" > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.json"
+# Capture CI check status (both formats consistently)
+if gh pr checks "$PR_NUM" > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.txt" 2>/dev/null; then
+    # If text format succeeded, try JSON format
+    if ! gh pr checks "$PR_NUM" --json name,status,conclusion,detailsUrl > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.json" 2>/dev/null; then
+        # If JSON failed but text succeeded, create empty JSON array
+        echo "[]" > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.json"
+    fi
+else
+    # No CI checks available, write consistent empty states
+    echo "No CI checks" > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.txt"
+    echo "[]" > "$EVIDENCE_DIR/pr_${PR_NUM}_checks.json"
+fi
 
 # Capture diff stat
 git diff --stat origin/main...HEAD > "$EVIDENCE_DIR/pr_${PR_NUM}_diffstat.txt"
