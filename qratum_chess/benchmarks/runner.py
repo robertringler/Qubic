@@ -39,10 +39,12 @@ class BenchmarkConfig:
         run_elo: Run Elo certification.
         run_resilience: Run resilience tests.
         run_telemetry: Enable telemetry capture and output.
+        record_motifs: Enable motif discovery and recording.
         torture_depth: Search depth for torture tests.
         gauntlet_games: Games per adversary in gauntlet.
         resilience_iterations: Iterations for resilience tests.
         output_telemetry: Generate telemetry output (deprecated, use run_telemetry).
+        output_dir: Output directory for results.
     """
     run_performance: bool = True
     run_torture: bool = True
@@ -50,10 +52,12 @@ class BenchmarkConfig:
     run_elo: bool = True
     run_resilience: bool = True
     run_telemetry: bool = True
+    record_motifs: bool = False
     torture_depth: int = 15
     gauntlet_games: int = 100
     resilience_iterations: int = 10
     output_telemetry: bool = True  # Kept for backwards compatibility
+    output_dir: str = "/benchmarks/auto_run"
 
 
 @dataclass
@@ -754,3 +758,241 @@ class BenchmarkRunner:
             lc0_pass=l0_pass,
             overall_certified=overall,
         )
+    
+    def run_single_game(self, engine) -> dict[str, Any]:
+        """Run a single game with the self-modifying engine.
+        
+        Alternates self-play or adversarial matches and records telemetry.
+        
+        Args:
+            engine: Self-modifying engine instance.
+            
+        Returns:
+            Game summary dictionary with moves, evaluations, and motifs.
+        """
+        from qratum_chess.core.position import Position
+        
+        start_time = time.perf_counter()
+        position = Position.starting()
+        
+        game_moves: list[dict[str, Any]] = []
+        game_motifs: list[dict[str, Any]] = []
+        evaluations: list[float] = []
+        novelty_pressures: list[float] = []
+        cortex_activations: list[dict[str, float]] = []
+        
+        move_count = 0
+        max_moves = 200  # Prevent infinite games
+        game_result = "draw"  # Default result
+        
+        while move_count < max_moves:
+            # Check for game end conditions
+            legal_moves = position.generate_legal_moves()
+            if not legal_moves:
+                # Checkmate or stalemate
+                if position.is_in_check():
+                    game_result = "loss" if position.side_to_move.value == 0 else "win"
+                else:
+                    game_result = "draw"
+                break
+            
+            # Search for best move
+            try:
+                best_move, eval_score, stats = engine.search(position, depth=10)
+            except Exception:
+                # Fallback to first legal move if search fails
+                best_move = legal_moves[0]
+                eval_score = 0.0
+                stats = None
+            
+            if best_move is None:
+                break
+            
+            # Increment engine's move counter
+            if hasattr(engine, 'total_moves'):
+                engine.total_moves += 1
+            
+            # Get telemetry from engine
+            telemetry = engine.telemetry_log[-1] if engine.telemetry_log else {}
+            
+            # Record move data
+            move_data = {
+                "move_uci": best_move.to_uci(),
+                "position_fen": position.to_fen(),
+                "evaluation": eval_score,
+                "novelty_pressure": telemetry.get("novelty_pressure", 0.0),
+                "cortex_activation": telemetry.get("cortex_activation", 0.0),
+                "depth": stats.depth_reached if stats else 0,
+                "nodes": stats.nodes_searched if stats else 0,
+            }
+            game_moves.append(move_data)
+            evaluations.append(eval_score)
+            novelty_pressures.append(telemetry.get("novelty_pressure", 0.0))
+            
+            # Record cortex activations
+            if hasattr(engine, 'current_state'):
+                cortex_activations.append({
+                    "tactical": engine.current_state.rules.tactical_weight,
+                    "strategic": engine.current_state.rules.strategic_weight,
+                    "conceptual": engine.current_state.rules.novelty_weight,
+                })
+            
+            # Record telemetry
+            if self.config.run_telemetry:
+                self.telemetry.record_time_per_move(
+                    stats.time_ms if stats else 0.0
+                )
+                self.telemetry.record_novelty_pressure(
+                    telemetry.get("novelty_pressure", 0.0)
+                )
+            
+            # Check for motif discovery (high novelty moves)
+            if self.config.record_motifs:
+                novelty = telemetry.get("novelty_pressure", 0.0)
+                if novelty > 0.6:  # High novelty threshold
+                    motif = {
+                        "position_fen": position.to_fen(),
+                        "move_uci": best_move.to_uci(),
+                        "novelty_score": novelty,
+                        "evaluation": eval_score,
+                        "move_number": move_count,
+                    }
+                    game_motifs.append(motif)
+                    
+                    # Record in engine if supported
+                    if hasattr(engine, 'record_motif'):
+                        engine.record_motif(
+                            position.to_fen(),
+                            [best_move.to_uci()],
+                            "tactical" if novelty > 0.8 else "strategic",
+                            novelty,
+                        )
+            
+            # Make the move
+            position = position.make_move(best_move)
+            move_count += 1
+            
+            # Draw by 50-move rule (simplified)
+            if move_count >= 100 and len(evaluations) > 50:
+                if all(abs(e) < 0.1 for e in evaluations[-50:]):
+                    game_result = "draw"
+                    break
+        
+        # Record game result in engine
+        if hasattr(engine, 'record_game_result'):
+            engine.record_game_result(game_result)
+        
+        elapsed_time = time.perf_counter() - start_time
+        
+        return {
+            "game_id": engine.games_played if hasattr(engine, 'games_played') else 0,
+            "result": game_result,
+            "moves": game_moves,
+            "move_count": move_count,
+            "motifs_discovered": game_motifs,
+            "avg_evaluation": sum(evaluations) / max(1, len(evaluations)),
+            "avg_novelty_pressure": sum(novelty_pressures) / max(1, len(novelty_pressures)),
+            "cortex_activations": cortex_activations,
+            "elapsed_time_seconds": elapsed_time,
+            "timestamp": time.time(),
+        }
+    
+    def log_game_summary(self, game_summary: dict[str, Any]) -> None:
+        """Log a game summary for aggregation.
+        
+        Args:
+            game_summary: Game summary dictionary from run_single_game.
+        """
+        if not hasattr(self, '_game_summaries'):
+            self._game_summaries: list[dict[str, Any]] = []
+        
+        self._game_summaries.append(game_summary)
+        
+        # Record telemetry
+        if self.config.run_telemetry:
+            # Record ELO progression (estimated from win/loss/draw)
+            result = game_summary.get("result", "draw")
+            current_elo = 2500.0  # Base ELO
+            if hasattr(self, '_elo_estimates'):
+                current_elo = self._elo_estimates[-1]
+            else:
+                self._elo_estimates: list[float] = [2500.0]
+            
+            # Simple ELO adjustment
+            k = 32
+            expected = 0.5  # Assume equal opponent
+            actual = {"win": 1.0, "loss": 0.0, "draw": 0.5}.get(result, 0.5)
+            new_elo = current_elo + k * (actual - expected)
+            self._elo_estimates.append(new_elo)
+            
+            self.telemetry.record_elo(new_elo, new_elo - 50, new_elo + 50)
+    
+    def compile_full_summary(self) -> dict[str, Any]:
+        """Compile comprehensive summary from all logged games.
+        
+        Returns:
+            Full simulation summary dictionary.
+        """
+        if not hasattr(self, '_game_summaries'):
+            self._game_summaries = []
+        
+        games = self._game_summaries
+        
+        if not games:
+            return {
+                "total_games": 0,
+                "error": "No games logged",
+            }
+        
+        # Aggregate statistics
+        total_games = len(games)
+        wins = sum(1 for g in games if g.get("result") == "win")
+        losses = sum(1 for g in games if g.get("result") == "loss")
+        draws = sum(1 for g in games if g.get("result") == "draw")
+        
+        # Aggregate motifs
+        all_motifs = []
+        for g in games:
+            all_motifs.extend(g.get("motifs_discovered", []))
+        
+        # Calculate averages
+        avg_moves = sum(g.get("move_count", 0) for g in games) / total_games
+        avg_eval = sum(g.get("avg_evaluation", 0) for g in games) / total_games
+        avg_novelty = sum(g.get("avg_novelty_pressure", 0) for g in games) / total_games
+        total_time = sum(g.get("elapsed_time_seconds", 0) for g in games)
+        
+        # ELO progression
+        elo_progression = self._elo_estimates if hasattr(self, '_elo_estimates') else []
+        
+        return {
+            "total_games": total_games,
+            "results": {
+                "wins": wins,
+                "losses": losses,
+                "draws": draws,
+                "win_rate": wins / total_games,
+                "draw_rate": draws / total_games,
+                "loss_rate": losses / total_games,
+            },
+            "averages": {
+                "moves_per_game": avg_moves,
+                "evaluation": avg_eval,
+                "novelty_pressure": avg_novelty,
+            },
+            "motifs": {
+                "total_discovered": len(all_motifs),
+                "catalog": all_motifs[:100],  # First 100 motifs
+            },
+            "elo": {
+                "start": elo_progression[0] if elo_progression else 2500.0,
+                "end": elo_progression[-1] if elo_progression else 2500.0,
+                "delta": (elo_progression[-1] - elo_progression[0]) if len(elo_progression) > 1 else 0.0,
+                "progression": elo_progression[-100:],  # Last 100 values
+            },
+            "performance": {
+                "total_time_seconds": total_time,
+                "avg_time_per_game": total_time / total_games,
+                "games_per_second": total_games / max(1, total_time),
+            },
+            "timestamp": time.time(),
+        }
