@@ -147,6 +147,10 @@ pub mod upgrade;
 pub mod transport;
 pub mod governance;
 
+// Q-Substrate: Unified Quantum-AI-CodeGen Interface
+pub mod q_substrate;
+pub use q_substrate::{QSubstrate, QuantumGate, IntentResult, IntentType, CodeGenResult};
+
 /// QRATUM version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
