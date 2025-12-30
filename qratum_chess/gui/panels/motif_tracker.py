@@ -344,13 +344,40 @@ class MotifTracker:
         """Detect passed pawns."""
         passed_squares = []
         
+        def _get_piece_symbol(piece) -> str:
+            """Get piece symbol handling both string and object representations."""
+            if piece is None:
+                return ''
+            if isinstance(piece, str):
+                return piece
+            # Handle piece object
+            try:
+                symbol = getattr(piece, 'symbol', None)
+                if callable(symbol):
+                    return symbol()
+                return str(piece)
+            except (AttributeError, TypeError):
+                return str(piece)
+        
+        def _is_white_piece(piece) -> bool:
+            """Check if piece is white handling both representations."""
+            if piece is None:
+                return False
+            if isinstance(piece, str):
+                return piece.isupper()
+            try:
+                return getattr(piece, 'color', True)  # True = white in python-chess
+            except AttributeError:
+                return True
+        
         # Check each pawn
         for square in range(64):
             piece = position.board.piece_at(square)
-            if piece and piece.upper() == 'P':
+            piece_sym = _get_piece_symbol(piece)
+            if piece_sym and piece_sym.upper() == 'P':
                 file = square % 8
                 rank = square // 8
-                is_white = piece.isupper()
+                is_white = _is_white_piece(piece)
                 
                 # Check if passed (no opposing pawns ahead on same or adjacent files)
                 is_passed = True
@@ -359,8 +386,11 @@ class MotifTracker:
                         check_sq = check_rank * 8 + check_file
                         if 0 <= check_sq < 64:
                             check_piece = position.board.piece_at(check_sq)
-                            if check_piece:
-                                if (is_white and check_piece == 'p') or (not is_white and check_piece == 'P'):
+                            check_sym = _get_piece_symbol(check_piece)
+                            if check_sym:
+                                check_is_white = _is_white_piece(check_piece)
+                                is_opponent_pawn = check_sym.upper() == 'P' and (is_white != check_is_white)
+                                if is_opponent_pawn:
                                     is_passed = False
                                     break
                     if not is_passed:

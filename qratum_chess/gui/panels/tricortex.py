@@ -10,6 +10,7 @@ Features:
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING, Any
@@ -276,9 +277,22 @@ class TriCortexPanel:
         Returns:
             Tactical activity value (0-1)
         """
-        # Get attacks to/from this square
-        attacks_from = bin(position.board.get_attacks_from(square)).count('1')
-        attacks_to = bin(position.board.get_attacks_to(square)).count('1')
+        # Get attacks to/from this square using position's bitboard methods
+        # Note: Uses position.board which may have get_attacks_from/to or attackers/attacks methods
+        try:
+            # Try using bitboard attack methods if available
+            if hasattr(position.board, 'get_attacks_from'):
+                attacks_from = bin(position.board.get_attacks_from(square)).count('1')
+                attacks_to = bin(position.board.get_attacks_to(square)).count('1')
+            else:
+                # Fallback: estimate activity based on piece presence
+                piece = position.board.piece_at(square)
+                attacks_from = 4 if piece else 0  # Simplified estimate
+                attacks_to = 2  # Central squares typically have more attacks
+        except (AttributeError, TypeError):
+            # Default fallback
+            attacks_from = 0
+            attacks_to = 0
         
         # Normalize
         activity = (attacks_from + attacks_to) / 16.0
@@ -327,14 +341,23 @@ class TriCortexPanel:
         piece = position.board.piece_at(square)
         piece_value = 0.0
         if piece:
-            # White pieces positive, black negative
-            is_white = piece.isupper()
-            piece_type = piece.upper()
-            
-            piece_values = {'P': 0.1, 'N': 0.3, 'B': 0.3, 'R': 0.5, 'Q': 0.9, 'K': 0.2}
-            piece_value = piece_values.get(piece_type, 0.0)
-            if not is_white:
-                piece_value = -piece_value
+            # Handle both string and object piece representations
+            try:
+                if isinstance(piece, str):
+                    is_white = piece.isupper()
+                    piece_type = piece.upper()
+                else:
+                    # Assume piece object with color and piece_type attributes
+                    is_white = getattr(piece, 'color', True)  # True = white
+                    piece_symbol = getattr(piece, 'symbol', lambda: 'P')
+                    piece_type = piece_symbol().upper() if callable(piece_symbol) else str(piece_symbol).upper()
+                
+                piece_values = {'P': 0.1, 'N': 0.3, 'B': 0.3, 'R': 0.5, 'Q': 0.9, 'K': 0.2}
+                piece_value = piece_values.get(piece_type, 0.0)
+                if not is_white:
+                    piece_value = -piece_value
+            except (AttributeError, TypeError):
+                piece_value = 0.0
         
         return center_value * 0.3 + piece_value * 0.7
     
@@ -501,5 +524,4 @@ class TriCortexPanel:
     
     def to_json(self) -> str:
         """Serialize render data to JSON."""
-        import json
         return json.dumps(self.get_render_data())

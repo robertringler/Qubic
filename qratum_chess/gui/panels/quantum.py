@@ -9,6 +9,7 @@ Features:
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -415,8 +416,6 @@ class QuantumPanel:
     
     def to_json(self) -> str:
         """Serialize render data to JSON."""
-        import json
-        
         def convert(obj):
             if isinstance(obj, np.ndarray):
                 return obj.tolist()

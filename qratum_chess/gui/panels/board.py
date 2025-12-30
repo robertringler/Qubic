@@ -11,7 +11,9 @@ Features:
 
 from __future__ import annotations
 
+import json
 import math
+import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Callable
@@ -275,7 +277,6 @@ class BoardPanel:
     
     def animate_move(self, from_sq: int, to_sq: int, piece: str) -> None:
         """Start move animation."""
-        import time
         self._animation_start_time = time.time()
         self._animating_piece = piece
         self._animation_from = from_sq
@@ -414,8 +415,6 @@ class BoardPanel:
         Returns:
             Dictionary with board state, pieces, highlights, arrows, etc.
         """
-        import time
-        
         # Update animation
         if self._animation_progress < 1.0:
             elapsed = time.time() - self._animation_start_time
