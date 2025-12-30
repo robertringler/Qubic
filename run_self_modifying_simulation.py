@@ -23,10 +23,13 @@ Components:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
+
+import numpy as np
 
 # Ensure the repository root is in the path
 repo_root = Path(__file__).parent
@@ -35,6 +38,20 @@ if str(repo_root) not in sys.path:
 
 from qratum_chess.self_modifying import SelfModifyingEngine
 from qratum_chess.benchmarks.runner import BenchmarkRunner, BenchmarkConfig
+
+
+# Custom JSON serializer for numpy types (module level to avoid repeated imports)
+def json_serializer(obj):
+    """Handle numpy and other non-serializable types."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif hasattr(obj, '__dict__'):
+        return str(obj)
+    return str(obj)
 
 
 def print_banner() -> None:
@@ -398,22 +415,7 @@ def run_simulation(args: argparse.Namespace) -> int:
     final_checkpoint = checkpoint_dir / f"self_modifying_final_{engine.games_played}.ckpt"
     engine.save_checkpoint(str(final_checkpoint))
     
-    # Custom JSON serializer for numpy types
-    def json_serializer(obj):
-        """Handle numpy and other non-serializable types."""
-        import numpy as np
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        elif hasattr(obj, '__dict__'):
-            return str(obj)
-        return str(obj)
-    
     # Save JSON results
-    import json
     results_file = output_dir / f"simulation_results_{timestamp}.json"
     with open(results_file, 'w') as f:
         json.dump({

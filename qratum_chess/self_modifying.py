@@ -814,7 +814,9 @@ class SelfModifyingEngine(SelfModifyingSearch):
             return str(obj)
         
         # Ensure directory exists
-        os.makedirs(os.path.dirname(filepath) if os.path.dirname(filepath) else ".", exist_ok=True)
+        dir_path = os.path.dirname(filepath)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
         
         # Convert activation history to serializable format
         cortex_data = self.visualize_cortex()

@@ -799,8 +799,8 @@ class BenchmarkRunner:
             # Search for best move
             try:
                 best_move, eval_score, stats = engine.search(position, depth=10)
-            except Exception:
-                # Fallback to first legal move if search fails
+            except (ValueError, RuntimeError, AttributeError) as e:
+                # Fallback to first legal move if search fails due to expected issues
                 best_move = legal_moves[0]
                 eval_score = 0.0
                 stats = None
@@ -812,8 +812,9 @@ class BenchmarkRunner:
             if hasattr(engine, 'total_moves'):
                 engine.total_moves += 1
             
-            # Get telemetry from engine
-            telemetry = engine.telemetry_log[-1] if engine.telemetry_log else {}
+            # Get telemetry from engine - safely access with copy
+            telemetry_log = getattr(engine, 'telemetry_log', [])
+            telemetry = telemetry_log[-1].copy() if telemetry_log else {}
             
             # Record move data
             move_data = {
