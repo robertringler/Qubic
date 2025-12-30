@@ -198,11 +198,12 @@ class PerformanceMetrics:
         Returns:
             Performance result with latency measurement.
         """
-        if not positions:
+        if not positions or evaluator is None:
             return PerformanceResult(
                 metric_name="nn_eval_latency",
                 value=0.0,
                 unit="ms",
+                metadata={"skipped": True, "reason": "No evaluator or positions"},
             )
         
         latencies = []
@@ -250,10 +251,12 @@ class PerformanceMetrics:
         total_hits = 0
         
         for pos in positions[:100]:  # Limit for efficiency
-            engine.clear_tables()
+            # Clear tables if available
+            if hasattr(engine, 'clear_tables'):
+                engine.clear_tables()
             _, _, stats = engine.search(pos, depth=depth)
             total_hits += getattr(stats, 'tt_hits', 0)
-            total_lookups += stats.nodes_searched
+            total_lookups += getattr(stats, 'nodes_searched', 0)
         
         hit_rate = total_hits / total_lookups if total_lookups > 0 else 0
         
