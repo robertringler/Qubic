@@ -567,6 +567,431 @@ class SelfModifyingSearch(AsymmetricAdaptiveSearch):
             json.dump(data, f, indent=2)
 
 
+@dataclass
+class SelfModifyingEngineConfig:
+    """Configuration for SelfModifyingEngine.
+    
+    Attributes:
+        tactical_weight: Weight for tactical evaluation (0.0-1.0).
+        strategic_weight: Weight for strategic evaluation (0.0-1.0).
+        conceptual_weight: Weight for conceptual evaluation (0.0-1.0).
+        novelty_pressure: Initial novelty pressure factor (0.0-1.0).
+        memory_decay: Memory kernel decay factor.
+        ontology_evolution: Enable ontology evolution (meta-dynamics).
+        recursive_depth_limit: Maximum recursion depth for self-modification.
+    """
+    tactical_weight: float = 0.4
+    strategic_weight: float = 0.4
+    conceptual_weight: float = 0.2
+    novelty_pressure: float = 0.5
+    memory_decay: float = 0.01
+    ontology_evolution: bool = True
+    recursive_depth_limit: int = 10
+
+
+class SelfModifyingEngine(SelfModifyingSearch):
+    """Full self-modifying chess engine for large-scale simulations.
+    
+    Extends SelfModifyingSearch with:
+    - Configurable tri-modal weights (tactical, strategic, conceptual)
+    - Ontology evolution with meta-dynamics
+    - Checkpoint save/load functionality
+    - Motif tracking and discovery
+    - ELO progression tracking
+    """
+    
+    def __init__(
+        self,
+        tactical_weight: float = 0.4,
+        strategic_weight: float = 0.4,
+        conceptual_weight: float = 0.2,
+        novelty_pressure: float = 0.5,
+        memory_decay: float = 0.01,
+        ontology_evolution: bool = True,
+        recursive_depth_limit: int = 10,
+        evaluator: Callable[[Position], float] | None = None,
+        config: AASConfig | None = None,
+    ):
+        """Initialize the self-modifying engine.
+        
+        Args:
+            tactical_weight: Weight for tactical evaluation (0.0-1.0).
+            strategic_weight: Weight for strategic evaluation (0.0-1.0).
+            conceptual_weight: Weight for conceptual evaluation (0.0-1.0).
+            novelty_pressure: Initial novelty pressure factor (0.0-1.0).
+            memory_decay: Memory kernel decay factor.
+            ontology_evolution: Enable ontology evolution (meta-dynamics).
+            recursive_depth_limit: Maximum recursion depth for self-modification.
+            evaluator: Position evaluation function.
+            config: Base AAS configuration.
+        """
+        # Normalize weights
+        total_weight = tactical_weight + strategic_weight + conceptual_weight
+        if total_weight > 0:
+            tactical_weight /= total_weight
+            strategic_weight /= total_weight
+            conceptual_weight /= total_weight
+        
+        super().__init__(
+            evaluator=evaluator,
+            config=config,
+            memory_decay=memory_decay,
+            learning_rate=0.01,
+        )
+        
+        # Engine configuration
+        self.engine_config = SelfModifyingEngineConfig(
+            tactical_weight=tactical_weight,
+            strategic_weight=strategic_weight,
+            conceptual_weight=conceptual_weight,
+            novelty_pressure=novelty_pressure,
+            memory_decay=memory_decay,
+            ontology_evolution=ontology_evolution,
+            recursive_depth_limit=recursive_depth_limit,
+        )
+        
+        # Apply weights to rules
+        self.current_state.rules.tactical_weight = tactical_weight
+        self.current_state.rules.strategic_weight = strategic_weight
+        self.current_state.rules.novelty_weight = conceptual_weight
+        
+        # Set initial novelty pressure
+        self.current_state.parameters.novelty_pressure = novelty_pressure
+        
+        # Tracking for simulation
+        self.games_played: int = 0
+        self.total_moves: int = 0
+        self.discovered_motifs: list[dict[str, Any]] = []
+        self.elo_history: list[float] = []
+        self.win_count: int = 0
+        self.loss_count: int = 0
+        self.draw_count: int = 0
+        
+        # Meta-dynamics state
+        self.ontology_version: int = 0
+        self.rule_changes: list[dict[str, Any]] = []
+        self.parameter_changes: list[dict[str, Any]] = []
+    
+    def update_meta_dynamics(self, evaluation: float, novelty: float) -> None:
+        """Update rules R_t and parameters Θ_t with meta-dynamics.
+        
+        Overrides parent to include ontology evolution tracking.
+        """
+        if not self.engine_config.ontology_evolution:
+            return
+        
+        # Record pre-update state
+        pre_state = {
+            "tactical_weight": self.current_state.rules.tactical_weight,
+            "strategic_weight": self.current_state.rules.strategic_weight,
+            "novelty_weight": self.current_state.rules.novelty_weight,
+            "search_depth": self.current_state.parameters.search_depth,
+            "novelty_pressure": self.current_state.parameters.novelty_pressure,
+        }
+        
+        # Call parent method for actual updates
+        super().update_meta_dynamics(evaluation, novelty)
+        
+        # Record post-update state
+        post_state = {
+            "tactical_weight": self.current_state.rules.tactical_weight,
+            "strategic_weight": self.current_state.rules.strategic_weight,
+            "novelty_weight": self.current_state.rules.novelty_weight,
+            "search_depth": self.current_state.parameters.search_depth,
+            "novelty_pressure": self.current_state.parameters.novelty_pressure,
+        }
+        
+        # Track rule changes
+        rule_delta = {
+            k: post_state[k] - pre_state[k]
+            for k in ["tactical_weight", "strategic_weight", "novelty_weight"]
+            if abs(post_state[k] - pre_state[k]) > 1e-6
+        }
+        
+        if rule_delta:
+            self.rule_changes.append({
+                "move": self.total_moves,
+                "game": self.games_played,
+                "changes": rule_delta,
+                "timestamp": time.time(),
+            })
+        
+        # Track parameter changes
+        param_delta = {
+            k: post_state[k] - pre_state[k]
+            for k in ["search_depth", "novelty_pressure"]
+            if abs(post_state[k] - pre_state[k]) > 1e-6
+        }
+        
+        if param_delta:
+            self.parameter_changes.append({
+                "move": self.total_moves,
+                "game": self.games_played,
+                "changes": param_delta,
+                "timestamp": time.time(),
+            })
+            self.ontology_version += 1
+    
+    def record_motif(
+        self,
+        position_fen: str,
+        move_sequence: list[str],
+        motif_type: str,
+        novelty_score: float,
+    ) -> None:
+        """Record a discovered motif.
+        
+        Args:
+            position_fen: Position in FEN notation.
+            move_sequence: Sequence of moves (UCI notation).
+            motif_type: Type of motif (tactical/strategic/conceptual).
+            novelty_score: Novelty score (0.0-1.0).
+        """
+        motif = {
+            "id": f"MOTIF_{len(self.discovered_motifs) + 1:06d}",
+            "position_fen": position_fen,
+            "move_sequence": move_sequence,
+            "motif_type": motif_type,
+            "novelty_score": novelty_score,
+            "game": self.games_played,
+            "move": self.total_moves,
+            "cortex_weights": {
+                "tactical": self.current_state.rules.tactical_weight,
+                "strategic": self.current_state.rules.strategic_weight,
+                "conceptual": self.current_state.rules.novelty_weight,
+            },
+            "timestamp": time.time(),
+        }
+        self.discovered_motifs.append(motif)
+    
+    def record_game_result(self, result: str, opponent_elo: float = 3500.0) -> None:
+        """Record game result and update ELO.
+        
+        Args:
+            result: Game result ("win", "loss", "draw").
+            opponent_elo: Opponent's ELO rating.
+        """
+        self.games_played += 1
+        
+        if result == "win":
+            self.win_count += 1
+            score = 1.0
+        elif result == "loss":
+            self.loss_count += 1
+            score = 0.0
+        else:
+            self.draw_count += 1
+            score = 0.5
+        
+        # Simple ELO calculation
+        current_elo = self.elo_history[-1] if self.elo_history else 2500.0
+        expected = 1.0 / (1.0 + 10 ** ((opponent_elo - current_elo) / 400))
+        k_factor = 32
+        new_elo = current_elo + k_factor * (score - expected)
+        
+        self.elo_history.append(new_elo)
+    
+    def save_checkpoint(self, filepath: str) -> None:
+        """Save engine state to checkpoint file.
+        
+        Args:
+            filepath: Output checkpoint file path.
+        """
+        import os
+        
+        # Custom JSON encoder for numpy types
+        def json_serializer(obj):
+            """Handle numpy and other non-serializable types."""
+            import numpy as np
+            if isinstance(obj, np.integer):
+                return int(obj)
+            elif isinstance(obj, np.floating):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif hasattr(obj, '__dict__'):
+                return str(obj)
+            return str(obj)
+        
+        # Ensure directory exists
+        dir_path = os.path.dirname(filepath)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
+        
+        # Convert activation history to serializable format
+        cortex_data = self.visualize_cortex()
+        cortex_data["tactical_activation_history"] = [
+            float(x) if hasattr(x, 'item') else float(x) 
+            for x in cortex_data.get("tactical_activation_history", [])
+        ]
+        cortex_data["current_activation"] = float(cortex_data.get("current_activation", 0.0))
+        
+        checkpoint = {
+            "version": "1.0.0",
+            "timestamp": time.time(),
+            "config": {
+                "tactical_weight": float(self.engine_config.tactical_weight),
+                "strategic_weight": float(self.engine_config.strategic_weight),
+                "conceptual_weight": float(self.engine_config.conceptual_weight),
+                "novelty_pressure": float(self.engine_config.novelty_pressure),
+                "memory_decay": float(self.engine_config.memory_decay),
+                "ontology_evolution": bool(self.engine_config.ontology_evolution),
+                "recursive_depth_limit": int(self.engine_config.recursive_depth_limit),
+            },
+            "state": {
+                "rules": {
+                    "tactical_weight": float(self.current_state.rules.tactical_weight),
+                    "strategic_weight": float(self.current_state.rules.strategic_weight),
+                    "novelty_weight": float(self.current_state.rules.novelty_weight),
+                },
+                "parameters": {
+                    "search_depth": int(self.current_state.parameters.search_depth),
+                    "mcts_rollouts": int(self.current_state.parameters.mcts_rollouts),
+                    "novelty_pressure": float(self.current_state.parameters.novelty_pressure),
+                    "temperature": float(self.current_state.parameters.temperature),
+                },
+            },
+            "statistics": {
+                "games_played": int(self.games_played),
+                "total_moves": int(self.total_moves),
+                "win_count": int(self.win_count),
+                "loss_count": int(self.loss_count),
+                "draw_count": int(self.draw_count),
+                "elo_history": [float(x) for x in self.elo_history],
+                "ontology_version": int(self.ontology_version),
+            },
+            "motifs": {
+                "count": len(self.discovered_motifs),
+                "motifs": self.discovered_motifs[-1000:],  # Last 1000 motifs
+            },
+            "meta_dynamics": {
+                "rule_changes": self.rule_changes[-500:],  # Last 500 changes
+                "parameter_changes": self.parameter_changes[-500:],
+            },
+            "telemetry": {
+                "count": len(self.telemetry_log),
+                "recent": [],  # Skip telemetry to avoid serialization issues
+            },
+            "cortex": cortex_data,
+        }
+        
+        with open(filepath, 'w') as f:
+            json.dump(checkpoint, f, indent=2, default=json_serializer)
+    
+    def load_checkpoint(self, filepath: str) -> None:
+        """Load engine state from checkpoint file.
+        
+        Args:
+            filepath: Input checkpoint file path.
+        """
+        with open(filepath, 'r') as f:
+            checkpoint = json.load(f)
+        
+        # Restore configuration
+        cfg = checkpoint.get("config", {})
+        self.engine_config = SelfModifyingEngineConfig(
+            tactical_weight=cfg.get("tactical_weight", 0.4),
+            strategic_weight=cfg.get("strategic_weight", 0.4),
+            conceptual_weight=cfg.get("conceptual_weight", 0.2),
+            novelty_pressure=cfg.get("novelty_pressure", 0.5),
+            memory_decay=cfg.get("memory_decay", 0.01),
+            ontology_evolution=cfg.get("ontology_evolution", True),
+            recursive_depth_limit=cfg.get("recursive_depth_limit", 10),
+        )
+        
+        # Restore state
+        state = checkpoint.get("state", {})
+        rules = state.get("rules", {})
+        self.current_state.rules.tactical_weight = rules.get("tactical_weight", 0.4)
+        self.current_state.rules.strategic_weight = rules.get("strategic_weight", 0.4)
+        self.current_state.rules.novelty_weight = rules.get("novelty_weight", 0.2)
+        
+        params = state.get("parameters", {})
+        self.current_state.parameters.search_depth = params.get("search_depth", 10)
+        self.current_state.parameters.mcts_rollouts = params.get("mcts_rollouts", 1000)
+        self.current_state.parameters.novelty_pressure = params.get("novelty_pressure", 0.3)
+        self.current_state.parameters.temperature = params.get("temperature", 1.0)
+        
+        # Restore statistics
+        stats = checkpoint.get("statistics", {})
+        self.games_played = stats.get("games_played", 0)
+        self.total_moves = stats.get("total_moves", 0)
+        self.win_count = stats.get("win_count", 0)
+        self.loss_count = stats.get("loss_count", 0)
+        self.draw_count = stats.get("draw_count", 0)
+        self.elo_history = stats.get("elo_history", [])
+        self.ontology_version = stats.get("ontology_version", 0)
+        
+        # Restore motifs
+        motifs = checkpoint.get("motifs", {})
+        self.discovered_motifs = motifs.get("motifs", [])
+        
+        # Restore meta-dynamics
+        meta = checkpoint.get("meta_dynamics", {})
+        self.rule_changes = meta.get("rule_changes", [])
+        self.parameter_changes = meta.get("parameter_changes", [])
+    
+    def get_engine_summary(self) -> dict[str, Any]:
+        """Get comprehensive engine summary for reporting.
+        
+        Returns:
+            Engine summary dictionary.
+        """
+        return {
+            "config": {
+                "tactical_weight": self.engine_config.tactical_weight,
+                "strategic_weight": self.engine_config.strategic_weight,
+                "conceptual_weight": self.engine_config.conceptual_weight,
+                "novelty_pressure": self.engine_config.novelty_pressure,
+                "memory_decay": self.engine_config.memory_decay,
+                "ontology_evolution": self.engine_config.ontology_evolution,
+                "recursive_depth_limit": self.engine_config.recursive_depth_limit,
+            },
+            "current_state": {
+                "rules": {
+                    "tactical_weight": self.current_state.rules.tactical_weight,
+                    "strategic_weight": self.current_state.rules.strategic_weight,
+                    "novelty_weight": self.current_state.rules.novelty_weight,
+                },
+                "parameters": {
+                    "search_depth": self.current_state.parameters.search_depth,
+                    "novelty_pressure": self.current_state.parameters.novelty_pressure,
+                },
+            },
+            "statistics": {
+                "games_played": self.games_played,
+                "total_moves": self.total_moves,
+                "win_rate": self.win_count / max(1, self.games_played),
+                "draw_rate": self.draw_count / max(1, self.games_played),
+                "loss_rate": self.loss_count / max(1, self.games_played),
+                "current_elo": self.elo_history[-1] if self.elo_history else 2500.0,
+                "elo_progression": {
+                    "start": self.elo_history[0] if self.elo_history else 2500.0,
+                    "end": self.elo_history[-1] if self.elo_history else 2500.0,
+                    "delta": (self.elo_history[-1] - self.elo_history[0]) if len(self.elo_history) > 1 else 0.0,
+                },
+            },
+            "meta_dynamics": {
+                "ontology_version": self.ontology_version,
+                "rule_changes_count": len(self.rule_changes),
+                "parameter_changes_count": len(self.parameter_changes),
+            },
+            "motifs": {
+                "total_discovered": len(self.discovered_motifs),
+                "by_type": self._count_motifs_by_type(),
+            },
+            "telemetry_entries": len(self.telemetry_log),
+        }
+    
+    def _count_motifs_by_type(self) -> dict[str, int]:
+        """Count motifs by type."""
+        counts: dict[str, int] = {}
+        for motif in self.discovered_motifs:
+            motif_type = motif.get("motif_type", "unknown")
+            counts[motif_type] = counts.get(motif_type, 0) + 1
+        return counts
+
+
 def demo_self_modifying_engine():
     """Demonstrate self-modifying engine capabilities."""
     print("=" * 80)

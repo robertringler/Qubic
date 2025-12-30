@@ -268,6 +268,151 @@ class TestBenchmarks:
         for name, fen, expected, category in suite.positions:
             pos = Position.from_fen(fen)
             assert pos is not None
+    
+    def test_benchmark_config_record_motifs(self):
+        """Test BenchmarkConfig has record_motifs field."""
+        from qratum_chess.benchmarks.runner import BenchmarkConfig
+        
+        config = BenchmarkConfig(record_motifs=True)
+        assert config.record_motifs is True
+        
+        config = BenchmarkConfig(record_motifs=False)
+        assert config.record_motifs is False
+    
+    def test_benchmark_runner_single_game(self):
+        """Test BenchmarkRunner has run_single_game method."""
+        from qratum_chess.benchmarks.runner import BenchmarkRunner, BenchmarkConfig
+        
+        config = BenchmarkConfig(
+            run_performance=False,
+            run_torture=False,
+            run_elo=False,
+            run_resilience=False,
+        )
+        runner = BenchmarkRunner(config)
+        
+        assert hasattr(runner, 'run_single_game')
+        assert hasattr(runner, 'log_game_summary')
+        assert hasattr(runner, 'compile_full_summary')
+
+
+class TestSelfModifyingEngine:
+    """Tests for SelfModifyingEngine."""
+    
+    def test_engine_initialization(self):
+        """Test SelfModifyingEngine initialization with all parameters."""
+        from qratum_chess.self_modifying import SelfModifyingEngine
+        
+        engine = SelfModifyingEngine(
+            tactical_weight=0.4,
+            strategic_weight=0.4,
+            conceptual_weight=0.2,
+            novelty_pressure=0.5,
+            memory_decay=0.01,
+            ontology_evolution=True,
+            recursive_depth_limit=10
+        )
+        
+        assert engine.engine_config.tactical_weight == 0.4
+        assert engine.engine_config.strategic_weight == 0.4
+        assert engine.engine_config.conceptual_weight == 0.2
+        assert engine.engine_config.novelty_pressure == 0.5
+        assert engine.engine_config.memory_decay == 0.01
+        assert engine.engine_config.ontology_evolution is True
+        assert engine.engine_config.recursive_depth_limit == 10
+    
+    def test_engine_checkpoint_save_load(self):
+        """Test checkpoint save and load functionality."""
+        import os
+        import tempfile
+        from qratum_chess.self_modifying import SelfModifyingEngine
+        
+        engine = SelfModifyingEngine(
+            tactical_weight=0.5,
+            strategic_weight=0.3,
+            conceptual_weight=0.2,
+        )
+        
+        # Modify some state
+        engine.games_played = 10
+        engine.win_count = 5
+        engine.elo_history = [2500.0, 2520.0, 2540.0]
+        
+        # Save checkpoint
+        with tempfile.NamedTemporaryFile(suffix='.ckpt', delete=False) as f:
+            checkpoint_path = f.name
+        
+        try:
+            engine.save_checkpoint(checkpoint_path)
+            assert os.path.exists(checkpoint_path)
+            
+            # Create new engine and load checkpoint
+            new_engine = SelfModifyingEngine()
+            new_engine.load_checkpoint(checkpoint_path)
+            
+            assert new_engine.games_played == 10
+            assert new_engine.win_count == 5
+            assert len(new_engine.elo_history) == 3
+        finally:
+            if os.path.exists(checkpoint_path):
+                os.remove(checkpoint_path)
+    
+    def test_engine_record_game_result(self):
+        """Test game result recording and ELO updates."""
+        from qratum_chess.self_modifying import SelfModifyingEngine
+        
+        engine = SelfModifyingEngine()
+        
+        # Record a win
+        engine.record_game_result("win", opponent_elo=3500.0)
+        assert engine.games_played == 1
+        assert engine.win_count == 1
+        assert len(engine.elo_history) == 1
+        
+        # Record a loss
+        engine.record_game_result("loss", opponent_elo=3500.0)
+        assert engine.games_played == 2
+        assert engine.loss_count == 1
+        
+        # Record a draw
+        engine.record_game_result("draw", opponent_elo=3500.0)
+        assert engine.games_played == 3
+        assert engine.draw_count == 1
+    
+    def test_engine_record_motif(self):
+        """Test motif recording functionality."""
+        from qratum_chess.self_modifying import SelfModifyingEngine
+        
+        engine = SelfModifyingEngine()
+        
+        engine.record_motif(
+            position_fen="rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+            move_sequence=["e2e4"],
+            motif_type="tactical",
+            novelty_score=0.8
+        )
+        
+        assert len(engine.discovered_motifs) == 1
+        assert engine.discovered_motifs[0]["motif_type"] == "tactical"
+        assert engine.discovered_motifs[0]["novelty_score"] == 0.8
+    
+    def test_engine_get_summary(self):
+        """Test engine summary generation."""
+        from qratum_chess.self_modifying import SelfModifyingEngine
+        
+        engine = SelfModifyingEngine(
+            tactical_weight=0.4,
+            strategic_weight=0.4,
+            conceptual_weight=0.2,
+        )
+        
+        summary = engine.get_engine_summary()
+        
+        assert "config" in summary
+        assert "current_state" in summary
+        assert "statistics" in summary
+        assert "meta_dynamics" in summary
+        assert "motifs" in summary
 
 
 class TestAgents:
