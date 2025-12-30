@@ -372,14 +372,23 @@ class BenchmarkRunner:
         """
         # Create timestamped directory
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        if output_dir.endswith("/"):
-            output_path = Path(output_dir) / timestamp
+        output_path = Path(output_dir)
+        
+        # If the path ends with a placeholder pattern, replace it
+        path_str = str(output_path)
+        if "YYYYMMDD" in path_str and "HHMMSS" in path_str:
+            # Replace any timestamp placeholder patterns
+            output_path = Path(
+                path_str.replace("YYYYMMDD", timestamp[:8])
+                       .replace("HHMMSS", timestamp[9:])
+                       .replace("_/", f"_{timestamp}/")  # Handle partial patterns
+            )
+        elif output_dir.endswith("/") or output_path.is_dir():
+            # Append timestamp as subdirectory
+            output_path = output_path / timestamp
         else:
-            # Handle format like "/benchmarks/auto_run/YYYYMMDD_HHMMSS/"
-            output_path = Path(output_dir)
-            if "YYYYMMDD" in str(output_path) or "HHMMSS" in str(output_path):
-                # Replace placeholder with actual timestamp
-                output_path = Path(str(output_path).replace("YYYYMMDD_HHMMSS", timestamp))
+            # Treat as base directory, append timestamp
+            output_path = output_path / timestamp
         
         output_path.mkdir(parents=True, exist_ok=True)
         

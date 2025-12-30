@@ -176,8 +176,9 @@ def run_benchmark(args: argparse.Namespace) -> int:
     """
     print_banner()
     
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    print(f"Benchmark started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    now = datetime.now()
+    timestamp = now.strftime("%Y%m%d_%H%M%S")
+    print(f"Benchmark started at: {now.strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Session timestamp: {timestamp}")
     print()
     
