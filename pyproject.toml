@@ -154,7 +154,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["quasim", "src", "QuASIM", "qstack", "qagents", "sdk", "integrations", "qubic", "qil", "qcore", "contracts", "events", "spine", "adapters", "epistemic_heat_sink", "topological_observer"]
+source = ["quasim", "src", "QuASIM", "qstack", "qagents", "sdk", "integrations", "qubic", "qil", "qcore", "contracts", "events", "spine", "adapters", "epistemic_heat_sink", "topological_observer", "qratum_chess"]
 branch = true
 omit = [
     "*/tests/*",

@@ -1,0 +1,30 @@
+"""Benchmarking and Load-Testing Protocol for QRATUM-Chess (Stage IV).
+
+Implements comprehensive performance certification framework:
+1. Performance metrics (nodes/sec, latency, hash hit rate)
+2. Strategic torture suite (zugzwang, fortress, trapped pieces)
+3. Engine adversarial gauntlet
+4. Elo certification protocol
+5. Load-failure injection and recovery testing
+6. Telemetry output (heatmaps, distributions, entropy curves)
+"""
+
+from __future__ import annotations
+
+from qratum_chess.benchmarks.runner import BenchmarkRunner
+from qratum_chess.benchmarks.metrics import PerformanceMetrics
+from qratum_chess.benchmarks.torture import StrategicTortureSuite
+from qratum_chess.benchmarks.gauntlet import AdversarialGauntlet
+from qratum_chess.benchmarks.elo import EloCertification
+from qratum_chess.benchmarks.resilience import ResilienceTest
+from qratum_chess.benchmarks.telemetry import TelemetryOutput
+
+__all__ = [
+    "BenchmarkRunner",
+    "PerformanceMetrics",
+    "StrategicTortureSuite",
+    "AdversarialGauntlet",
+    "EloCertification",
+    "ResilienceTest",
+    "TelemetryOutput",
+]
