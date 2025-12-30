@@ -26,6 +26,12 @@ class TelemetryData:
     branching_entropy: list[float] = field(default_factory=list)
     elo_history: list[tuple[float, float, float]] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
+    # Enhanced fields for motif extraction
+    cortex_activations: list[dict[str, float]] = field(default_factory=list)
+    novelty_pressure: list[float] = field(default_factory=list)
+    move_divergence: list[dict[str, Any]] = field(default_factory=list)
+    pattern_inventions: list[dict[str, Any]] = field(default_factory=list)
+    abstraction_signals: list[float] = field(default_factory=list)
 
 
 class TelemetryOutput:
@@ -86,6 +92,88 @@ class TelemetryOutput:
             high: Upper confidence bound.
         """
         self.data.elo_history.append((elo, low, high))
+    
+    def record_cortex_activation(
+        self,
+        tactical: float = 0.0,
+        strategic: float = 0.0,
+        conceptual: float = 0.0
+    ) -> None:
+        """Record cortex activation weights for a move.
+        
+        Args:
+            tactical: Tactical cortex activation weight.
+            strategic: Strategic cortex activation weight.
+            conceptual: Conceptual cortex activation weight.
+        """
+        self.data.cortex_activations.append({
+            "tactical": tactical,
+            "strategic": strategic,
+            "conceptual": conceptual,
+            "timestamp": time.time(),
+        })
+    
+    def record_novelty_pressure(self, pressure: float) -> None:
+        """Record novelty pressure functional value Ω(a).
+        
+        Args:
+            pressure: Novelty pressure value.
+        """
+        self.data.novelty_pressure.append(pressure)
+    
+    def record_move_divergence(
+        self,
+        position_fen: str,
+        move_uci: str,
+        engine_move: str,
+        divergence_score: float
+    ) -> None:
+        """Record move divergence from engine databases.
+        
+        Args:
+            position_fen: Position in FEN format.
+            move_uci: Selected move in UCI notation.
+            engine_move: Expected engine move in UCI notation.
+            divergence_score: Divergence score (0.0 = match, 1.0 = completely different).
+        """
+        self.data.move_divergence.append({
+            "position": position_fen,
+            "selected_move": move_uci,
+            "engine_move": engine_move,
+            "divergence": divergence_score,
+            "timestamp": time.time(),
+        })
+    
+    def record_pattern_invention(
+        self,
+        position_fen: str,
+        move_sequence: list[str],
+        pattern_type: str,
+        novelty_score: float
+    ) -> None:
+        """Record pattern invention event.
+        
+        Args:
+            position_fen: Position in FEN format.
+            move_sequence: Sequence of moves (UCI notation).
+            pattern_type: Type of pattern (tactical/strategic/conceptual).
+            novelty_score: Novelty score (0.0-1.0).
+        """
+        self.data.pattern_inventions.append({
+            "position": position_fen,
+            "moves": move_sequence,
+            "pattern_type": pattern_type,
+            "novelty_score": novelty_score,
+            "timestamp": time.time(),
+        })
+    
+    def record_abstraction_signal(self, signal: float) -> None:
+        """Record abstraction learning signal.
+        
+        Args:
+            signal: Abstraction learning signal value.
+        """
+        self.data.abstraction_signals.append(signal)
     
     def finalize_snapshot(self) -> TelemetryData:
         """Finalize current telemetry snapshot.
@@ -282,6 +370,11 @@ class TelemetryOutput:
                 "neural_drift": self.generate_neural_drift_spectrum(),
                 "branching_entropy": self.generate_branching_entropy_curve(),
                 "elo_confidence": self.generate_elo_confidence_plot(),
+                "cortex_activations": self.data.cortex_activations,
+                "novelty_pressure": self.data.novelty_pressure,
+                "move_divergence": self.data.move_divergence,
+                "pattern_inventions": self.data.pattern_inventions,
+                "abstraction_signals": self.data.abstraction_signals,
             },
             "history_count": len(self.history),
             "export_timestamp": time.time(),
@@ -303,4 +396,9 @@ class TelemetryOutput:
             "entropy_samples": len(self.data.branching_entropy),
             "elo_measurements": len(self.data.elo_history),
             "total_snapshots": len(self.history),
+            "cortex_activations_recorded": len(self.data.cortex_activations),
+            "novelty_pressure_samples": len(self.data.novelty_pressure),
+            "move_divergences": len(self.data.move_divergence),
+            "pattern_inventions": len(self.data.pattern_inventions),
+            "abstraction_signals": len(self.data.abstraction_signals),
         }
