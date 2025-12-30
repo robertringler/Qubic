@@ -7,11 +7,17 @@ Implements comprehensive performance certification framework:
 4. Elo certification protocol
 5. Load-failure injection and recovery testing
 6. Telemetry output (heatmaps, distributions, entropy curves)
+7. Stage III certification verification
 """
 
 from __future__ import annotations
 
-from qratum_chess.benchmarks.runner import BenchmarkRunner
+from qratum_chess.benchmarks.runner import (
+    BenchmarkRunner,
+    BenchmarkConfig,
+    BenchmarkSummary,
+    CertificationResult,
+)
 from qratum_chess.benchmarks.metrics import PerformanceMetrics
 from qratum_chess.benchmarks.torture import StrategicTortureSuite
 from qratum_chess.benchmarks.gauntlet import AdversarialGauntlet
@@ -21,6 +27,9 @@ from qratum_chess.benchmarks.telemetry import TelemetryOutput
 
 __all__ = [
     "BenchmarkRunner",
+    "BenchmarkConfig",
+    "BenchmarkSummary",
+    "CertificationResult",
     "PerformanceMetrics",
     "StrategicTortureSuite",
     "AdversarialGauntlet",
