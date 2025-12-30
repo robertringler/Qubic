@@ -147,6 +147,9 @@ pub mod upgrade;
 pub mod transport;
 pub mod governance;
 
+// Compliance controls modules (HIPAA, GDPR, CMMC)
+pub mod compliance_controls;
+
 /// QRATUM version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
