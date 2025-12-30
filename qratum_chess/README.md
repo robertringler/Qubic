@@ -73,6 +73,8 @@ QRATUM-Chess is a complete chess engine system implementing:
 - **EloCertification**: Rating calculation and validation
 - **ResilienceTest**: Failure injection and recovery
 - **TelemetryOutput**: Diagnostic data generation
+- **AutoBenchmark**: Fully automated benchmarking orchestration
+- **MotifExtractor**: Novel chess pattern discovery and classification
 
 ### Protocols (`qratum_chess/protocols/`)
 - **UCIEngine**: Universal Chess Interface implementation
@@ -111,6 +113,8 @@ Then connect with any UCI-compatible chess GUI.
 
 ## Benchmarking
 
+### Manual Benchmarking
+
 ```python
 from qratum_chess.benchmarks.runner import BenchmarkRunner, BenchmarkConfig
 from qratum_chess.search.aas import AsymmetricAdaptiveSearch
@@ -128,6 +132,36 @@ engine = AsymmetricAdaptiveSearch()
 summary = runner.run(engine)
 runner.print_summary(summary)
 ```
+
+### Automated Benchmarking with Motif Extraction
+
+Run the complete automated benchmark suite:
+
+```bash
+# Full benchmark with certification and motif extraction
+python run_full_benchmark.py --certify --extract-motifs
+
+# Quick mode for faster iteration
+python run_full_benchmark.py --quick
+
+# Custom configuration
+python run_full_benchmark.py \
+  --certify \
+  --output-dir ./my_results \
+  --gpu \
+  --torture-depth 20
+```
+
+Features:
+- **Automated execution**: Complete pipeline from start to finish
+- **Environment verification**: Python, dependencies, GPU detection
+- **Motif extraction**: Discover novel chess patterns automatically
+- **Comprehensive reports**: JSON, CSV, HTML, PGN outputs
+- **Stage III certification**: Automatic verification against promotion criteria
+
+See [`qratum_chess/benchmarks/README_AUTOMATION.md`](benchmarks/README_AUTOMATION.md) for detailed usage.
+
+See [`docs/MOTIF_EXTRACTION.md`](../docs/MOTIF_EXTRACTION.md) for motif classification details.
 
 ## Performance Targets (Stage IV)
 
