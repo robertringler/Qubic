@@ -440,14 +440,28 @@ class Position:
                 current = from_sq
                 while True:
                     prev_file = current % 8
+                    prev_rank = current // 8
                     current += direction
                     
                     if current < 0 or current > 63:
                         break
                     
                     curr_file = current % 8
-                    if abs(curr_file - prev_file) > 1:
-                        break
+                    curr_rank = current // 8
+                    
+                    # Check for edge wrapping based on direction
+                    # For orthogonal moves (±1), file should change by 1
+                    # For orthogonal moves (±8), file should not change
+                    # For diagonal moves, both rank and file should change by 1
+                    if direction in [1, -1]:
+                        if abs(curr_file - prev_file) != 1:
+                            break
+                    elif direction in [8, -8]:
+                        if curr_file != prev_file:
+                            break
+                    else:  # Diagonal: ±7, ±9
+                        if abs(curr_file - prev_file) != 1 or abs(curr_rank - prev_rank) != 1:
+                            break
                     
                     if int(self.board.occupancy[color]) & (1 << current):
                         break

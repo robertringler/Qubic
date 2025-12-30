@@ -257,6 +257,9 @@ class TacticalCortex:
             return 0.0
         
         values = list(move_values.values())
+        if not values:
+            return 0.0
+        
         max_val = max(values)
         min_val = min(values)
         spread = max_val - min_val

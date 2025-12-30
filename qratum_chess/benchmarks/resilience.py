@@ -103,15 +103,24 @@ class ResilienceTest:
         """
         from qratum_chess.core.position import Move
         
-        # Corrupt hash table
+        # Corrupt hash table with malformed but structurally valid entries
         if hasattr(engine, 'tt'):
+            from qratum_chess.search.alphabeta import TranspositionEntry
+            
             num_entries = len(engine.tt)
             num_corrupt = int(num_entries * corruption_rate)
             
             keys = list(engine.tt.keys())[:num_corrupt]
             for key in keys:
-                # Corrupt by replacing with invalid data
-                engine.tt[key] = None
+                # Corrupt with invalid but structurally valid entry
+                # Use extreme/invalid values that should be handled gracefully
+                engine.tt[key] = TranspositionEntry(
+                    hash_key=key ^ 0xDEADBEEF,  # Wrong hash
+                    depth=-999,  # Invalid depth
+                    value=float('inf'),  # Extreme value
+                    flag="invalid",  # Invalid flag
+                    best_move=None,
+                )
         
         # Measure recovery
         start = time.perf_counter()

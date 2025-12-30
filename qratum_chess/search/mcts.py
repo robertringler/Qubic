@@ -263,10 +263,17 @@ class MCTSSearch:
     
     def _dirichlet(self, alpha: float, n: int) -> list[float]:
         """Generate Dirichlet distributed random vector."""
-        # Simplified: use gamma distribution
+        if n <= 0:
+            return []
+        if alpha <= 0:
+            # Invalid alpha, return uniform distribution
+            return [1.0 / n] * n
+        
+        # Use gamma distribution for Dirichlet sampling
         samples = [random.gammavariate(alpha, 1) for _ in range(n)]
         total = sum(samples)
         if total == 0:
+            # All samples are zero (rare), return uniform
             return [1.0 / n] * n
         return [s / total for s in samples]
     

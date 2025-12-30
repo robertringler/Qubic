@@ -326,12 +326,13 @@ class AlphaBetaSearch:
             if alpha >= beta:
                 self.stats.beta_cutoffs += 1
                 
-                # Update killer moves
+                # Update killer moves for the move that caused the beta cutoff
+                # Only store quiet (non-capture) moves as killers
                 if not position.board.piece_at(move.to_sq):  # Quiet move
                     self.killer_moves[ply][1] = self.killer_moves[ply][0]
                     self.killer_moves[ply][0] = move
                     
-                    # Update history
+                    # Update history heuristic - reward moves that cause cutoffs
                     key = (move.from_sq, move.to_sq)
                     self.history[key] = self.history.get(key, 0) + depth * depth
                 
