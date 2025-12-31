@@ -209,9 +209,10 @@ class KaggleConfig:
         auth_bytes = auth_string.encode('ascii')
         auth_b64 = base64.b64encode(auth_bytes).decode('ascii')
         
+        # Note: Content-Type is intentionally not set here as it should be
+        # determined by the request type (e.g., multipart/form-data for file uploads)
         return {
             "Authorization": f"Basic {auth_b64}",
-            "Content-Type": "application/json",
         }
 
 

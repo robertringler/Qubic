@@ -9,10 +9,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 import json
+import logging
 import requests
 
 from qratum_chess.core.position import Position
 from qratum_chess.benchmarks.kaggle_config import KaggleConfig
+
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -40,7 +45,7 @@ class KaggleBenchmarkPosition:
             try:
                 self.position = Position.from_fen(self.fen)
             except Exception as e:
-                print(f"Warning: Failed to parse FEN for position {self.position_id}: {e}")
+                logger.warning(f"Failed to parse FEN for position {self.position_id}: {e}")
                 self.position = None
 
 
@@ -195,8 +200,8 @@ class KaggleIntegration:
             # Parse positions from data
             return self._extract_positions_from_data(data)
         else:
-            # If API call fails, return empty list
-            print(f"Warning: Could not download benchmark positions: {response.status_code}")
+            # If API call fails, log warning and return empty list
+            logger.warning(f"Could not download benchmark positions: {response.status_code}")
             return []
     
     def _parse_leaderboard_data(self, data: dict[str, Any]) -> KaggleLeaderboardData:

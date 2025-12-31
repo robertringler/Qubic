@@ -21,10 +21,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-# Add repository root to path
-repo_root = Path(__file__).parent.parent.parent
-if str(repo_root) not in sys.path:
-    sys.path.insert(0, str(repo_root))
+# Repository path setup for standalone execution
+# Note: For development, consider using: pip install -e .
+# This allows proper imports without sys.path manipulation
+if __name__ == "__main__":
+    repo_root = Path(__file__).parent.parent.parent
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
 
 from qratum_chess.benchmarks.kaggle_config import KaggleConfig, load_config
 from qratum_chess.benchmarks.kaggle_integration import (
