@@ -59,10 +59,16 @@ echo "  ✓ Generating metadata..."
 python ../../scripts/generate_bob_metadata.py > model-metadata.json
 echo ""
 
+# Clean up cache files before packaging
+echo "  ✓ Cleaning cache files..."
+find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+find . -type f -name "*.pyc" -delete 2>/dev/null || true
+echo ""
+
 # Package for upload
 echo "  ✓ Creating archive..."
 cd ..
-tar -czf bob-chess-engine.tar.gz bob/
+tar -czf bob-chess-engine.tar.gz --exclude="__pycache__" --exclude="*.pyc" bob/
 ARCHIVE_SIZE=$(du -h bob-chess-engine.tar.gz | cut -f1)
 echo "    Archive size: ${ARCHIVE_SIZE}"
 echo ""
