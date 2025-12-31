@@ -108,6 +108,9 @@ goodyear_pilot_execution_log.txt
 results/
 bm001_execution.log
 bm001_execution_output.txt
+kaggle_benchmark_results.json
+kaggle_leaderboard*.json
+kaggle_test_positions.json
 
 # Generated documentation package
 output_package/

@@ -215,8 +215,20 @@ class KaggleConfig:
         }
 
 
-# Default configuration instance
-DEFAULT_CONFIG = KaggleConfig()
+# Default configuration is created on demand to avoid requiring credentials at import time
+DEFAULT_CONFIG = None
+
+
+def get_default_config() -> KaggleConfig:
+    """Get or create default configuration instance.
+    
+    Returns:
+        Default KaggleConfig instance.
+    """
+    global DEFAULT_CONFIG
+    if DEFAULT_CONFIG is None:
+        DEFAULT_CONFIG = KaggleConfig()
+    return DEFAULT_CONFIG
 
 
 def load_config(

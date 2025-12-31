@@ -225,7 +225,7 @@ def run_benchmark_suite(
         middlegame_focus=1.5,
         endgame_precision=2.0,
     )
-    engine = AsymmetricAdaptiveSearch(config)
+    engine = AsymmetricAdaptiveSearch(config=config)
     
     print(f"\nRunning benchmark on {len(positions)} positions...")
     print(f"Search depth: {depth}")
