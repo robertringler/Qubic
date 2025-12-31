@@ -8,6 +8,7 @@ Implements comprehensive performance certification framework:
 5. Load-failure injection and recovery testing
 6. Telemetry output (heatmaps, distributions, entropy curves)
 7. Stage III certification verification
+8. Kaggle Chess Leaderboard integration
 """
 
 from __future__ import annotations
@@ -33,6 +34,17 @@ from qratum_chess.benchmarks.kaggle_integration import (
 from qratum_chess.benchmarks.kaggle_submission import (
     KaggleSubmission,
     SubmissionResult,
+from qratum_chess.benchmarks.kaggle_integration import (
+    KaggleLeaderboardLoader,
+    KaggleLeaderboard,
+    KaggleBenchmarkPosition,
+    KaggleSubmission,
+    download_kaggle_leaderboard,
+)
+from qratum_chess.benchmarks.benchmark_kaggle import (
+    KaggleBenchmarkRunner,
+    KaggleBenchmarkResult,
+    KaggleBenchmarkSummary,
 )
 
 __all__ = [
@@ -53,4 +65,12 @@ __all__ = [
     "KaggleLeaderboardData",
     "KaggleSubmission",
     "SubmissionResult",
+    "KaggleLeaderboardLoader",
+    "KaggleLeaderboard",
+    "KaggleBenchmarkPosition",
+    "KaggleSubmission",
+    "KaggleBenchmarkRunner",
+    "KaggleBenchmarkResult",
+    "KaggleBenchmarkSummary",
+    "download_kaggle_leaderboard",
 ]

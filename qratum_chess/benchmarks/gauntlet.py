@@ -28,6 +28,7 @@ class AdversaryType(Enum):
     NEURAL = "neural"
     HUMAN_GM = "human_gm"
     KAGGLE = "kaggle"  # Kaggle leaderboard benchmark positions
+    KAGGLE = "kaggle"
 
 
 @dataclass
@@ -382,3 +383,50 @@ class AdversarialGauntlet:
         
         match_rate = matches / total if total > 0 else 0.0
         return match_rate, results
+    def run_kaggle_benchmark_adversary(
+        self,
+        engine,
+        leaderboard_file: str,
+        depth: int = 15,
+        max_positions: int | None = None
+    ) -> float:
+        """Run Kaggle benchmark as an adversary test.
+        
+        Tests engine against Kaggle benchmark positions and returns
+        accuracy score as win rate approximation.
+        
+        Args:
+            engine: Engine to test.
+            leaderboard_file: Path to Kaggle leaderboard JSON file.
+            depth: Search depth for engine.
+            max_positions: Maximum positions to test.
+            
+        Returns:
+            Accuracy score (move accuracy as win rate proxy).
+        """
+        try:
+            from qratum_chess.benchmarks.kaggle_integration import KaggleLeaderboardLoader
+            from qratum_chess.benchmarks.benchmark_kaggle import KaggleBenchmarkRunner
+            
+            # Load Kaggle data
+            loader = KaggleLeaderboardLoader()
+            leaderboard = loader.load_from_file(leaderboard_file)
+            
+            # Run benchmark
+            runner = KaggleBenchmarkRunner()
+            results = runner.run_benchmark(
+                engine,
+                leaderboard,
+                depth=depth,
+                max_positions=max_positions
+            )
+            
+            # Generate summary
+            summary = runner.generate_summary(results)
+            
+            # Return move accuracy as proxy for win rate
+            return summary.move_accuracy
+            
+        except Exception as e:
+            print(f"Warning: Kaggle benchmark adversary test failed: {e}")
+            return 0.0
