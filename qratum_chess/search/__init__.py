@@ -9,9 +9,9 @@ Implements multiple search strategies:
 
 from __future__ import annotations
 
+from qratum_chess.search.aas import AsymmetricAdaptiveSearch
 from qratum_chess.search.alphabeta import AlphaBetaSearch
 from qratum_chess.search.mcts import MCTSSearch
-from qratum_chess.search.aas import AsymmetricAdaptiveSearch
 
 __all__ = [
     "AlphaBetaSearch",
@@ -24,10 +24,12 @@ __all__ = [
 def get_self_modifying_engine():
     """Get SelfModifyingEngine class (lazy import to avoid circular imports)."""
     from qratum_chess.self_modifying import SelfModifyingEngine
+
     return SelfModifyingEngine
 
 
 def get_self_modifying_search():
     """Get SelfModifyingSearch class (lazy import to avoid circular imports)."""
     from qratum_chess.self_modifying import SelfModifyingSearch
+
     return SelfModifyingSearch
