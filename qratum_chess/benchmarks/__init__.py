@@ -25,6 +25,15 @@ from qratum_chess.benchmarks.gauntlet import AdversarialGauntlet
 from qratum_chess.benchmarks.elo import EloCertification
 from qratum_chess.benchmarks.resilience import ResilienceTest
 from qratum_chess.benchmarks.telemetry import TelemetryOutput
+from qratum_chess.benchmarks.kaggle_config import KaggleConfig, load_config
+from qratum_chess.benchmarks.kaggle_integration import (
+    KaggleIntegration,
+    KaggleBenchmarkPosition,
+    KaggleLeaderboardData,
+)
+from qratum_chess.benchmarks.kaggle_submission import (
+    KaggleSubmission,
+    SubmissionResult,
 from qratum_chess.benchmarks.kaggle_integration import (
     KaggleLeaderboardLoader,
     KaggleLeaderboard,
@@ -49,6 +58,13 @@ __all__ = [
     "EloCertification",
     "ResilienceTest",
     "TelemetryOutput",
+    "KaggleConfig",
+    "load_config",
+    "KaggleIntegration",
+    "KaggleBenchmarkPosition",
+    "KaggleLeaderboardData",
+    "KaggleSubmission",
+    "SubmissionResult",
     "KaggleLeaderboardLoader",
     "KaggleLeaderboard",
     "KaggleBenchmarkPosition",

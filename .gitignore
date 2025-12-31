@@ -11,6 +11,10 @@ __pycache__/
 .env
 .env.local
 
+# Kaggle API credentials (never commit)
+.kaggle/
+kaggle.json
+
 # Artifacts
 artifacts/real_world_sim_2025/
 artifacts/*.jsonl
@@ -104,6 +108,9 @@ goodyear_pilot_execution_log.txt
 results/
 bm001_execution.log
 bm001_execution_output.txt
+kaggle_benchmark_results.json
+kaggle_leaderboard*.json
+kaggle_test_positions.json
 
 # Generated documentation package
 output_package/
