@@ -27,6 +27,7 @@ class AdversaryType(Enum):
     NNUE = "nnue"
     NEURAL = "neural"
     HUMAN_GM = "human_gm"
+    KAGGLE = "kaggle"  # Kaggle leaderboard benchmark positions
 
 
 @dataclass
@@ -312,3 +313,72 @@ class AdversarialGauntlet:
                 position = position.make_move(Move.from_uci(gm_move))
         
         return matches / total if total > 0 else 0.0
+    
+    def run_kaggle_benchmark(
+        self,
+        engine,
+        kaggle_positions: list,  # List of KaggleBenchmarkPosition
+        depth: int = 15,
+        time_limit_ms: float = 5000.0
+    ) -> tuple[float, list[dict]]:
+        """Run engine against Kaggle benchmark positions.
+        
+        Args:
+            engine: Engine to test.
+            kaggle_positions: List of Kaggle benchmark positions.
+            depth: Search depth.
+            time_limit_ms: Time limit per position.
+            
+        Returns:
+            Tuple of (match_rate, detailed_results).
+        """
+        from qratum_chess.core.position import Position
+        import time
+        
+        matches = 0
+        total = 0
+        results = []
+        
+        for pos_data in kaggle_positions:
+            position = pos_data.position
+            expected_move = pos_data.expected_move
+            
+            if position is None:
+                continue
+            
+            try:
+                start = time.perf_counter()
+                engine_move, eval_score, stats = engine.search(
+                    position,
+                    depth=depth,
+                    time_limit_ms=time_limit_ms
+                )
+                elapsed = (time.perf_counter() - start) * 1000
+                
+                result = {
+                    "position_id": pos_data.position_id,
+                    "engine_move": engine_move.to_uci() if engine_move else "",
+                    "expected_move": expected_move,
+                    "evaluation": eval_score,
+                    "time_ms": elapsed,
+                    "nodes": stats.nodes_searched if stats else 0,
+                }
+                
+                if expected_move and engine_move:
+                    if engine_move.to_uci() == expected_move:
+                        matches += 1
+                        result["match"] = True
+                    else:
+                        result["match"] = False
+                    total += 1
+                
+                results.append(result)
+            
+            except Exception as e:
+                results.append({
+                    "position_id": pos_data.position_id,
+                    "error": str(e),
+                })
+        
+        match_rate = matches / total if total > 0 else 0.0
+        return match_rate, results
