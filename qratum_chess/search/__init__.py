@@ -4,7 +4,8 @@ Implements multiple search strategies:
 1. Alpha-Beta with iterative deepening
 2. Monte Carlo Tree Search (MCTS)
 3. Asymmetric Adaptive Search (AAS) for Stage III
-4. Self-Modifying Engine for meta-dynamics evolution (imported separately)
+4. AAS Canonical Kernel - Universal decision primitive
+5. Self-Modifying Engine for meta-dynamics evolution (imported separately)
 """
 
 from __future__ import annotations
@@ -12,11 +13,28 @@ from __future__ import annotations
 from qratum_chess.search.alphabeta import AlphaBetaSearch
 from qratum_chess.search.mcts import MCTSSearch
 from qratum_chess.search.aas import AsymmetricAdaptiveSearch
+from qratum_chess.search.aas_kernel import (
+    AASKernel,
+    ChessAASKernel,
+    EntropyGradient,
+    DepthBudget,
+    OrthogonalSubspace,
+    AASMetrics,
+    create_aas_kernel,
+)
 
 __all__ = [
     "AlphaBetaSearch",
     "MCTSSearch",
     "AsymmetricAdaptiveSearch",
+    # AAS Canonical Kernel
+    "AASKernel",
+    "ChessAASKernel",
+    "EntropyGradient",
+    "DepthBudget",
+    "OrthogonalSubspace",
+    "AASMetrics",
+    "create_aas_kernel",
 ]
 
 
