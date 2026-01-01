@@ -8,9 +8,10 @@
 
 namespace QRATUM
 {
-    // Evaluation bounds
-    static constexpr int32 EVAL_INF = FFixedPoint32::Max().RawValue - 1000;
-    static constexpr int32 EVAL_MATE = EVAL_INF - 1000;
+    // Evaluation bounds - margins prevent overflow during score adjustments
+    static constexpr int32 EVAL_SAFETY_MARGIN = 1000;  // Buffer to prevent overflow
+    static constexpr int32 EVAL_INF = FFixedPoint32::Max().RawValue - EVAL_SAFETY_MARGIN;
+    static constexpr int32 EVAL_MATE = EVAL_INF - EVAL_SAFETY_MARGIN;  // Mate scores distinct from infinity
 
     //--------------------------------------------------------------------------
     // FAASSearch Implementation

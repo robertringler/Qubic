@@ -248,7 +248,8 @@ namespace QRATUM
         }
 
         // Sort by value (highest first)
-        Algo::Sort(ChildValues, [](const auto& A, const auto& B)
+        Algo::Sort(ChildValues, [](const TPair<FFixedPoint32, FAASAction>& A, 
+                                   const TPair<FFixedPoint32, FAASAction>& B)
         {
             return A.Key > B.Key;
         });

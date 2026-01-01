@@ -128,15 +128,18 @@ namespace QRATUM
     class FDeterministicRNG
     {
     public:
-        explicit FDeterministicRNG(uint64 Seed = 0x51415455)
-            : State(Seed != 0 ? Seed : 0x51415455) // Prevent zero state
+        /** Default seed: "QATU" in ASCII (0x51='Q', 0x41='A', 0x54='T', 0x55='U') */
+        static constexpr uint64 DEFAULT_RNG_SEED = 0x51415455;
+
+        explicit FDeterministicRNG(uint64 Seed = DEFAULT_RNG_SEED)
+            : State(Seed != 0 ? Seed : DEFAULT_RNG_SEED) // Prevent zero state
         {
         }
 
         /** Reset to a new seed value */
         void Seed(uint64 NewSeed)
         {
-            State = NewSeed != 0 ? NewSeed : 0x51415455;
+            State = NewSeed != 0 ? NewSeed : DEFAULT_RNG_SEED;
         }
 
         /** Get current state for serialization */
