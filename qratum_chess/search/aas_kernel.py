@@ -293,6 +293,14 @@ except ImportError:
     _CHESS_AVAILABLE = False
     Position = Any  # type: ignore
     Move = Any  # type: ignore
+    Color = None  # type: ignore
+    PieceType = None  # type: ignore
+
+
+# Chess board constants
+BOARD_SIZE = 8
+CENTER_MIN = 2  # d-file (files a=0 through h=7)
+CENTER_MAX = 5  # e-file
 
 
 class ChessAASKernel(AASKernel[Position, Move]):
@@ -400,9 +408,9 @@ class ChessAASKernel(AASKernel[Position, Move]):
         if new_pos.is_check():
             value *= self._check_weight
 
-        # Center control bonus
-        to_rank, to_file = target_sq // 8, target_sq % 8
-        if 2 <= to_rank <= 5 and 2 <= to_file <= 5:
+        # Center control bonus (squares d3-e6 / c3-f6)
+        to_rank, to_file = target_sq // BOARD_SIZE, target_sq % BOARD_SIZE
+        if CENTER_MIN <= to_rank <= CENTER_MAX and CENTER_MIN <= to_file <= CENTER_MAX:
             value *= self._center_weight
 
         # Promotion bonus

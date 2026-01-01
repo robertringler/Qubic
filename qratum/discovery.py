@@ -106,12 +106,21 @@ class EmpiricalDelta:
     relative_delta: float = 0.0  # (actual - baseline) / baseline
     statistical_significance: float = 0.0
     timestamp: float = field(default_factory=time.time)
+    # Configurable thresholds for exceeds_threshold check
+    relative_delta_threshold: float = 0.1  # 10% improvement required
+    significance_threshold: float = 0.95  # 95% confidence required
 
     @property
     def exceeds_threshold(self) -> bool:
-        """Check if delta exceeds significance threshold."""
-        # Default threshold: 10% improvement with >95% confidence
-        return self.relative_delta > 0.1 and self.statistical_significance > 0.95
+        """Check if delta exceeds significance threshold.
+        
+        Uses configurable thresholds (relative_delta_threshold and
+        significance_threshold) to allow tuning for different domains.
+        """
+        return (
+            self.relative_delta > self.relative_delta_threshold
+            and self.statistical_significance > self.significance_threshold
+        )
 
 
 @dataclass
