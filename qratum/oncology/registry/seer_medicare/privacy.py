@@ -16,7 +16,7 @@ import hashlib
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 # Default minimum cell size for suppression (HIPAA Safe Harbor principle)
 DEFAULT_MIN_CELL_SIZE = 11

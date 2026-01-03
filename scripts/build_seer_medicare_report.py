@@ -23,7 +23,7 @@ import logging
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Add repository root to path if needed
 repo_root = Path(__file__).parent.parent
@@ -255,7 +255,7 @@ def generate_data_sources_section(manifest: dict[str, Any]) -> str:
         lines.append(f"| {name} | {size:,} | {sha}... |")
 
     if len(manifest.get("files", [])) > 20:
-        lines.append(f"| ... | ... | ... |")
+        lines.append("| ... | ... | ... |")
         lines.append(f"*({len(manifest['files']) - 20} more files not shown)*")
 
     return "\n".join(lines)
@@ -592,10 +592,10 @@ def try_generate_pdf(markdown_content: str, output_path: Path) -> bool:
     """
     # Try markdown2pdf or similar
     try:
-        import markdown
-        from reportlab.lib.pagesizes import letter
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-        from reportlab.lib.styles import getSampleStyleSheet
+        # Check if reportlab is available
+        import importlib.util
+        if importlib.util.find_spec("reportlab") is None:
+            raise ImportError("reportlab not found")
 
         # This is a simplified PDF generation
         # For production, consider using weasyprint or pandoc

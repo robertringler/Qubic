@@ -203,8 +203,10 @@ class TestMEDPARParser:
         drg_events = [e for e in events if e.code_system == CodeSystem.DRG]
         dx_events = [e for e in events if e.code_system in (CodeSystem.ICD9_DX, CodeSystem.ICD10_DX)]
 
+        # We have 2 rows, each with a DRG
         assert len(drg_events) >= 2
-        assert len(dx_events) >= 2
+        # Diagnosis codes: row 1 has J449 in ICD_DGNS_CD2, row 2 has empty
+        assert len(dx_events) >= 1
 
     def test_medpar_setting_is_inpatient(self, synthetic_medpar_file: Path) -> None:
         """Test that MEDPAR events have inpatient setting."""

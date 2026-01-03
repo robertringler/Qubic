@@ -9,20 +9,19 @@ RESEARCH USE ONLY - Not for clinical diagnosis or treatment decisions.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any, Generator, Optional
+from typing import Any, Optional
 
 import yaml
 
 from .linkages import LinkedPatient
 from .privacy import PrivacyConfig, SafeLogger, suppress_small_counts
-from .schema import ClaimEvent, ClaimSetting, CodeSystem, PatientTimeline, TreatmentEvent
+from .schema import ClaimEvent, CodeSystem, PatientTimeline, TreatmentEvent
 
 logger = logging.getLogger(__name__)
 
@@ -329,16 +328,19 @@ class TimelineSummary:
 
     def to_dict(self, min_cell_size: int = 11) -> dict[str, Any]:
         """Serialize with suppression."""
+        suppressed = f"<{min_cell_size}"
+        n_pts = self.n_patients
+        n_treated = self.n_with_any_treatment
         return {
-            "n_patients": self.n_patients if self.n_patients >= min_cell_size else f"<{min_cell_size}",
+            "n_patients": n_pts if n_pts >= min_cell_size else suppressed,
             "n_with_any_treatment": (
-                self.n_with_any_treatment
-                if self.n_with_any_treatment >= min_cell_size
-                else f"<{min_cell_size}"
+                n_treated if n_treated >= min_cell_size else suppressed
             ),
             "time_to_first_treatment_median": self.time_to_first_treatment_median,
             "time_to_first_treatment_mean": self.time_to_first_treatment_mean,
-            "treatment_type_counts": suppress_small_counts(self.treatment_type_counts, min_cell_size),
+            "treatment_type_counts": suppress_small_counts(
+                self.treatment_type_counts, min_cell_size
+            ),
             "lines_of_therapy_distribution": suppress_small_counts(
                 self.lines_of_therapy_distribution, min_cell_size
             ),

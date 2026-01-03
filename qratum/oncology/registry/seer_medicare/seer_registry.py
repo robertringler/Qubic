@@ -12,7 +12,7 @@ import csv
 import logging
 from datetime import date
 from pathlib import Path
-from typing import Any, Generator, Optional
+from typing import Generator, Optional
 
 from .privacy import PrivacyConfig, SafeLogger, create_patient_key
 from .schema import CauseOfDeath, RegistryCase, VitalStatus

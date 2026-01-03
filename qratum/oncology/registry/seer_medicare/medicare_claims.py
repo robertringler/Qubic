@@ -13,7 +13,7 @@ import csv
 import logging
 from datetime import date
 from pathlib import Path
-from typing import Any, Generator, Optional
+from typing import Generator, Optional
 
 from .privacy import PrivacyConfig, SafeLogger, create_claim_id_hash, create_patient_key
 from .schema import ClaimEvent, ClaimSetting, CodeSystem
@@ -255,7 +255,9 @@ class MEDPARParser(MedicareClaimsParser):
 
         # Get payment
         payment_str = _find_field(row, self.field_aliases["payment"])
-        payment = float(payment_str) if payment_str and payment_str.replace(".", "").isdigit() else None
+        payment = None
+        if payment_str and payment_str.replace(".", "").isdigit():
+            payment = float(payment_str)
 
         # DRG code
         drg = _find_field(row, self.field_aliases["drg"])
@@ -342,7 +344,9 @@ class NCHParser(MedicareClaimsParser):
             return events
 
         payment_str = _find_field(row, self.field_aliases["payment"])
-        payment = float(payment_str) if payment_str and payment_str.replace(".", "").replace("-", "").isdigit() else None
+        payment = None
+        if payment_str and payment_str.replace(".", "").replace("-", "").isdigit():
+            payment = float(payment_str)
 
         provider_specialty = _find_field(row, self.field_aliases["provider_specialty"])
 
@@ -395,7 +399,9 @@ class OUTSAFParser(MedicareClaimsParser):
             return events
 
         payment_str = _find_field(row, self.field_aliases["payment"])
-        payment = float(payment_str) if payment_str and payment_str.replace(".", "").replace("-", "").isdigit() else None
+        payment = None
+        if payment_str and payment_str.replace(".", "").replace("-", "").isdigit():
+            payment = float(payment_str)
 
         # HCPCS code
         hcpcs = _find_field(row, self.field_aliases["hcpcs"])
@@ -466,11 +472,15 @@ class PDEParser(MedicareClaimsParser):
 
         # Quantity
         qty_str = _find_field(row, self.field_aliases["quantity"])
-        quantity = int(float(qty_str)) if qty_str and qty_str.replace(".", "").isdigit() else None
+        quantity = None
+        if qty_str and qty_str.replace(".", "").isdigit():
+            quantity = int(float(qty_str))
 
         # Payment
         payment_str = _find_field(row, self.field_aliases["payment"])
-        payment = float(payment_str) if payment_str and payment_str.replace(".", "").replace("-", "").isdigit() else None
+        payment = None
+        if payment_str and payment_str.replace(".", "").replace("-", "").isdigit():
+            payment = float(payment_str)
 
         events.append(
             ClaimEvent(

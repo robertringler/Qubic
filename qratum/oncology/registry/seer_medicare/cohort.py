@@ -12,12 +12,11 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import date
 from typing import Any, Generator, Optional
 
-from .linkages import LinkedPatient, PatientLinker
-from .privacy import PrivacyConfig, SafeLogger, aggregate_age_to_bins, suppress_small_counts
-from .schema import CohortDefinition, RegistryCase, VitalStatus
+from .linkages import LinkedPatient
+from .privacy import PrivacyConfig, SafeLogger, suppress_small_counts
+from .schema import CohortDefinition, RegistryCase
 
 logger = logging.getLogger(__name__)
 
@@ -230,7 +229,8 @@ class CohortBuilder:
             return False
 
         # Check age
-        if self.definition.age_min and (case.age_at_dx is None or case.age_at_dx < self.definition.age_min):
+        age_min = self.definition.age_min
+        if age_min and (case.age_at_dx is None or case.age_at_dx < age_min):
             if record_stats:
                 self._stats.exclusion_reasons["age_too_young"] = (
                     self._stats.exclusion_reasons.get("age_too_young", 0) + 1

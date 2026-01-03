@@ -44,10 +44,13 @@ class QualityMetrics:
 
     def to_dict(self, min_cell_size: int = 11) -> dict[str, Any]:
         """Serialize with suppression."""
+        valid = self.valid_records
+        invalid = self.invalid_records
+        suppressed = f"<{min_cell_size}"
         return {
             "total_records": self.total_records,
-            "valid_records": self.valid_records if self.valid_records >= min_cell_size else f"<{min_cell_size}",
-            "invalid_records": self.invalid_records if self.invalid_records >= min_cell_size else f"<{min_cell_size}",
+            "valid_records": valid if valid >= min_cell_size else suppressed,
+            "invalid_records": invalid if invalid >= min_cell_size else suppressed,
             "error_counts": suppress_small_counts(self.error_counts, min_cell_size),
             "field_completeness": self.field_completeness,
             "date_range": self.date_range,

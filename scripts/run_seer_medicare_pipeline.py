@@ -37,7 +37,7 @@ import logging
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Add repository root to path if needed
 repo_root = Path(__file__).parent.parent
@@ -58,7 +58,6 @@ from qratum.oncology.registry.seer_medicare.privacy import (
     PrivacyConfig,
     SafeLogger,
 )
-from qratum.oncology.registry.seer_medicare.quality import DataValidator
 from qratum.oncology.registry.seer_medicare.seer_registry import SEERRegistryParser
 from qratum.oncology.registry.seer_medicare.timelines import (
     CodeMappingLibrary,
@@ -581,7 +580,7 @@ def main() -> None:
 
     try:
         results = run_pipeline(args)
-        print(f"\nPipeline completed successfully.")
+        print("\nPipeline completed successfully.")
         print(f"Output directory: {results['output_dir']}")
         print(f"Cohort size: {results['cohort_size']}")
         print(f"Timelines built: {results['timelines_built']}")

@@ -21,10 +21,8 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 from typing import Any, Optional
 
-import numpy as np
-
 from .privacy import PrivacyConfig, SafeLogger
-from .schema import ClaimEvent, ClaimSetting, CodeSystem, PatientTimeline, RegistryCase
+from .schema import ClaimEvent, ClaimSetting, CodeSystem, PatientTimeline
 
 logger = logging.getLogger(__name__)
 

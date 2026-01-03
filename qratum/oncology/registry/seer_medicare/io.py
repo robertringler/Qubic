@@ -16,14 +16,13 @@ import csv
 import hashlib
 import json
 import logging
-import os
 import platform
 import subprocess
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Generator, Iterator, Optional
+from typing import Any, Generator, Optional
 
 logger = logging.getLogger(__name__)
 
