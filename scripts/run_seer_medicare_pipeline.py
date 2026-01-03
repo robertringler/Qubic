@@ -485,12 +485,19 @@ def run_qratum_analysis(
             values = [s.get(key, 0.5) for s in state_vectors]
             avg_state[key] = sum(values) / len(values)
     else:
-        # Default state
+        # Default state when no timelines available
+        # These are PLACEHOLDER values for testing/demo only
+        # Rationale:
+        # - tumor_burden=0.8: Assumes advanced disease (stage IV typical)
+        # - immune_engagement=0.2: Low baseline without immunotherapy
+        # - toxicity_level=0.2: Moderate baseline toxicity
+        # - proliferation_rate=0.6: Active disease state
+        # These should be derived from cohort data when available
         avg_state = {
-            "tumor_burden": 0.8,
-            "immune_engagement": 0.2,
-            "toxicity_level": 0.2,
-            "proliferation_rate": 0.6,
+            "tumor_burden": 0.8,  # High burden for advanced cancer cohort
+            "immune_engagement": 0.2,  # Low baseline immune engagement
+            "toxicity_level": 0.2,  # Moderate baseline toxicity
+            "proliferation_rate": 0.6,  # Active disease proliferation
         }
 
     # Build causal graph

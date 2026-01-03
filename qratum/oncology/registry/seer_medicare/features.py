@@ -153,18 +153,39 @@ class StateFeatures:
 
 
 # ICD diagnosis codes associated with comorbidities (Charlson-like proxy)
-# These are EXAMPLES only and should be validated by domain experts
+#
+# IMPORTANT:
+# - These are EXAMPLE mappings only and REQUIRE validation by domain experts
+# - Codes mix ICD-9 (numeric, e.g., "410") and ICD-10 (alphanumeric, e.g., "I21")
+# - The ICD-9 to ICD-10 transition occurred Oct 1, 2015 for Medicare
+# - Claims before Oct 2015 use ICD-9; claims after use ICD-10
+# - These mappings are adapted from Charlson Comorbidity Index literature
+# - Users should validate mappings for their specific study population and era
+#
+# Format: condition_name: [ICD-9 codes..., ICD-10 codes...]
 COMORBIDITY_CODE_GROUPS = {
+    # ICD-9: 410  |  ICD-10: I21, I22
     "mi": ["410", "I21", "I22"],  # Myocardial infarction
+    # ICD-9: 428  |  ICD-10: I50
     "chf": ["428", "I50"],  # Congestive heart failure
+    # ICD-9: 443, etc  |  ICD-10: I70, I73
     "pvd": ["443", "I73", "I70"],  # Peripheral vascular disease
-    "cvd": ["430", "431", "432", "433", "434", "I60", "I61", "I62", "I63"],  # Cerebrovascular
+    # ICD-9: 430-434  |  ICD-10: I60-I63
+    "cvd": ["430", "431", "432", "433", "434", "I60", "I61", "I62", "I63"],
+    # ICD-9: 290  |  ICD-10: F00-F03
     "dementia": ["290", "F00", "F01", "F02", "F03"],  # Dementia
-    "copd": ["490", "491", "492", "493", "494", "495", "496", "J40", "J41", "J42", "J43", "J44"],
+    # ICD-9: 490-496  |  ICD-10: J40-J44
+    "copd": ["490", "491", "492", "493", "494", "495", "496",
+             "J40", "J41", "J42", "J43", "J44"],
+    # ICD-9: 710, 714, 725  |  ICD-10: M05, M06, M32
     "rheumatic": ["710", "714", "725", "M05", "M06", "M32"],  # Rheumatic disease
+    # ICD-9: 531-534  |  ICD-10: K25-K28
     "peptic_ulcer": ["531", "532", "533", "534", "K25", "K26", "K27", "K28"],
+    # ICD-9: 571  |  ICD-10: K70, K73, K74
     "liver_mild": ["571", "K70", "K73", "K74"],  # Mild liver disease
+    # ICD-9: 250  |  ICD-10: E10, E11, E13
     "diabetes": ["250", "E10", "E11", "E13"],  # Diabetes
+    # ICD-9: 582, 583, 585, 586  |  ICD-10: N18, N19
     "renal": ["582", "583", "585", "586", "N18", "N19"],  # Renal disease
 }
 
@@ -362,6 +383,17 @@ class FeatureEngineer:
         Higher utilization may correlate with disease progression
         but should not be interpreted as tumor size.
 
+        Methodology:
+        - Combines inpatient and total claims into a utilization score
+        - Inpatient admissions weighted 3x (reflect higher acuity)
+        - Score normalized to 0-1 scale using empirical scaling factor (50)
+        - These weights are HEURISTIC and require validation
+
+        Scaling assumptions (require validation):
+        - IP_WEIGHT=3: Inpatient admits reflect higher disease burden
+        - SCALE_FACTOR=50: Assumes ~15 IP + ~5 total in high-burden month
+        - These should be calibrated against clinical outcomes
+
         Args:
             claims: Recent claims
 
@@ -371,12 +403,16 @@ class FeatureEngineer:
         if not claims:
             return 0.5  # Unknown/baseline
 
+        # Configurable weights (consider making class attributes)
+        IP_WEIGHT = 3  # Inpatient admissions weighted higher
+        SCALE_FACTOR = 50.0  # Empirical normalization factor
+
         # Count different claim types
         ip_count = sum(1 for c in claims if c.setting == ClaimSetting.INPATIENT)
         total_count = len(claims)
 
         # High inpatient utilization suggests higher burden
-        score = min((ip_count * 3 + total_count) / 50.0, 1.0)
+        score = min((ip_count * IP_WEIGHT + total_count) / SCALE_FACTOR, 1.0)
         return score
 
     def _compute_immune_engagement_proxy(self, events: list) -> float:

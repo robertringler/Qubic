@@ -63,12 +63,20 @@ class SafeLogger:
     """
 
     # Patterns that look like identifiers
+    # Note: These patterns balance detection sensitivity with false positive rate.
+    # Consider extending for specific data sources as needed.
     IDENTIFIER_PATTERNS = [
         r"\b[A-Z]{3}\d{9}\b",  # Medicare HIC-like
         r"\b\d{9}\b",  # SSN-like (9 digits)
         r"\b\d{3}-\d{2}-\d{4}\b",  # SSN format
         r"\bPATIENT_?\w*[:=]\s*\w+",  # Explicit patient_id patterns
         r"\bBENE_?\w*[:=]\s*\w+",  # Beneficiary ID patterns
+        r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b",  # Email addresses
+        r"\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b",  # Phone numbers
+        r"\b\d{1,2}/\d{1,2}/\d{2,4}\b",  # Date formats (potential DOB)
+        r"\b\d{5}(-\d{4})?\b",  # ZIP codes (potential geographic identifier)
+        r"\bMRN[:=]?\s*\d+\b",  # Medical record numbers
+        r"\bNCH_?\w*[:=]\s*\w+",  # NCH claim identifiers
     ]
 
     def __init__(
