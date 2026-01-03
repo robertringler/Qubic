@@ -482,12 +482,24 @@ DATA AND BIAS:
         output_content: dict[str, Any],
         context: dict[str, Any],
     ) -> Optional[dict[str, Any]]:
-        """Check if a specific constraint is violated."""
-        # Simple keyword-based checks (would be more sophisticated in production)
+        """Check if a specific constraint is violated.
+
+        NOTE: This is a simplified keyword-based check for demonstration.
+        Production implementations should use:
+        1. NLP-based semantic analysis for nuanced violation detection
+        2. Formal verification methods for critical constraints
+        3. Human-in-the-loop review for ambiguous cases
+        4. Domain-specific rule engines for medical context
+
+        This basic implementation provides a first-pass filter but
+        is NOT sufficient for production medical AI systems.
+        """
+        # Keyword-based violation triggers (basic first-pass filter)
+        # Maps constraint categories to potentially violating keywords
         violation_triggers = {
-            "direct treatment": ["prescribe", "administer", "give patient"],
-            "diagnostic accuracy": ["diagnose", "confirms diagnosis"],
-            "autonomous": ["automatically", "without review", "autonomous"],
+            "direct treatment": ["prescribe", "administer", "give patient", "take this"],
+            "diagnostic accuracy": ["diagnose", "confirms diagnosis", "you have", "definitive"],
+            "autonomous": ["automatically", "without review", "autonomous", "no oversight"],
         }
 
         content_str = json.dumps(output_content).lower()
@@ -500,6 +512,7 @@ DATA AND BIAS:
                             "constraint": constraint,
                             "trigger": keyword,
                             "location": "output_content",
+                            "note": "Basic keyword match - requires human review for confirmation",
                         }
 
         return None

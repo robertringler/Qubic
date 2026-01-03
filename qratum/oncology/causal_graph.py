@@ -325,7 +325,7 @@ class CausalOncologyGraph:
         self.rng = np.random.RandomState(seed)
 
         self._nodes: dict[str, OncogenicNode] = {}
-        self._edges: list[CausalEdge] = {}
+        self._edges: dict[str, CausalEdge] = {}
         self._adjacency: dict[str, list[str]] = {}
         self._reverse_adjacency: dict[str, list[str]] = {}
 

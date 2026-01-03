@@ -433,14 +433,20 @@ class ValidationPipeline:
             1 for v in validations if v.status == ValidationStatus.COMPLETED_SUCCESS
         )
 
+        # Calculate rates with proper handling of edge cases
+        completion_rate = completed / total if total > 0 else 0.0
+        # success_rate is percentage of completed validations that were successful
+        # Returns 0.0 if no validations completed (not misleading - correctly indicates no data)
+        success_rate = successful / completed if completed > 0 else 0.0
+
         return {
             "stage": stage.value,
             "total_validations": total,
             "completed": completed,
             "successful": successful,
-            "completion_rate": completed / max(total, 1),
-            "success_rate": successful / max(completed, 1),
-            "can_proceed": successful >= total * 0.7,  # 70% threshold
+            "completion_rate": completion_rate,
+            "success_rate": success_rate,
+            "can_proceed": total > 0 and successful >= total * 0.7,  # 70% threshold
         }
 
     def generate_go_no_go_recommendation(
