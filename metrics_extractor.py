@@ -13,11 +13,15 @@ Integration assumptions:
         MSD_EXPONENT=...\n
   - Future: create dedicated artifact files (e.g., metrics_run.json)
 """
+
 from __future__ import annotations
-import re, json, statistics
+
+import json
+import re
+import statistics
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from dataclasses import dataclass, asdict
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 TRACE_RE = re.compile(r"TRACE_MAX=([0-9.eE+-]+)")
 TRACE_SWEEP_RE = re.compile(r"TRACE_MAX_SWEEP=([0-9.eE+-]+)")
@@ -74,6 +78,7 @@ HYPER_AUTO_ANOMALIES_DETECTED_RE = re.compile(r"HYPER_AUTO_ANOMALIES_DETECTED=([
 HYPER_AUTO_HYPOTHESES_GENERATED_RE = re.compile(r"HYPER_AUTO_HYPOTHESES_GENERATED=([0-9.eE+-]+)")
 HYPER_AUTO_STRATEGY_CHANGES_RE = re.compile(r"HYPER_AUTO_STRATEGY_CHANGES=([0-9.eE+-]+)")
 HYPER_AUTO_KNOWLEDGE_SIZE_RE = re.compile(r"HYPER_AUTO_KNOWLEDGE_SIZE=([0-9.eE+-]+)")
+
 
 @dataclass
 class Metrics:
@@ -138,11 +143,11 @@ def parse_stdout(path: Path) -> Metrics:
     if not path.exists():
         return m
     text = path.read_text(encoding="utf-8", errors="ignore")
-    if (match := TRACE_RE.search(text)):
+    if match := TRACE_RE.search(text):
         m.trace_max = float(match.group(1))
-    if (match := TRACE_SWEEP_RE.search(text)):
+    if match := TRACE_SWEEP_RE.search(text):
         m.trace_max_sweep = float(match.group(1))
-    if (match := D2_RE.search(text)):
+    if match := D2_RE.search(text):
         m.d2 = float(match.group(1))
     else:
         # Fallback: parse all convergence D2 values and take the last (finest dt) or median
@@ -150,101 +155,101 @@ def parse_stdout(path: Path) -> Metrics:
         if conv_vals:
             # Heuristic: choose last (assuming sorted by refining dt). If spread small use median.
             last = conv_vals[-1]
-            if len(conv_vals) >= 3 and (max(conv_vals)-min(conv_vals)) < 1e-3:
+            if len(conv_vals) >= 3 and (max(conv_vals) - min(conv_vals)) < 1e-3:
                 last = statistics.median(conv_vals)
             m.d2 = last
-    if (match := MSD_EXP_RE.search(text)):
+    if match := MSD_EXP_RE.search(text):
         m.alpha_d = float(match.group(1))
-    if (match := DT_ORDER_RE.search(text)):
+    if match := DT_ORDER_RE.search(text):
         m.dt_order = float(match.group(1))
-    if (match := BOOT_HW_RE.search(text)):
+    if match := BOOT_HW_RE.search(text):
         m.bootstrap_halfwidth = float(match.group(1))
-    if (match := CPU_TIME_RE.search(text)):
+    if match := CPU_TIME_RE.search(text):
         m.cpu_time = float(match.group(1))
-    if (match := RSS_RE.search(text)):
+    if match := RSS_RE.search(text):
         m.rss = float(match.group(1))
-    if (match := LOGICAL_GAMMA_L_HZ_RE.search(text)):
+    if match := LOGICAL_GAMMA_L_HZ_RE.search(text):
         m.logical_gamma_L_hz = float(match.group(1))
-    if (match := GATE_TIME_NS_RE.search(text)):
+    if match := GATE_TIME_NS_RE.search(text):
         m.gate_time_ns = float(match.group(1))
-    if (match := MAX_SAFE_CLOCK_MHZ_RE.search(text)):
+    if match := MAX_SAFE_CLOCK_MHZ_RE.search(text):
         m.max_safe_clock_mhz = float(match.group(1))
     # Ultra-advanced
-    if (match := ULTRA_QFT_RE.search(text)):
+    if match := ULTRA_QFT_RE.search(text):
         m.ultra_qft_scaling_exponent = float(match.group(1))
-    if (match := ULTRA_HOLO_VIOL_RE.search(text)):
+    if match := ULTRA_HOLO_VIOL_RE.search(text):
         m.ultra_max_holo_violation = float(match.group(1))
-    if (match := ULTRA_MAX_CHERN_RE.search(text)):
+    if match := ULTRA_MAX_CHERN_RE.search(text):
         m.ultra_max_chern_number = float(match.group(1))
-    if (match := ULTRA_FISHER_RE.search(text)):
+    if match := ULTRA_FISHER_RE.search(text):
         m.ultra_fisher_scaling = float(match.group(1))
     # Hyper-advanced
-    if (match := HYPER_GAUGE_EMERGENCE_RE.search(text)):
+    if match := HYPER_GAUGE_EMERGENCE_RE.search(text):
         m.hyper_gauge_emergence_exponent = float(match.group(1))
-    if (match := HYPER_DIFFEO_SCALING_RE.search(text)):
+    if match := HYPER_DIFFEO_SCALING_RE.search(text):
         m.hyper_diffeo_scaling = float(match.group(1))
-    if (match := HYPER_NONCOMM_THETA_RE.search(text)):
+    if match := HYPER_NONCOMM_THETA_RE.search(text):
         m.hyper_noncomm_theta = float(match.group(1))
-    if (match := HYPER_SPECTRAL_DIM_RE.search(text)):
+    if match := HYPER_SPECTRAL_DIM_RE.search(text):
         m.hyper_spectral_dimension = float(match.group(1))
-    if (match := HYPER_CHAOS_R_RE.search(text)):
+    if match := HYPER_CHAOS_R_RE.search(text):
         m.hyper_chaos_r_parameter = float(match.group(1))
-    if (match := HYPER_PAGE_ENTROPY_RE.search(text)):
+    if match := HYPER_PAGE_ENTROPY_RE.search(text):
         m.hyper_page_entropy = float(match.group(1))
-    if (match := HYPER_ENTROPY_PROD_RE.search(text)):
+    if match := HYPER_ENTROPY_PROD_RE.search(text):
         m.hyper_entropy_production_rate = float(match.group(1))
     # Autonomous Discovery metrics
-    if (match := HYPER_AUTO_DISCOVERIES_RE.search(text)):
+    if match := HYPER_AUTO_DISCOVERIES_RE.search(text):
         m.hyper_auto_discoveries = int(float(match.group(1)))
-    if (match := HYPER_AUTO_ITERATIONS_RE.search(text)):
+    if match := HYPER_AUTO_ITERATIONS_RE.search(text):
         m.hyper_auto_iterations = int(float(match.group(1)))
-    if (match := HYPER_AUTO_OPTIMAL_GAMMA_RE.search(text)):
+    if match := HYPER_AUTO_OPTIMAL_GAMMA_RE.search(text):
         m.hyper_auto_optimal_gamma = float(match.group(1))
-    if (match := HYPER_AUTO_OPTIMAL_DISORDER_RE.search(text)):
+    if match := HYPER_AUTO_OPTIMAL_DISORDER_RE.search(text):
         m.hyper_auto_optimal_disorder = float(match.group(1))
-    if (match := HYPER_AUTO_EFFICIENCY_RE.search(text)):
+    if match := HYPER_AUTO_EFFICIENCY_RE.search(text):
         m.hyper_auto_efficiency = float(match.group(1))
-    if (match := HYPER_AUTO_ANOMALIES_DETECTED_RE.search(text)):
+    if match := HYPER_AUTO_ANOMALIES_DETECTED_RE.search(text):
         m.hyper_auto_anomalies_detected = int(float(match.group(1)))
-    if (match := HYPER_AUTO_HYPOTHESES_GENERATED_RE.search(text)):
+    if match := HYPER_AUTO_HYPOTHESES_GENERATED_RE.search(text):
         m.hyper_auto_hypotheses_generated = int(float(match.group(1)))
-    if (match := HYPER_AUTO_STRATEGY_CHANGES_RE.search(text)):
+    if match := HYPER_AUTO_STRATEGY_CHANGES_RE.search(text):
         m.hyper_auto_strategy_changes = int(float(match.group(1)))
-    if (match := HYPER_AUTO_KNOWLEDGE_SIZE_RE.search(text)):
+    if match := HYPER_AUTO_KNOWLEDGE_SIZE_RE.search(text):
         m.hyper_auto_knowledge_size = int(float(match.group(1)))
-    if (match := MIN_EIG_RE.search(text)):
+    if match := MIN_EIG_RE.search(text):
         m.min_eig = float(match.group(1))
-    if (match := NEG_EIG_COUNT_RE.search(text)):
+    if match := NEG_EIG_COUNT_RE.search(text):
         m.neg_eig_count = int(float(match.group(1)))
-    if (match := ADAPT_REJECT_RE.search(text)):
+    if match := ADAPT_REJECT_RE.search(text):
         m.adaptive_dt_rejections = int(float(match.group(1)))
-    if (match := ADAPT_MEAN_RE.search(text)):
+    if match := ADAPT_MEAN_RE.search(text):
         m.adaptive_dt_mean = float(match.group(1))
-    if (match := LOCAL_ERR_MAX_RE.search(text)):
+    if match := LOCAL_ERR_MAX_RE.search(text):
         m.local_error_max = float(match.group(1))
-    if (match := LOGICAL_FID_RE.search(text)):
+    if match := LOGICAL_FID_RE.search(text):
         m.logical_fidelity = float(match.group(1))
-    if (match := ENT_FID_RE.search(text)):
+    if match := ENT_FID_RE.search(text):
         m.entanglement_fidelity = float(match.group(1))
-    if (match := COHERENT_INFO_RE.search(text)):
+    if match := COHERENT_INFO_RE.search(text):
         m.coherent_information = float(match.group(1))
-    if (match := FISHER_GAMMA_RE.search(text)):
+    if match := FISHER_GAMMA_RE.search(text):
         m.fisher_gamma = float(match.group(1))
-    if (match := FISHER_GAMMA_SQRT_RE.search(text)):
+    if match := FISHER_GAMMA_SQRT_RE.search(text):
         m.fisher_gamma_sqrt = float(match.group(1))
-    if (match := D2_FORCED_FLAG_RE.search(text)):
-        m.d2_forced = (match.group(1) == '1')
+    if match := D2_FORCED_FLAG_RE.search(text):
+        m.d2_forced = match.group(1) == "1"
     # Provide default false for forced flag if D2 present but no explicit tag
     if m.d2 is not None and m.d2_forced is None:
         m.d2_forced = False
     # PTQ instanton metrics
-    if (match := DELTA_INST_RE.search(text)):
+    if match := DELTA_INST_RE.search(text):
         m.delta_instanton = float(match.group(1))
-    if (match := DELTA_INST_S0_RE.search(text)):
+    if match := DELTA_INST_S0_RE.search(text):
         m.delta_instanton_S0 = float(match.group(1))
-    if (match := DELTA_INST_VALID_RE.search(text)):
-        m.delta_instanton_valid = (match.group(1) == '1')
-    if (match := DELTA_INST_OMEGA0_RE.search(text)):
+    if match := DELTA_INST_VALID_RE.search(text):
+        m.delta_instanton_valid = match.group(1) == "1"
+    if match := DELTA_INST_OMEGA0_RE.search(text):
         m.delta_instanton_omega0 = float(match.group(1))
     # Fractal transport gap derivation:
     # Let MSD exponent alpha_d ~ 2/d_w (walk dimension d_w) and effective spectral/fractal transport dimension d_s ≈ D2 * alpha_d.
@@ -258,10 +263,10 @@ def parse_stdout(path: Path) -> Metrics:
 def write_metrics(metrics: Metrics, out_path: Path) -> None:
     data = metrics.to_dict()
     # Guarantee presence of d2_forced field for downstream tests even if None
-    if 'd2_forced' not in data or data['d2_forced'] is None:
+    if "d2_forced" not in data or data["d2_forced"] is None:
         # Default False if D2 exists, else None
-        if data.get('d2') is not None and data.get('d2_forced') is None:
-            data['d2_forced'] = False
+        if data.get("d2") is not None and data.get("d2_forced") is None:
+            data["d2_forced"] = False
     out_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
@@ -270,8 +275,10 @@ def extract_and_write(analysis_stdout: Path, metrics_path: Path) -> Path:
     write_metrics(metrics, metrics_path)
     return metrics_path
 
+
 if __name__ == "__main__":
     import argparse
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--stdout", required=True)
     ap.add_argument("--out", required=True)

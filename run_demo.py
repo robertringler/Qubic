@@ -2,26 +2,26 @@
 
 Author: Robert Ringler (Independent Researcher)
 """
-import json
-import os
-from pathlib import Path
-import sys
 
+import json
+from pathlib import Path
+
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = Path(__file__).resolve().parent / 'output'
+OUT = Path(__file__).resolve().parent / "output"
 OUT.mkdir(parents=True, exist_ok=True)
 
 
 def load_json(path):
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return None
@@ -30,36 +30,37 @@ def load_json(path):
 def main():
     # Collect known metric files (best-effort)
     metrics_files = [
-        ROOT / 'all_metrics.json',
-        ROOT / 'benchmark_results.json',
-        ROOT / 'aggregated_data.json',
-        ROOT / 'aggregated_data.csv',
+        ROOT / "all_metrics.json",
+        ROOT / "benchmark_results.json",
+        ROOT / "aggregated_data.json",
+        ROOT / "aggregated_data.csv",
     ]
 
     summaries = {}
     for p in metrics_files:
         if p.exists():
-            if p.suffix == '.csv':
+            if p.suffix == ".csv":
                 try:
                     df = pd.read_csv(p)
-                    summaries[p.name] = {'rows': len(df), 'columns': list(df.columns)[:10]}
+                    summaries[p.name] = {"rows": len(df), "columns": list(df.columns)[:10]}
                 except Exception as e:
-                    summaries[p.name] = {'error': str(e)}
+                    summaries[p.name] = {"error": str(e)}
             else:
                 data = load_json(p)
-                summaries[p.name] = {'present': data is not None}
-    
+                summaries[p.name] = {"present": data is not None}
+
     # Emit TAG=VALUE summary lines
     metrics_out = {}
     for k, v in summaries.items():
-        tag = k.replace('.', '_').upper()
+        tag = k.replace(".", "_").upper()
         metrics_out[tag] = v
         print(f"{tag}=present")
 
     # Quick numerical aggregation: look for numeric fields in all_metrics.json
-    am = load_json(ROOT / 'all_metrics.json') or {}
+    am = load_json(ROOT / "all_metrics.json") or {}
     numeric_summary = {}
-    def collect_nums(obj, prefix=''):
+
+    def collect_nums(obj, prefix=""):
         if isinstance(obj, dict):
             for kk, vv in obj.items():
                 collect_nums(vv, f"{prefix}{kk}.")
@@ -67,15 +68,15 @@ def main():
             for i, vv in enumerate(obj[:50]):
                 collect_nums(vv, f"{prefix}{i}.")
         elif isinstance(obj, (int, float)):
-            numeric_summary[prefix.rstrip('.')] = obj
+            numeric_summary[prefix.rstrip(".")] = obj
 
     collect_nums(am)
     # Save numeric summary
-    with open(OUT / 'numeric_summary.json', 'w', encoding='utf-8') as f:
+    with open(OUT / "numeric_summary.json", "w", encoding="utf-8") as f:
         json.dump(numeric_summary, f, indent=2)
 
     # If aggregated_data.csv exists, make a few plots
-    csvp = ROOT / 'aggregated_data.csv'
+    csvp = ROOT / "aggregated_data.csv"
     stats_summary = {}
     if csvp.exists():
         try:
@@ -109,12 +110,21 @@ def main():
                 arr = s.values
                 nboot = 1000
                 if len(arr) > 0:
-                    boots = np.mean(np.random.choice(arr, size=(nboot, len(arr)), replace=True), axis=1)
+                    boots = np.mean(
+                        np.random.choice(arr, size=(nboot, len(arr)), replace=True), axis=1
+                    )
                     pval = float(np.mean(np.abs(boots) >= abs(mean)))
                 else:
                     pval = None
 
-                stats_summary[c] = dict(mean=mean, std=std, median=median, count=count, ci95=(lo, hi), p_mean_bootstrap=pval)
+                stats_summary[c] = dict(
+                    mean=mean,
+                    std=std,
+                    median=median,
+                    count=count,
+                    ci95=(lo, hi),
+                    p_mean_bootstrap=pval,
+                )
 
                 # hist plot (lightweight matplotlib; sample if dataset is large)
                 try:
@@ -125,10 +135,10 @@ def main():
                             # sample without replacement for plotting
                             data = np.random.choice(data, size=max_plot, replace=False)
                         plt.figure(figsize=(6, 3))
-                        plt.hist(data, bins=50, color='#4C72B0', alpha=0.8)
-                        plt.title(f'Histogram: {c}')
+                        plt.hist(data, bins=50, color="#4C72B0", alpha=0.8)
+                        plt.title(f"Histogram: {c}")
                         plt.tight_layout()
-                        plt.savefig(OUT / f'hist_{c}.png')
+                        plt.savefig(OUT / f"hist_{c}.png")
                         plt.close()
                 except Exception:
                     pass
@@ -140,8 +150,8 @@ def main():
                     try:
                         sample_n = min(len(sub), 1000)
                         sns.pairplot(sub.sample(sample_n))
-                        plt.suptitle('Pairwise numeric relationships')
-                        plt.savefig(OUT / 'pairplot.png')
+                        plt.suptitle("Pairwise numeric relationships")
+                        plt.savefig(OUT / "pairplot.png")
                         plt.close()
                     except Exception as e:
                         print(f"PAIRPLOT_ERROR={str(e)}")
@@ -183,16 +193,23 @@ def main():
                         slope = intercept = r2 = None
 
                     key = f"{paircols[i]}__vs__{paircols[j]}"
-                    correlations_summary[key] = dict(r=r, r_ci95=(rlo, rhi), p_r_bootstrap=pr, slope=slope, intercept=intercept, r2=r2)
+                    correlations_summary[key] = dict(
+                        r=r,
+                        r_ci95=(rlo, rhi),
+                        p_r_bootstrap=pr,
+                        slope=slope,
+                        intercept=intercept,
+                        r2=r2,
+                    )
 
             if correlations_summary:
-                with open(OUT / 'correlations_summary.json', 'w', encoding='utf-8') as f:
+                with open(OUT / "correlations_summary.json", "w", encoding="utf-8") as f:
                     json.dump(correlations_summary, f, indent=2)
         except Exception as e:
             print(f"CSV_PLOT_ERROR={str(e)}")
 
     # If benchmark_results.json exists, create simple bar chart
-    br = load_json(ROOT / 'benchmark_results.json')
+    br = load_json(ROOT / "benchmark_results.json")
     if isinstance(br, dict):
         # try to find numeric metrics keyed by benchmark name
         keys = []
@@ -204,17 +221,17 @@ def main():
         if keys:
             plt.figure()
             sns.barplot(x=vals, y=keys)
-            plt.title('Benchmark numeric metrics')
+            plt.title("Benchmark numeric metrics")
             plt.tight_layout()
-            plt.savefig(OUT / 'benchmarks.png')
+            plt.savefig(OUT / "benchmarks.png")
             plt.close()
 
     # Basic validation checks (example): assert that certain files exist
     checks = {
-        'all_metrics.json_exists': (ROOT / 'all_metrics.json').exists(),
-        'benchmark_results.json_exists': (ROOT / 'benchmark_results.json').exists(),
+        "all_metrics.json_exists": (ROOT / "all_metrics.json").exists(),
+        "benchmark_results.json_exists": (ROOT / "benchmark_results.json").exists(),
     }
-    with open(OUT / 'checks.json', 'w', encoding='utf-8') as f:
+    with open(OUT / "checks.json", "w", encoding="utf-8") as f:
         json.dump(checks, f, indent=2)
 
     # Summary printed as TAG=VALUE for downstream parsing
@@ -223,30 +240,32 @@ def main():
 
     # Save statistical summary
     if stats_summary:
-        with open(OUT / 'stats_summary.json', 'w', encoding='utf-8') as f:
+        with open(OUT / "stats_summary.json", "w", encoding="utf-8") as f:
             json.dump(stats_summary, f, indent=2)
 
         # Create a simple findings markdown file
         md = []
-        md.append('# Demo Findings and Key Results')
-        md.append('\n')
-        md.append('Author: Robert Ringler (Independent Researcher)')
-        md.append('\n')
-        md.append('This file summarizes simple statistical analyses computed from `aggregated_data.csv` where available.')
-        md.append('\n')
+        md.append("# Demo Findings and Key Results")
+        md.append("\n")
+        md.append("Author: Robert Ringler (Independent Researcher)")
+        md.append("\n")
+        md.append(
+            "This file summarizes simple statistical analyses computed from `aggregated_data.csv` where available."
+        )
+        md.append("\n")
         for col, s in stats_summary.items():
-            md.append(f'## {col}')
+            md.append(f"## {col}")
             md.append(f'- count: {s["count"]}')
             md.append(f'- mean: {s["mean"]:.6g}')
             md.append(f'- std: {s["std"]:.6g}')
-            lo, hi = s['ci95']
+            lo, hi = s["ci95"]
             if lo is not None:
-                md.append(f'- 95% bootstrap CI (mean): [{lo:.6g}, {hi:.6g}]')
-            md.append('\n')
+                md.append(f"- 95% bootstrap CI (mean): [{lo:.6g}, {hi:.6g}]")
+            md.append("\n")
 
-        with open(OUT / 'findings.md', 'w', encoding='utf-8') as f:
-            f.write('\n'.join(md))
+        with open(OUT / "findings.md", "w", encoding="utf-8") as f:
+            f.write("\n".join(md))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
